@@ -60,5 +60,5 @@ http.createServer((req, res) => {
   });
 
 }).listen(port, '0.0.0.0', () => {
-  console.log(Rukn Legal running on ${port});
+console.log('Rukn Legal running');
 });
