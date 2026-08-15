@@ -167,3 +167,13 @@
     grid-template-columns: 1fr;
   }
 }
+/* إصلاح ظهور أسماء المناطق وعلامة + */
+.region-accordion summary {
+  color: #111d2e !important;
+  background: #ffffff !important;
+}
+
+.region-accordion summary span {
+  color: #111d2e !important;
+  display: inline-block !important;
+}
