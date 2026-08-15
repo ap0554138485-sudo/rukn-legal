@@ -177,3 +177,24 @@
   color: #111d2e !important;
   display: inline-block !important;
 }
+/* إصلاح ظهور المدن والمناطق الفرعية */
+.region-cities span,
+.region-cities button {
+  color: #111d2e !important;
+  background: #f8f8f8 !important;
+  opacity: 1 !important;
+  visibility: visible !important;
+}/* كل منطقة مستقلة عند الفتح */
+.region-accordion {
+  display: block !important;
+}
+
+.region-accordion details {
+  width: 100% !important;
+  display: block !important;
+  margin-bottom: 12px !important;
+}
+
+.region-accordion details[open] {
+  display: block !important;
+}
