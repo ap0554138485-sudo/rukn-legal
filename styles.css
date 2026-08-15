@@ -104,3 +104,66 @@
     padding:15px;
   }
 }
+/* ===== تنسيق قائمة مناطق المملكة الـ 13 ===== */
+
+.region-accordion {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 12px;
+  margin-top: 20px;
+}
+
+.region-accordion details {
+  background: #ffffff;
+  border: 1px solid #d8d8d8;
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+.region-accordion summary {
+  padding: 16px;
+  font-weight: 700;
+  cursor: pointer;
+  list-style: none;
+  position: relative;
+}
+
+.region-accordion summary::-webkit-details-marker {
+  display: none;
+}
+
+.region-accordion summary span {
+  float: left;
+  font-size: 22px;
+  font-weight: bold;
+}
+
+.region-accordion details[open] summary span {
+  transform: rotate(45deg);
+}
+
+.region-cities {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 8px;
+  padding: 0 14px 14px;
+}
+
+.region-cities span,
+.region-cities button {
+  padding: 10px;
+  border-radius: 8px;
+  border: 1px solid #e5e5e5;
+  background: #f8f8f8;
+  text-align: center;
+}
+
+@media (max-width: 600px) {
+  .region-accordion {
+    grid-template-columns: 1fr;
+  }
+
+  .region-cities {
+    grid-template-columns: 1fr;
+  }
+}
