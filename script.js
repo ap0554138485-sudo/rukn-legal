@@ -9,4 +9,4 @@ document.querySelectorAll('[data-close-modal]').forEach(b=>b.addEventListener('c
 document.getElementById('backService').addEventListener('click',()=>{stepRegion.hidden=true;stepService.hidden=false});
 document.getElementById('menuBtn').addEventListener('click',()=>document.getElementById('nav').classList.toggle('open'));
 document.querySelectorAll('#nav a').forEach(a=>a.addEventListener('click',()=>document.getElementById('nav').classList.remove('open')));
-document.getElementById('langBtn')?.addEventListener('click',()=>{window.location.href='en.html';});
+document.getElementById('langBtn')?.addEventListener('click',()=>{window.location.href=window.location.pathname.endsWith('en.html')?'index.html':'en.html';});
