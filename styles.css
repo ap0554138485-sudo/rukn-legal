@@ -166,9 +166,9 @@ html[dir="ltr"] .service-card::after { content: "→"; right: 24px; left: auto; 
 .region-accordion summary span::before, .region-item summary span::before { content: "+"; font-size: 19px; font-weight: 400; }
 .region-accordion details[open] summary span, .region-item[open] summary span { transform: rotate(45deg); }
 .region-cities { display: flex; flex-wrap: wrap; gap: 7px; padding: 2px 16px 17px; }
-.region-cities span, .region-cities button, .other-region { min-height: 37px; display: inline-flex; align-items: center; justify-content: center; color: #526562 !important; background: #f4f1e9 !important; border: 1px solid #e5dfd3; border-radius: 999px; padding: 7px 13px; font-size: 12px; opacity: 1 !important; visibility: visible !important; }
-.region-cities button, .other-region { cursor: pointer; }
-.region-cities button:hover, .other-region:hover { color: var(--ink) !important; background: rgba(184, 146, 84, 0.15) !important; border-color: rgba(184, 146, 84, 0.5); }
+.region-cities span, .region-cities a, .region-cities button, .other-region { min-height: 37px; display: inline-flex; align-items: center; justify-content: center; color: #526562 !important; background: #f4f1e9 !important; border: 1px solid #e5dfd3; border-radius: 999px; padding: 7px 13px; font-size: 12px; text-decoration: none; opacity: 1 !important; visibility: visible !important; }
+.region-cities a, .region-cities button, .other-region { cursor: pointer; }
+.region-cities a:hover, .region-cities button:hover, .other-region:hover { color: var(--ink) !important; background: rgba(184, 146, 84, 0.15) !important; border-color: rgba(184, 146, 84, 0.5); }
 .region-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; }
 .region-card { background: var(--white); border: 1px solid var(--line); border-radius: var(--radius-sm); padding: 25px; }
 .region-card h3 { color: var(--ink); }
@@ -236,6 +236,20 @@ html[dir="ltr"] .modal-close { right: 18px; left: auto; }
 .card h3 { margin: 0 0 9px; color: var(--ink); }
 .section:not(.hero) .btn.primary { margin-top: 20px; color: #fff; background: var(--ink); border-color: var(--ink); }
 
+.breadcrumb { display: flex; align-items: center; gap: 9px; min-height: 48px; color: var(--muted); font-size: 12px; }
+.breadcrumb a { color: var(--ink-soft); }
+.local-hero { padding-top: clamp(68px, 8vw, 105px); }
+.coverage-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; }
+.coverage-panel { background: rgba(255, 253, 248, 0.82); border: 1px solid var(--line); border-radius: var(--radius-sm); padding: clamp(24px, 3.5vw, 36px); }
+.coverage-panel-wide { grid-column: 1 / -1; }
+.coverage-panel h3 { margin: 0 0 18px; color: var(--ink); font-size: 22px; }
+.coverage-panel p { margin: 0; color: var(--muted); line-height: 1.9; }
+.location-list, .road-list { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 9px; margin: 0; padding: 0; list-style: none; }
+.location-list li, .road-list li { position: relative; min-height: 42px; display: flex; align-items: center; color: var(--ink-soft); background: var(--paper); border: 1px solid var(--line); border-radius: 10px; padding: 9px 31px 9px 11px; font-size: 13px; }
+.location-list li::before, .road-list li::before { content: ""; position: absolute; right: 13px; width: 7px; height: 7px; background: var(--gold); border-radius: 50%; }
+.road-list { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.coverage-note { margin-top: 18px !important; padding-top: 16px; border-top: 1px solid var(--line); font-size: 13px; }
+
 @media (max-width: 1020px) {
   .nav { gap: 18px; }
   .header-cta { display: none; }
@@ -261,6 +275,7 @@ html[dir="ltr"] .modal-close { right: 18px; left: auto; }
   .process-step:first-child { border-top: 0; }
   .process-step h3 { margin-top: 22px; }
   .footer-grid { grid-template-columns: 1fr; gap: 28px; }
+  .location-list { grid-template-columns: repeat(3, minmax(0, 1fr)); }
 }
 
 @media (max-width: 620px) {
@@ -281,7 +296,9 @@ html[dir="ltr"] .modal-close { right: 18px; left: auto; }
   .mini-list { grid-template-columns: 1fr; }
   .section { padding: 72px 0; }
   .section-head { margin-bottom: 30px; }
-  .cards-grid, .region-accordion, .region-grid, .cards, .option-grid { grid-template-columns: 1fr; }
+  .cards-grid, .region-accordion, .region-grid, .cards, .option-grid, .coverage-grid { grid-template-columns: 1fr; }
+  .coverage-panel-wide { grid-column: auto; }
+  .location-list, .road-list { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .service-card { min-height: 235px; }
   .contact-card { align-items: flex-start; flex-direction: column; }
   .contact-card .primary-btn { width: 100%; }
