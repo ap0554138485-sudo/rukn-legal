@@ -1,0 +1,13 @@
+# Dependencies and generated files
+node_modules/
+*.log
+
+# Local secrets and machine-specific deployment settings
+.env
+.env.*
+!.env.example
+.deployment.local.*
+
+# Operating-system files
+.DS_Store
+Thumbs.db
