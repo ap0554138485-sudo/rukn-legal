@@ -5,7 +5,55 @@ const menuButton = document.getElementById("menuBtn");
 const nav = document.getElementById("nav");
 
 let selectedService = "";
+let selectedRegion = "";
 let lastFocusedElement = null;
+
+function updateSelectedRegionNotice() {
+  document.querySelectorAll("[data-selected-region]").forEach((notice) => {
+    notice.hidden = !selectedRegion;
+    if (!selectedRegion) return;
+
+    const isEnglish = document.documentElement.lang === "en";
+    notice.textContent = isEnglish
+      ? `Selected location: ${selectedRegion}. Now choose the required service.`
+      : `الموقع المختار: ${selectedRegion} — اختر الآن الخدمة المطلوبة.`;
+  });
+}
+
+function getInteractionLocation(element) {
+  if (element.closest(".whatsapp-float")) return "floating_button";
+  if (element.closest(".topbar")) return "topbar";
+  if (element.closest("header")) return "header";
+  if (element.closest(".hero")) return "hero";
+  if (element.closest(".contact-section, #contact")) return "contact_section";
+  if (element.closest("footer")) return "footer";
+  if (element.closest("#serviceModal")) return "service_modal";
+  return "page";
+}
+
+function trackEvent(eventName, parameters = {}) {
+  const eventParameters = {
+    page_language: document.documentElement.lang || "ar",
+    page_path: window.location.pathname,
+    transport_type: "beacon",
+    ...parameters,
+  };
+
+  if (typeof window.gtag === "function") {
+    window.gtag("event", eventName, eventParameters);
+    return;
+  }
+
+  window.dataLayer = window.dataLayer || [];
+  window.dataLayer.push({ event: eventName, ...eventParameters });
+}
+
+function trackLead(contactMethod, parameters = {}) {
+  trackEvent("generate_lead", {
+    contact_method: contactMethod,
+    ...parameters,
+  });
+}
 
 function showServiceStep() {
   if (!stepService || !stepRegion) return;
@@ -20,11 +68,13 @@ function showRegionStep() {
   stepRegion.scrollTop = 0;
 }
 
-function openModal(service = "", trigger = null) {
+function openModal(service = "", trigger = null, region = "") {
   if (!modal) return;
 
   lastFocusedElement = trigger || document.activeElement;
   selectedService = service;
+  selectedRegion = region;
+  updateSelectedRegionNotice();
   service ? showRegionStep() : showServiceStep();
 
   modal.classList.add("open");
@@ -32,6 +82,24 @@ function openModal(service = "", trigger = null) {
   document.body.style.overflow = "hidden";
 
   window.setTimeout(() => modal.querySelector(".modal-close")?.focus(), 50);
+}
+
+function submitRequest(region) {
+  const isEnglish = document.documentElement.lang === "en";
+  const message = isEnglish
+    ? `Hello, I would like to request ${selectedService || "a legal service"} in ${region}. Please share the next steps.`
+    : `مرحبًا، أرغب بطلب ${selectedService || "خدمة قانونية"} في ${region}. أرجو تزويدي بالخطوات والمتطلبات.`;
+
+  trackLead("whatsapp", {
+    contact_location: "service_modal",
+    service_name: selectedService || "unspecified",
+    service_region: region || "unspecified",
+  });
+
+  const contactUrl = `https://wa.me/966506142113?text=${encodeURIComponent(message)}`;
+  const contactWindow = window.open(contactUrl, "_blank", "noopener,noreferrer");
+  if (contactWindow) contactWindow.opener = null;
+  closeModal();
 }
 
 function closeModal() {
@@ -50,16 +118,48 @@ function closeMenu() {
 }
 
 document.querySelectorAll("[data-open-service]").forEach((button) => {
-  button.addEventListener("click", () => openModal("", button));
+  button.addEventListener("click", () => {
+    trackEvent("service_request_start", {
+      contact_location: getInteractionLocation(button),
+    });
+    openModal("", button);
+  });
+});
+
+document.querySelectorAll("[data-start-region]").forEach((button) => {
+  button.addEventListener("click", () => {
+    const region = button.dataset.startRegion || "";
+    trackEvent("region_selected", {
+      contact_location: "regions_section",
+      service_region: region || "unspecified",
+    });
+    openModal("", button, region);
+  });
 });
 
 document.querySelectorAll(".service-card").forEach((button) => {
-  button.addEventListener("click", () => openModal(button.dataset.service || "", button));
+  button.addEventListener("click", () => {
+    const serviceName = button.dataset.service || "unspecified";
+    trackEvent("service_request_start", {
+      contact_location: "services_section",
+      service_name: serviceName,
+    });
+    openModal(button.dataset.service || "", button);
+  });
 });
 
 document.querySelectorAll("[data-modal-service]").forEach((button) => {
   button.addEventListener("click", () => {
     selectedService = button.dataset.modalService || "";
+    trackEvent("service_selected", {
+      contact_location: "service_modal",
+      service_name: selectedService || "unspecified",
+    });
+    if (selectedRegion) {
+      submitRequest(selectedRegion);
+      return;
+    }
+
     showRegionStep();
   });
 });
@@ -67,12 +167,30 @@ document.querySelectorAll("[data-modal-service]").forEach((button) => {
 document.querySelectorAll("[data-region]").forEach((button) => {
   button.addEventListener("click", () => {
     const region = button.dataset.region || "";
-    const isEnglish = document.documentElement.lang === "en";
-    const message = isEnglish
-      ? `Hello, I would like to request ${selectedService || "a legal service"} in ${region}. Please share the next steps.`
-      : `مرحبًا، أرغب بطلب ${selectedService || "خدمة قانونية"} في منطقة ${region}. أرجو تزويدي بالخطوات والمتطلبات.`;
-    const contactWindow = window.open(`https://wa.me/966506142113?text=${encodeURIComponent(message)}`, "_blank", "noopener,noreferrer");
-    if (contactWindow) contactWindow.opener = null;
+    submitRequest(region);
+  });
+});
+
+document.addEventListener("click", (event) => {
+  const eventTarget = typeof event.target?.closest === "function" ? event.target : event.target?.parentElement;
+  const link = eventTarget?.closest("a[href]");
+  if (!link) return;
+
+  const href = link.getAttribute("href") || "";
+  let contactMethod = "";
+
+  if (href.startsWith("https://wa.me/") || href.startsWith("http://wa.me/")) {
+    contactMethod = "whatsapp";
+  } else if (href.startsWith("tel:")) {
+    contactMethod = "phone";
+  } else if (href.startsWith("mailto:")) {
+    contactMethod = "email";
+  }
+
+  if (!contactMethod) return;
+
+  trackLead(contactMethod, {
+    contact_location: getInteractionLocation(link),
   });
 });
 
