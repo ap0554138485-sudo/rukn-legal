@@ -73,10 +73,18 @@
   <link rel="stylesheet" href="styles.css" />
 </head>
 <body>
+  <div class="topbar">
+    <div class="container topbar-inner">
+      <p class="topbar-status">نستقبل الطلبات القانونية من جميع مناطق المملكة</p>
+      <p>تواصل مباشر: <a href="tel:+966506142113" dir="ltr">+966 50 614 2113</a></p>
+    </div>
+  </div>
   <header class="site-header">
     <div class="container nav-wrap">
       <a class="brand" href="#home" aria-label="رُكن الأنظمة القانونية">
-        <div class="brand-mark">⚖</div>
+        <div class="brand-mark">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v18M5 21h14M4 7h16M6 7l-3 7m3-7 3 7m9 0-3-7-3 7M2 14h8a4 4 0 0 1-8 0Zm12 0h8a4 4 0 0 1-8 0Z"/></svg>
+        </div>
         <div>
           <strong>رُكن الأنظمة القانونية</strong>
           <span>LEGAL SYSTEMS CORNER</span>
@@ -91,7 +99,8 @@
       </nav>
       <div class="nav-actions">
         <button id="langBtn" class="ghost-btn" type="button">EN</button>
-        <button id="menuBtn" class="menu-btn" type="button" aria-label="القائمة">☰</button>
+        <button class="header-cta" type="button" data-open-service>طلب استشارة</button>
+        <button id="menuBtn" class="menu-btn" type="button" aria-label="القائمة" aria-expanded="false" aria-controls="nav">☰</button>
       </div>
     </div>
   </header>
@@ -100,28 +109,30 @@
     <section id="home" class="hero">
       <div class="container hero-grid">
         <div class="hero-copy">
-          <span class="eyebrow">خدمات قانونية في جميع مناطق المملكة</span>
-          <h1>استشارات قانونية<br><span>بثقة واحترافية</span></h1>
-          <p>حلول قانونية واضحة، متابعة للقضايا، مراجعة للعقود، وخدمات قانونية تساعدك على اتخاذ القرار المناسب بسرعة وخصوصية.</p>
+          <span class="eyebrow">حلول قانونية للأفراد والمنشآت</span>
+          <h1>خبرة قانونية<br><span>تحمي مصالحك</span></h1>
+          <p>نقدّم قراءة واضحة لموقفك القانوني، ونساعدك في القضايا والعقود والمطالبات بخطوات عملية تراعي الدقة والخصوصية.</p>
           <div class="hero-actions">
-            <button class="primary-btn" data-open-service>ابدأ بطلب خدمة</button>
-            <a class="secondary-btn" href="#services">استعرض الخدمات</a>
+            <button class="primary-btn" data-open-service>اطلب تقييمًا أوليًا</button>
+            <a class="secondary-btn" href="#services">تعرّف على خدماتنا</a>
           </div>
           <div class="trust-row">
-            <div><b>24/7</b><span>استقبال الطلبات</span></div>
-            <div><b>سرية</b><span>وخصوصية</span></div>
-            <div><b>المملكة</b><span>تغطية واسعة</span></div>
+            <div><b>13 منطقة</b><span>تغطية المملكة</span></div>
+            <div><b>خصوصية</b><span>لبيانات الطلب</span></div>
+            <div><b>استجابة</b><span>بمسار واضح</span></div>
           </div>
         </div>
         <div class="hero-card">
-          <div class="hero-card-icon">⚖</div>
-          <h3>خدمة قانونية تبدأ من احتياجك</h3>
-          <p>اختر نوع الخدمة والمنطقة، ثم انتقل مباشرة إلى التواصل لإرسال التفاصيل.</p>
+          <div class="hero-card-icon">
+            <svg viewBox="0 0 24 24" width="30" height="30" fill="none" stroke="currentColor" stroke-width="1.35" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v18M5 21h14M4 7h16M6 7l-3 7m3-7 3 7m9 0-3-7-3 7M2 14h8a4 4 0 0 1-8 0Zm12 0h8a4 4 0 0 1-8 0Z"/></svg>
+          </div>
+          <h3>وضوح قانوني من أول خطوة</h3>
+          <p>حدّد نوع الخدمة وموقعك، وسنجهّز لك قناة تواصل مباشرة لعرض تفاصيل الطلب بصورة منظّمة.</p>
           <div class="mini-list">
-            <span>✓ استشارات قانونية</span>
-            <span>✓ متابعة القضايا</span>
-            <span>✓ مراجعة العقود</span>
-            <span>✓ الوكالات والإجراءات</span>
+            <span>✓ تقييم أولي للطلب</span>
+            <span>✓ تواصل مباشر</span>
+            <span>✓ سرية وخصوصية</span>
+            <span>✓ تغطية شاملة</span>
           </div>
         </div>
       </div>
@@ -135,14 +146,29 @@
           <p>اختر الخدمة المناسبة، وبعدها حدد منطقتك ليتم تجهيز رسالة التواصل تلقائيًا.</p>
         </div>
         <div class="cards-grid">
-         <button class="service-card" data-service="استشارة قانونية"><span>⚖️</span><h3>استشارة قانونية</h3><p>استشارات قانونية لفهم موقفك والخيارات والإجراءات المناسبة.</p></button>
-<button class="service-card" data-service="القضايا والترافع"><span>📋</span><h3>القضايا والترافع</h3><p>دراسة القضايا ومتابعتها وإعداد المتطلبات القانونية اللازمة.</p></button>
-<button class="service-card" data-service="صياغة المذكرات والاعتراضات"><span>📝</span><h3>صياغة المذكرات والاعتراضات</h3><p>صياغة ومراجعة المذكرات واللوائح والاعتراضات القانونية.</p></button>
-<button class="service-card" data-service="العقود والاتفاقيات"><span>📄</span><h3>العقود والاتفاقيات</h3><p>صياغة ومراجعة العقود والاتفاقيات وتوضيح الالتزامات والبنود.</p></button>
-<button class="service-card" data-service="الشركات والأعمال"><span>🏢</span><h3>الشركات والأعمال</h3><p>خدمات قانونية للشركات والمنشآت والأعمال التجارية.</p></button>
-<button class="service-card" data-service="التنفيذ والمطالبات"><span>⚡</span><h3>التنفيذ والمطالبات</h3><p>خدمات متعلقة بالتنفيذ والمطالبات والإجراءات القانونية المرتبطة بها.</p></button>
-<button class="service-card" data-service="الوكالات والتوثيق"><span>✍️</span><h3>الوكالات والتوثيق</h3><p>خدمات الوكالات والتوثيق وما يرتبط بها من إجراءات.</p></button>
-<button class="service-card" data-service="خدمات قانونية أخرى"><span>⚖️</span><h3>خدمات قانونية أخرى</h3><p>طلبات وخدمات قانونية أخرى بحسب طبيعة الحالة والاحتياج.</p></button>
+         <button class="service-card" data-service="استشارة قانونية"><span>01</span><h3>استشارة قانونية</h3><p>استشارات قانونية لفهم موقفك والخيارات والإجراءات المناسبة.</p></button>
+<button class="service-card" data-service="القضايا والترافع"><span>02</span><h3>القضايا والترافع</h3><p>دراسة القضايا ومتابعتها وإعداد المتطلبات القانونية اللازمة.</p></button>
+<button class="service-card" data-service="صياغة المذكرات والاعتراضات"><span>03</span><h3>صياغة المذكرات والاعتراضات</h3><p>صياغة ومراجعة المذكرات واللوائح والاعتراضات القانونية.</p></button>
+<button class="service-card" data-service="العقود والاتفاقيات"><span>04</span><h3>العقود والاتفاقيات</h3><p>صياغة ومراجعة العقود والاتفاقيات وتوضيح الالتزامات والبنود.</p></button>
+<button class="service-card" data-service="الشركات والأعمال"><span>05</span><h3>الشركات والأعمال</h3><p>خدمات قانونية للشركات والمنشآت والأعمال التجارية.</p></button>
+<button class="service-card" data-service="التنفيذ والمطالبات"><span>06</span><h3>التنفيذ والمطالبات</h3><p>خدمات متعلقة بالتنفيذ والمطالبات والإجراءات القانونية المرتبطة بها.</p></button>
+<button class="service-card" data-service="الوكالات والتوثيق"><span>07</span><h3>الوكالات والتوثيق</h3><p>خدمات الوكالات والتوثيق وما يرتبط بها من إجراءات.</p></button>
+<button class="service-card" data-service="خدمات قانونية أخرى"><span>08</span><h3>خدمات قانونية أخرى</h3><p>طلبات وخدمات قانونية أخرى بحسب طبيعة الحالة والاحتياج.</p></button>
+        </div>
+      </div>
+    </section>
+
+    <section class="section process-section" aria-labelledby="process-title">
+      <div class="container">
+        <div class="section-head">
+          <span class="eyebrow">آلية العمل</span>
+          <h2 id="process-title">مسار واضح لطلبك القانوني</h2>
+          <p>ثلاث خطوات مختصرة تساعدنا على فهم احتياجك وتوجيهه إلى الخدمة المناسبة.</p>
+        </div>
+        <div class="process-grid">
+          <article class="process-step"><span class="process-number">01</span><h3>حدّد نوع الخدمة</h3><p>اختر المجال الأقرب إلى طلبك، سواء كان استشارة أو قضية أو عقدًا أو مطالبة.</p></article>
+          <article class="process-step"><span class="process-number">02</span><h3>شارك المعلومات الأساسية</h3><p>اذكر المنطقة وملخصًا موجزًا للموضوع دون إرسال بيانات شديدة الحساسية.</p></article>
+          <article class="process-step"><span class="process-number">03</span><h3>استلم التوجيه المناسب</h3><p>يتم توجيهك إلى الخطوة التالية والمتطلبات اللازمة بحسب طبيعة الطلب.</p></article>
         </div>
       </div>
     </section>
@@ -331,8 +357,8 @@
       <div class="container contact-card">
         <div>
           <span class="eyebrow">تواصل معنا</span>
-          <h2>ابدأ طلبك القانوني الآن</h2>
-          <p>اختر الخدمة والمنطقة وسنجهز لك رسالة واتساب تلقائيًا.</p>
+          <h2>قضيتك تستحق بداية واضحة</h2>
+          <p>حدّد الخدمة والمنطقة وسنجهّز لك رسالة تواصل منظّمة لعرض طلبك.</p>
         </div>
         <button class="primary-btn" data-open-service>اختيار الخدمة والمنطقة</button>
       </div>
@@ -341,14 +367,14 @@
 
   <footer class="footer">
     <div class="container footer-grid">
-      <div><strong>رُكن الأنظمة القانونية</strong><p>خدمات قانونية رقمية بواجهة واضحة وتجربة سهلة.</p></div>
+      <div><strong>رُكن الأنظمة القانونية</strong><p>حلول قانونية عملية للأفراد والمنشآت، بتواصل واضح يراعي الدقة والخصوصية.</p></div>
       <div><b>التواصل</b><a href="tel:+966506142113">050 614 2113</a><a href="mailto:ap0554138485@icloud.com">ap0554138485@icloud.com</a></div>
       <div><b>روابط سريعة</b><a href="#services">الخدمات</a><a href="legal-consultation-tabuk.html">استشارات قانونية في تبوك</a><a href="#faq">الأسئلة الشائعة</a><a href="en.html" hreflang="en" lang="en">English</a></div>
     </div>
     <div class="container copyright">© 2026 رُكن الأنظمة القانونية. جميع الحقوق محفوظة.</div>
   </footer>
 
-  <a class="whatsapp-float" href="https://wa.me/966506142113?text=%D9%85%D8%B1%D8%AD%D8%A8%D8%A7%D8%8C%20%D8%A3%D8%B1%D8%BA%D8%A8%20%D8%A8%D8%B7%D9%84%D8%A8%20%D8%AE%D8%AF%D9%85%D8%A9%20%D9%82%D8%A7%D9%86%D9%88%D9%86%D9%8A%D8%A9" target="_blank" rel="noopener" aria-label="واتساب">✆</a>
+  <a class="whatsapp-float" href="https://wa.me/966506142113?text=%D9%85%D8%B1%D8%AD%D8%A8%D8%A7%D8%8C%20%D8%A3%D8%B1%D8%BA%D8%A8%20%D8%A8%D8%B7%D9%84%D8%A8%20%D8%AE%D8%AF%D9%85%D8%A9%20%D9%82%D8%A7%D9%86%D9%88%D9%86%D9%8A%D8%A9" target="_blank" rel="noopener" aria-label="واتساب"><svg viewBox="0 0 24 24" width="25" height="25" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 11.5a8.4 8.4 0 0 1-9 8.5 9.3 9.3 0 0 1-3.8-.8L3 21l1.8-5A8.5 8.5 0 1 1 21 11.5Z"/><path d="M8.2 8.1c.5 3.1 2.6 5.2 5.7 5.7l1.2-1.3 2 .5c-.4 2-1.7 3-3.4 2.8-3.8-.5-7-3.7-7.5-7.5C6 6.6 7 5.3 9 4.9l.5 2-1.3 1.2Z"/></svg></a>
 
   <div class="modal" id="serviceModal" aria-hidden="true">
     <div class="modal-backdrop" data-close-modal></div>
