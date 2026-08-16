@@ -284,6 +284,8 @@ html[dir="ltr"] .modal-close { right: 18px; left: auto; }
 .specialty-card::after { content: attr(data-number); position: absolute; left: 17px; bottom: -14px; color: rgba(184, 146, 84, 0.09); font-family: "Manrope", sans-serif; font-size: 72px; font-weight: 700; line-height: 1; }
 .specialty-card:hover { border-color: rgba(184, 146, 84, 0.58); box-shadow: var(--shadow-sm); transform: translateY(-4px); }
 .specialty-card h3 { position: relative; z-index: 1; margin: 0 0 10px; color: var(--ink); font-size: 20px; }
+.specialty-card h3 a { color: inherit; text-decoration: none; }
+.specialty-card h3 a:hover { color: var(--gold); }
 .specialty-card p { position: relative; z-index: 1; margin: 0; color: var(--muted); font-size: 14px; }
 .prep-layout { display: grid; grid-template-columns: minmax(0, 0.8fr) minmax(0, 1.2fr); gap: clamp(30px, 6vw, 80px); align-items: start; }
 .prep-intro { position: sticky; top: 115px; }
