@@ -223,3 +223,47 @@ document.addEventListener("keydown", (event) => {
 document.getElementById("langBtn")?.addEventListener("click", () => {
   window.location.href = document.documentElement.lang === "en" ? "index.html" : "en.html";
 });
+
+const locationDirectorySearch = document.getElementById("locationDirectorySearch");
+const locationDirectoryCount = document.getElementById("locationDirectoryCount");
+const locationDirectoryEmpty = document.getElementById("locationDirectoryEmpty");
+
+function normalizeArabicSearch(value) {
+  return String(value || "")
+    .trim()
+    .toLowerCase()
+    .replace(/[\u064B-\u065F\u0670]/g, "")
+    .replace(/[أإآ]/g, "ا")
+    .replace(/ى/g, "ي")
+    .replace(/ة/g, "ه")
+    .replace(/ـ/g, "");
+}
+
+function filterLocationDirectory() {
+  if (!locationDirectorySearch) return;
+
+  const query = normalizeArabicSearch(locationDirectorySearch.value);
+  let visibleCount = 0;
+
+  document.querySelectorAll("[data-location-group]").forEach((group) => {
+    const heading = normalizeArabicSearch(group.querySelector("h3")?.textContent);
+    const showWholeGroup = Boolean(query && heading.includes(query));
+    let groupVisibleCount = 0;
+
+    group.querySelectorAll("[data-location-item]").forEach((item) => {
+      const isVisible = !query || showWholeGroup || normalizeArabicSearch(item.textContent).includes(query);
+      item.hidden = !isVisible;
+      if (isVisible) groupVisibleCount += 1;
+    });
+
+    group.hidden = groupVisibleCount === 0;
+    visibleCount += groupVisibleCount;
+  });
+
+  if (locationDirectoryCount) {
+    locationDirectoryCount.textContent = `${visibleCount} ${visibleCount === 1 ? "مركز ظاهر" : "مركزًا ظاهرًا"}`;
+  }
+  if (locationDirectoryEmpty) locationDirectoryEmpty.hidden = visibleCount !== 0;
+}
+
+locationDirectorySearch?.addEventListener("input", filterLocationDirectory);
