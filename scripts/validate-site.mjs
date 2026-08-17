@@ -44,12 +44,18 @@ for (const file of files) {
 const sitemap = readFileSync(resolve(root, "sitemap.xml"), "utf8");
 const sitemapCount = [...sitemap.matchAll(/<loc>/g)].length;
 const sitemapLocations = [...sitemap.matchAll(/<loc>([^<]+)<\/loc>/g)].map((match) => match[1]);
+let indexableCount = 0;
 for (const file of files) {
+  const html = readFileSync(resolve(root, file), "utf8");
+  const isNoindex = /<meta name="robots" content="[^"]*noindex/i.test(html);
+  if (isNoindex) continue;
+  indexableCount += 1;
   const expected = file === "index.html" ? "https://rukn-legal-vwptio.cranl.net/" : `https://rukn-legal-vwptio.cranl.net/${file}`;
   if (!sitemapLocations.includes(expected)) errors.push(`${file}: not listed in sitemap.xml`);
 }
 
 console.log(`Public pages: ${files.length}`);
+console.log(`Indexable pages: ${indexableCount}`);
 console.log(`Sitemap URLs: ${sitemapCount}`);
 console.log(`Errors: ${errors.length}`);
 if (errors.length) {
