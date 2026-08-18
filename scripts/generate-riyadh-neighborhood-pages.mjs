@@ -246,7 +246,7 @@ function render(page) {
   const [methodTitle, methodText] = pageVariant(page);
   const message = `السلام عليكم، أرغب في خدمة قانونية من حي ${page.name} بالرياض. نوع الطلب ومرحلته: `;
   const title = `خدمات قانونية في حي ${page.name} بالرياض | ${page.primary.short} و${page.secondary.short}`;
-  const description = `خدمات قانونية إلكترونية لسكان حي ${page.name} بالرياض، بتركيز على ${page.primary.label} و${page.secondary.label}، مع خطوات تجهيز الطلب والأسئلة الشائعة دون ادعاء وجود فرع.`;
+  const description = `خدمات قانونية في حي ${page.name} بالرياض تشمل ${page.primary.short} و${page.secondary.short}، مع خطوات عملية لتجهيز الطلب واستقبال إلكتروني من الحي دون ادعاء وجود فرع.`;
   const faqs = [
     [`ما نقطة البداية لطلب ${page.primary.short} من حي ${page.name}؟`, `${page.firstStep} ويمكن بدء الاستقبال إلكترونيًا بذكر الحي والمرحلة والموعد المهم.`],
     [`متى يكون مسار ${page.secondary.short} هو الأنسب؟`, `${page.secondary.intro} ويتحدد الاختيار النهائي بعد الاطلاع على الصفة والمستند والنتيجة المطلوبة.`],
@@ -282,15 +282,16 @@ for (const page of pages) writeFileSync(resolve(root, page.slug), render(page), 
 function updateSitemap() {
   const sitemapPath = resolve(root, "sitemap.xml");
   let sitemap = readFileSync(sitemapPath, "utf8");
-  const removePaths = [...riyadhServiceSlugs, ...pages.map((page) => page.slug)];
-  for (const path of removePaths) {
-    const escaped = `${baseUrl}/${path}`.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
-    sitemap = sitemap.replace(new RegExp(`\\s*<url>\\s*<loc>${escaped}<\\/loc>[\\s\\S]*?<\\/url>`, "g"), "");
-  }
   const serviceEntries = riyadhServiceSlugs.map((slug) => `  <url>\n    <loc>${baseUrl}/${slug}</loc>\n    <lastmod>2026-08-18</lastmod>\n    <changefreq>weekly</changefreq>\n    <priority>0.8</priority>\n  </url>`);
   const neighborhoodEntries = pages.map((page) => `  <url>\n    <loc>${baseUrl}/${page.slug}</loc>\n    <lastmod>2026-08-18</lastmod>\n    <changefreq>weekly</changefreq>\n    <priority>0.7</priority>\n  </url>`);
-  const entries = [...serviceEntries, ...neighborhoodEntries].join("\n");
-  sitemap = sitemap.replace("</urlset>", `${entries}\n</urlset>`);
+  for (const entry of [...serviceEntries, ...neighborhoodEntries]) {
+    const location = entry.match(/<loc>([^<]+)<\/loc>/)?.[1];
+    const escaped = location.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+    const pattern = new RegExp(`\\s*<url>\\s*<loc>${escaped}<\\/loc>[\\s\\S]*?<\\/url>`);
+    sitemap = pattern.test(sitemap)
+      ? sitemap.replace(pattern, `\n${entry}`)
+      : sitemap.replace("</urlset>", `${entry}\n</urlset>`);
+  }
   writeFileSync(sitemapPath, sitemap, "utf8");
 }
 
