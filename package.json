@@ -9,7 +9,8 @@
     "generate:jeddah": "node scripts/generate-jeddah-wave3.js",
     "generate:wave3": "node scripts/generate-jeddah-wave3.js",
     "generate:dammam": "node scripts/generate-dammam-waves.mjs",
-    "check:dammam": "node scripts/check-dammam-waves.mjs"
+    "check:dammam": "node scripts/check-dammam-waves.mjs",
+    "audit:seo": "node scripts/audit-seo.mjs"
   },
   "engines": {"node": ">=18"}
 }

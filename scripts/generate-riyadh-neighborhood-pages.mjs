@@ -6,6 +6,16 @@ const baseUrl = "https://rukn-legal-vwptio.cranl.net";
 const phone = "+966506142113";
 const displayPhone = "+966 50 614 2113";
 const email = "ap0554138485@icloud.com";
+const riyadhServiceSlugs = [
+  "lawyer-riyadh.html",
+  "criminal-lawyer-riyadh.html",
+  "family-lawyer-riyadh.html",
+  "commercial-lawyer-riyadh.html",
+  "labor-lawyer-riyadh.html",
+  "execution-lawyer-riyadh.html",
+  "contracts-lawyer-riyadh.html",
+  "real-estate-lawyer-riyadh.html",
+];
 
 const topics = {
   contracts: {
@@ -272,13 +282,14 @@ for (const page of pages) writeFileSync(resolve(root, page.slug), render(page), 
 function updateSitemap() {
   const sitemapPath = resolve(root, "sitemap.xml");
   let sitemap = readFileSync(sitemapPath, "utf8");
-  const excludedDrafts = ["lawyer-riyadh.html", "criminal-lawyer-riyadh.html", "family-lawyer-riyadh.html", "commercial-lawyer-riyadh.html", "labor-lawyer-riyadh.html", "execution-lawyer-riyadh.html", "contracts-lawyer-riyadh.html", "real-estate-lawyer-riyadh.html"];
-  const removePaths = [...excludedDrafts, ...pages.map((page) => page.slug)];
+  const removePaths = [...riyadhServiceSlugs, ...pages.map((page) => page.slug)];
   for (const path of removePaths) {
     const escaped = `${baseUrl}/${path}`.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
     sitemap = sitemap.replace(new RegExp(`\\s*<url>\\s*<loc>${escaped}<\\/loc>[\\s\\S]*?<\\/url>`, "g"), "");
   }
-  const entries = pages.map((page) => `  <url>\n    <loc>${baseUrl}/${page.slug}</loc>\n    <lastmod>2026-08-17</lastmod>\n    <changefreq>weekly</changefreq>\n    <priority>0.7</priority>\n  </url>`).join("\n");
+  const serviceEntries = riyadhServiceSlugs.map((slug) => `  <url>\n    <loc>${baseUrl}/${slug}</loc>\n    <lastmod>2026-08-18</lastmod>\n    <changefreq>weekly</changefreq>\n    <priority>0.8</priority>\n  </url>`);
+  const neighborhoodEntries = pages.map((page) => `  <url>\n    <loc>${baseUrl}/${page.slug}</loc>\n    <lastmod>2026-08-18</lastmod>\n    <changefreq>weekly</changefreq>\n    <priority>0.7</priority>\n  </url>`);
+  const entries = [...serviceEntries, ...neighborhoodEntries].join("\n");
   sitemap = sitemap.replace("</urlset>", `${entries}\n</urlset>`);
   writeFileSync(sitemapPath, sitemap, "utf8");
 }
