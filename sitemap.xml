@@ -403,4 +403,60 @@
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
+  <!-- JEDDAH_WAVE3_START -->
+  <url>
+    <loc>https://rukn-legal-vwptio.cranl.net/legal-services-jeddah.html</loc>
+    <lastmod>2026-08-18</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.9</priority>
+  </url>
+  <url>
+    <loc>https://rukn-legal-vwptio.cranl.net/lawyer-jeddah.html</loc>
+    <lastmod>2026-08-18</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://rukn-legal-vwptio.cranl.net/criminal-lawyer-jeddah.html</loc>
+    <lastmod>2026-08-18</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://rukn-legal-vwptio.cranl.net/family-lawyer-jeddah.html</loc>
+    <lastmod>2026-08-18</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://rukn-legal-vwptio.cranl.net/commercial-lawyer-jeddah.html</loc>
+    <lastmod>2026-08-18</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://rukn-legal-vwptio.cranl.net/labor-lawyer-jeddah.html</loc>
+    <lastmod>2026-08-18</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://rukn-legal-vwptio.cranl.net/execution-lawyer-jeddah.html</loc>
+    <lastmod>2026-08-18</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://rukn-legal-vwptio.cranl.net/contracts-lawyer-jeddah.html</loc>
+    <lastmod>2026-08-18</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://rukn-legal-vwptio.cranl.net/real-estate-lawyer-jeddah.html</loc>
+    <lastmod>2026-08-18</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <!-- JEDDAH_WAVE3_END -->
 </urlset>

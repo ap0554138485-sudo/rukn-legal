@@ -5,7 +5,9 @@
   "description": "Rukn Legal website",
   "scripts": {
     "start": "node server.js",
-    "generate:riyadh": "node scripts/generate-riyadh-wave2.js"
+    "generate:riyadh": "node scripts/generate-riyadh-wave2.js",
+    "generate:jeddah": "node scripts/generate-jeddah-wave3.js",
+    "generate:wave3": "node scripts/generate-jeddah-wave3.js"
   },
   "engines": {"node": ">=18"}
 }
