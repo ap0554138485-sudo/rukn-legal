@@ -7,7 +7,7 @@ const releaseDate = "2026-08-21";
 const phone = "+966506142113";
 const displayPhone = "+966 50 614 2113";
 const email = "ap0554138485@icloud.com";
-const assetVersion = "20260821b";
+const assetVersion = "20260821c";
 const stylesheetFile = `styles-${assetVersion}.css`;
 const fontStylesheet = "https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@400;500;600;700&family=Manrope:wght@400;500;600;700&display=swap";
 
