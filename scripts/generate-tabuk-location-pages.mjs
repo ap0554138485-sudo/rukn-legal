@@ -11,7 +11,9 @@ const locations = [
     slug: "lawyer-duba.html",
     name: "ضباء",
     symbol: "ض",
-    meta: "طلب محامي في ضباء للخدمات والقضايا والعقود والتنفيذ والأحوال الشخصية. استقبال الطلبات إلكترونيًا من مدينة ضباء وشرما والمويلح والمراكز والقرى التابعة.",
+    title: "محامي في ضباء | عقود وتنفيذ وقضايا أسرية",
+    meta: "محامي في ضباء للعقود والتنفيذ والقضايا الأسرية والعقار، مع استقبال الطلبات إلكترونيًا من ضباء وشرما والمويلح والمراكز التابعة.",
+    ogDescription: "خدمات قانونية في ضباء للعقود والتنفيذ والأسرة والعقار مع استقبال إلكتروني من المحافظة ومراكزها.",
     intro: "صفحة محلية لبدء طلب محامٍ في محافظة ضباء، تربط موقعك بنوع القضية ومرحلتها بدل الاكتفاء بعبارة عامة. اذكر هل الطلب متعلق بعقد أو مطالبة أو أسرة أو تنفيذ، ثم حدّد المدينة أو المركز أو الطريق الأقرب.",
     contextTitle: "خدمة قانونية تراعي طبيعة محافظة ضباء",
     context: "يمتد نطاق الطلبات من مدينة ضباء إلى التجمعات الساحلية والمراكز التابعة. لذلك يبدأ التوجيه بسؤالين عمليين: ما موضوع القضية، وأين توجد المعاملة أو الأطراف؟ يساعد ذلك على اختيار المسار المناسب وتحديد المستندات الأولية دون الادعاء بوجود مكتب فعلي في كل موقع.",
@@ -34,7 +36,9 @@ const locations = [
     slug: "lawyer-al-wajh.html",
     name: "الوجه",
     symbol: "و",
-    meta: "محامي في الوجه للخدمات القانونية والقضايا والعقود والعقار والتنفيذ والأحوال الشخصية، مع استقبال الطلبات من جميع أحياء ومراكز وقرى محافظة الوجه.",
+    title: "محامي في الوجه | عقار وتنفيذ وأحوال شخصية",
+    meta: "محامي في الوجه للقضايا العقارية والتنفيذ والأحوال الشخصية والعقود، مع استقبال الطلبات إلكترونيًا من أحياء ومراكز وقرى المحافظة.",
+    ogDescription: "خدمات قانونية في الوجه للعقار والتنفيذ والأسرة والعقود مع استقبال إلكتروني من المحافظة ومراكزها.",
     intro: "ابدأ طلب محامٍ في الوجه من صفحة تجمع الموقع ونوع المسألة والمرحلة الإجرائية. سواء كان الطلب عقدًا أو نزاعًا أو حكمًا أو شأنًا أسريًا، يسهّل الملخص المنظم تحديد الصفحة التخصصية والخطوة التالية.",
     contextTitle: "توجيه الطلبات القانونية داخل محافظة الوجه",
     context: "تغطي الصفحة مدينة الوجه وأحياءها ومخططاتها والمراكز والقرى التابعة، مع استقبال إلكتروني أولي. لا يفيد تكرار اسم المدينة وحده؛ الأفضل ذكر صفتك في القضية، والجهة الحالية، والموعد الأقرب، ومكان العقار أو العقد أو الطرف ذي الصلة.",
@@ -57,7 +61,9 @@ const locations = [
     slug: "lawyer-umluj.html",
     name: "أملج",
     symbol: "أ",
+    title: "محامي في أملج | عقود وعقار وخدمات أعمال",
     meta: "محامي في أملج للأفراد والمنشآت: عقود وأعمال وعقار وأحوال شخصية وتنفيذ. استقبال الطلبات من جميع أحياء ومراكز وقرى محافظة أملج.",
+    ogDescription: "محامي في أملج للأفراد والمنشآت: عقود وأعمال وعقار وأحوال شخصية وتنفيذ. استقبال الطلبات من جميع أحياء ومراكز وقرى محافظة أملج.",
     intro: "صفحة مخصصة لطلبات المحامين والخدمات القانونية في محافظة أملج. حدّد هل الموضوع شخصي أو تجاري، ثم اذكر المرحلة والموقع داخل المدينة أو المركز حتى ينتقل الطلب إلى الدليل التخصصي الأنسب.",
     contextTitle: "من أحياء أملج إلى المراكز والقرى التابعة",
     context: "تتعدد المسائل القانونية بين معاملات الأفراد واحتياجات الأعمال والعقود والعقار. لهذا تفصل الصفحة بين نوع الخدمة ونطاقها الجغرافي، وتوضح أن بدء الطلب متاح إلكترونيًا من أي حي أو مخطط أو مركز تابع لمحافظة أملج.",
@@ -80,7 +86,9 @@ const locations = [
     slug: "lawyer-tayma.html",
     name: "تيماء",
     symbol: "ت",
-    meta: "محامي في تيماء للقضايا والعقار والمواريث والعقود والمطالبات والتنفيذ، مع استقبال الطلبات من جميع أحياء ومراكز وقرى محافظة تيماء.",
+    title: "محامي في تيماء | عقار ومواريث وتنفيذ",
+    meta: "محامي في تيماء لقضايا العقار والمواريث والتنفيذ والعقود والمطالبات، مع استقبال الطلبات إلكترونيًا من أحياء ومراكز وقرى المحافظة.",
+    ogDescription: "خدمات قانونية في تيماء للعقار والمواريث والتنفيذ والعقود مع استقبال إلكتروني من المحافظة ومراكزها.",
     intro: "لبدء طلب محامٍ في تيماء، اجمع بين موضوع القضية وموقعها ومرحلتها. صُممت الصفحة لطلبات الأفراد والمنشآت داخل المدينة والمراكز والقرى، مع روابط مباشرة إلى أدلة العقار والأسرة والعقود والتنفيذ.",
     contextTitle: "ترتيب الطلب القانوني في محافظة تيماء",
     context: "قد يرتبط الطلب بعقار أو تركة أو عقد أو مطالبة أو إجراء قضائي. يساعد ذكر موقع العقار أو الأطراف داخل تيماء، مع الجهة والموعد والوثيقة الأساسية، على منع الخلط بين الاستشارة الأولية والدعوى والتنفيذ.",
@@ -103,7 +111,9 @@ const locations = [
     slug: "lawyer-haql.html",
     name: "حقل",
     symbol: "ح",
-    meta: "محامي في حقل للقضايا والعقود والأحوال الشخصية والمطالبات والتنفيذ، مع استقبال الطلبات من مدينة حقل والدرة وجميع المراكز والقرى التابعة.",
+    title: "محامي في حقل | قضايا وعقود وأحوال شخصية",
+    meta: "محامي في حقل للقضايا والعقود والأحوال الشخصية والتنفيذ، مع استقبال الطلبات إلكترونيًا من مدينة حقل والدرة والمراكز والقرى التابعة.",
+    ogDescription: "خدمات قانونية في حقل للقضايا والعقود والأسرة والتنفيذ مع استقبال إلكتروني من المدينة والدرة والمراكز التابعة.",
     intro: "تتيح صفحة محامي حقل بدء الطلب من المدينة أو الدرة أو أي مركز تابع، مع فصل واضح بين نوع القضية ومرحلتها. اكتب ملخصًا موجزًا وموقعك وأقرب موعد لتحديد الدليل القانوني المناسب.",
     contextTitle: "طلبات قانونية من شمال منطقة تبوك",
     context: "الموقع الجغرافي لا يغيّر ضرورة فهم الاختصاص والمرحلة. لذلك تسأل الصفحة عن موضوع الطلب والجهة الحالية والمكان داخل محافظة حقل، ثم توجه إلى مسار العقود أو الأسرة أو المطالبات أو القضايا بحسب الحاجة.",
@@ -126,7 +136,9 @@ const locations = [
     slug: "lawyer-al-bad.html",
     name: "البدع",
     symbol: "ب",
+    title: "محامي في البدع | عقود وعقار وقضايا أسرية",
     meta: "محامي في البدع للخدمات القانونية والعقار والعقود والمواريث والمطالبات، مع استقبال الطلبات من البدع ومقنا وجميع المراكز والقرى التابعة.",
+    ogDescription: "محامي في البدع للخدمات القانونية والعقار والعقود والمواريث والمطالبات، مع استقبال الطلبات من البدع ومقنا وجميع المراكز والقرى التابعة.",
     intro: "صفحة محلية لبدء طلب محامٍ في محافظة البدع، من المدينة أو مقنا أو أي مركز وقرية تابعة. يربط الدليل بين موضوع الطلب وموقعه ومرحلته، ثم ينقلك إلى الخدمة التخصصية الأقرب.",
     contextTitle: "تغطية البدع ومقنا والمواقع التابعة",
     context: "يمكن أن يتصل الطلب بعقار أو عقد أو أسرة أو مطالبة أو إجراء قضائي. تحديد موقع الواقعة داخل البدع، مع صفة مقدم الطلب والمستند الأساسي والموعد، يسهّل التوجيه الأولي ويمنع إرسال تفاصيل لا يحتاجها التقييم الأول.",
@@ -159,8 +171,8 @@ function header(topbar, message, servicesHref = "#services", coverageHref = "#co
 }
 
 function footer(message) {
-  return `<footer class="footer"><div class="container footer-grid"><div><strong>رُكن الأنظمة القانونية</strong><p>استقبال طلبات الخدمات القانونية إلكترونيًا من مدينة تبوك وجميع محافظات ومراكز المنطقة.</p></div><div><b>دليل المنطقة</b><a href="tabuk-region-lawyers.html">محامو منطقة تبوك</a><a href="lawyer-tabuk.html">محامي مدينة تبوك</a><a href="legal-services-tabuk.html">الخدمات القانونية</a></div><div><b>تواصل</b><a href="tel:${phone}" dir="ltr">${displayPhone}</a><a href="mailto:ap0554138485@icloud.com">ap0554138485@icloud.com</a></div></div><div class="container copyright">© 2026 رُكن الأنظمة القانونية. جميع الحقوق محفوظة.</div></footer>
-  <a class="whatsapp-float" href="https://wa.me/966506142113?text=${encodeURIComponent(message)}" target="_blank" rel="noopener" aria-label="تواصل عبر واتساب"><svg viewBox="0 0 24 24" width="25" height="25" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 11.5a8.4 8.4 0 0 1-9 8.5 9.3 9.3 0 0 1-3.8-.8L3 21l1.8-5A8.5 8.5 0 1 1 21 11.5Z"/><path d="M8.2 8.1c.5 3.1 2.6 5.2 5.7 5.7l1.2-1.3 2 .5c-.4 2-1.7 3-3.4 2.8-3.8-.5-7-3.7-7.5-7.5C6 6.6 7 5.3 9 4.9l.5 2-1.3 1.2Z"/></svg></a><script src="script.js"></script>`;
+  return `<footer class="footer"><div class="container footer-grid"><div><strong>رُكن الأنظمة القانونية</strong><p>استقبال طلبات الخدمات القانونية إلكترونيًا من مدينة تبوك وجميع محافظات ومراكز المنطقة.</p></div><div><b>دليل المنطقة</b><a href="tabuk-region-lawyers.html">محامو منطقة تبوك</a><a href="lawyer-tabuk.html">محامي مدينة تبوك</a><a href="legal-services-tabuk.html">الخدمات القانونية</a><a href="articles.html">المقالات القانونية</a></div><div><b>تواصل</b><a href="tel:${phone}" dir="ltr">${displayPhone}</a><a href="mailto:ap0554138485@icloud.com">ap0554138485@icloud.com</a></div></div><div class="container copyright">© 2026 رُكن الأنظمة القانونية. جميع الحقوق محفوظة.</div><!-- sitewide-trust:start --><div class="container footer-trust-links" aria-label="روابط الثقة والسياسات"><a href="about.html">عن الموقع ومنهج المحتوى</a><a href="saudi-regions-guide.html">دليل مناطق السعودية</a><a href="site-directory.html">دليل جميع الصفحات</a><a href="privacy.html">سياسة الخصوصية</a></div><!-- sitewide-trust:end --></footer>
+  <a class="whatsapp-float" href="https://wa.me/966506142113?text=${encodeURIComponent(message)}" target="_blank" rel="noopener" aria-label="تواصل عبر واتساب"><svg viewBox="0 0 24 24" width="25" height="25" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 11.5a8.4 8.4 0 0 1-9 8.5 9.3 9.3 0 0 1-3.8-.8L3 21l1.8-5A8.5 8.5 0 1 1 21 11.5Z"/><path d="M8.2 8.1c.5 3.1 2.6 5.2 5.7 5.7l1.2-1.3 2 .5c-.4 2-1.7 3-3.4 2.8-3.8-.5-7-3.7-7.5-7.5C6 6.6 7 5.3 9 4.9l.5 2-1.3 1.2Z"/></svg></a><script src="script.js?v=20260821"></script>`;
 }
 
 function renderLocation(location) {
@@ -191,12 +203,14 @@ function renderLocation(location) {
 <head>
   ${analytics()}
   <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="robots" content="index,follow,max-image-preview:large,max-snippet:-1,max-video-preview:-1">
-  <title>محامي في ${location.name} | رُكن الأنظمة القانونية</title>
+  <title>${location.title}</title>
   <meta name="description" content="${location.meta}">
+  <meta name="author" content="رُكن الأنظمة القانونية">
   <link rel="canonical" href="${url}"><link rel="alternate" hreflang="ar" href="${url}"><link rel="alternate" hreflang="x-default" href="${url}">
-  <meta property="og:type" content="website"><meta property="og:locale" content="ar_SA"><meta property="og:site_name" content="رُكن الأنظمة القانونية"><meta property="og:title" content="محامي في ${location.name}"><meta property="og:description" content="${location.meta}"><meta property="og:url" content="${url}">
+  <meta property="og:type" content="website"><meta property="og:locale" content="ar_SA"><meta property="og:site_name" content="رُكن الأنظمة القانونية"><meta property="og:title" content="${location.title}"><meta property="og:description" content="${location.ogDescription}"><meta property="og:url" content="${url}">
   <script type="application/ld+json">${JSON.stringify(schema)}</script>
-  <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="styles.css?v=20260821">
+  <script type="application/ld+json" data-sitewide-schema>${JSON.stringify({"@context":"https://schema.org","@type":"WebPage","@id":`${url}#webpage`,url,name:location.title,description:location.meta,inLanguage:"ar-SA",isPartOf:{"@id":`${baseUrl}/#website`},publisher:{"@id":`${baseUrl}/#organization`},dateModified:"2026-08-21"})}</script>
 </head>
 <body>
   ${header(`طلبات المحامين من محافظة ${location.name} وجميع المواقع التابعة`, message)}
@@ -215,7 +229,9 @@ function renderLocation(location) {
 
     <section class="section"><div class="container"><div class="section-head"><span class="eyebrow">مدن ومحافظات قريبة</span><h2>استكشف جميع صفحات منطقة تبوك</h2><p>دليل جغرافي مترابط لمدينة تبوك والمحافظات الست.</p></div><div class="related-services"><a href="lawyer-tabuk.html">مدينة تبوك</a>${locations.map(item=>`<a href="${item.slug}"${item.slug===location.slug?' aria-current="page"':''}>${item.name}</a>`).join("")}</div></div></section>
 
-    <section class="section alt" id="faq"><div class="container narrow"><div class="section-head"><span class="eyebrow">إجابات مباشرة</span><h2>أسئلة عن المحامين في ${location.name}</h2></div>${location.faqs.map(([question,answer])=>`<details><summary>${question}</summary><p>${answer}</p></details>`).join("")}</div></section>
+    <section class="section alt"><div class="container"><div class="section-head"><span class="eyebrow">قبل بدء الطلب</span><h2>أدلة تساعدك على تجهيز ملفك</h2><p>نظّم الوقائع والمستندات واكتب ملخصًا واضحًا قبل التواصل.</p></div><div class="related-services"><a href="articles.html#prepare-consultation">الاستعداد للاستشارة</a><a href="articles.html#organize-case-documents">تنظيم المستندات</a><a href="articles.html#legal-request-summary">كتابة ملخص الطلب</a></div></div></section>
+
+    <section class="section" id="faq"><div class="container narrow"><div class="section-head"><span class="eyebrow">إجابات مباشرة</span><h2>أسئلة عن المحامين في ${location.name}</h2></div>${location.faqs.map(([question,answer])=>`<details><summary>${question}</summary><p>${answer}</p></details>`).join("")}</div></section>
     <section class="section contact-section"><div class="container"><div class="contact-card"><div><span class="eyebrow">ابدأ الآن</span><h2>اذكر نوع القضية وموقعك في ${location.name}</h2><p>تبدأ المراجعة بتحديد التخصص وإمكان تقديم الخدمة ونطاقها.</p></div><a class="primary-btn" href="https://wa.me/966506142113?text=${encodeURIComponent(message)}">طلب محامي عبر واتساب</a></div></div></section>
   </main>
   ${footer(message)}
@@ -250,12 +266,14 @@ function renderHub() {
 <head>
   ${analytics()}
   <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="robots" content="index,follow,max-image-preview:large,max-snippet:-1,max-video-preview:-1">
-  <title>محامو منطقة تبوك | دليل المدن والمحافظات</title>
-  <meta name="description" content="دليل المحامين والخدمات القانونية في منطقة تبوك: مدينة تبوك وضباء والوجه وأملج وتيماء وحقل والبدع، مع الأحياء والمراكز والقرى والطرق.">
+  <title>محامي في منطقة تبوك | 6 محافظات و72 مركزًا</title>
+  <meta name="description" content="محامي في منطقة تبوك: اختر من دليل مدينة تبوك وضباء والوجه وأملج وتيماء وحقل والبدع، مع 72 مركزًا وروابط مباشرة للخدمات القانونية.">
+  <meta name="author" content="رُكن الأنظمة القانونية">
   <link rel="canonical" href="${url}"><link rel="alternate" hreflang="ar" href="${url}"><link rel="alternate" hreflang="x-default" href="${url}">
-  <meta property="og:type" content="website"><meta property="og:locale" content="ar_SA"><meta property="og:site_name" content="رُكن الأنظمة القانونية"><meta property="og:title" content="محامو منطقة تبوك | دليل المدن والمحافظات"><meta property="og:description" content="صفحة مركزية للتغطية القانونية في مدينة تبوك وجميع محافظات المنطقة ومراكزها وطرقها."><meta property="og:url" content="${url}">
+  <meta property="og:type" content="website"><meta property="og:locale" content="ar_SA"><meta property="og:site_name" content="رُكن الأنظمة القانونية"><meta property="og:title" content="محامي في منطقة تبوك | 6 محافظات و72 مركزًا"><meta property="og:description" content="دليل مدينة تبوك ومحافظات المنطقة ومراكزها مع روابط الخدمات القانونية المتخصصة."><meta property="og:url" content="${url}">
   <script type="application/ld+json">${JSON.stringify(schema)}</script>
-  <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="styles.css?v=20260821">
+  <script type="application/ld+json" data-sitewide-schema>${JSON.stringify({"@context":"https://schema.org","@type":"WebPage","@id":`${url}#webpage`,url,name:"محامي في منطقة تبوك | 6 محافظات و72 مركزًا",description:"محامي في منطقة تبوك: اختر من دليل مدينة تبوك وضباء والوجه وأملج وتيماء وحقل والبدع، مع 72 مركزًا وروابط مباشرة للخدمات القانونية.",inLanguage:"ar-SA",isPartOf:{"@id":`${baseUrl}/#website`},publisher:{"@id":`${baseUrl}/#organization`},dateModified:"2026-08-21"})}</script>
 </head>
 <body>
   ${header("دليل التغطية القانونية في جميع منطقة تبوك", message, "#locations", "#tabuk-city")}
@@ -272,7 +290,9 @@ function renderHub() {
 
     <section class="section alt"><div class="container"><div class="section-head"><span class="eyebrow">دليل الخدمات</span><h2>اختر تخصصك القانوني في منطقة تبوك</h2><p>بعد اختيار الموقع، انتقل إلى الصفحة التي تطابق جوهر طلبك.</p></div><div class="related-services"><a href="criminal-lawyer-tabuk.html">محامي جنائي</a><a href="family-lawyer-tabuk.html">أحوال شخصية</a><a href="commercial-lawyer-tabuk.html">محامي تجاري</a><a href="labor-lawyer-tabuk.html">محامي عمالي</a><a href="execution-lawyer-tabuk.html">محامي تنفيذ</a><a href="contracts-lawyer-tabuk.html">محامي عقود</a><a href="real-estate-lawyer-tabuk.html">محامي عقاري</a><a href="legal-consultation-tabuk.html">استشارة قانونية</a></div></div></section>
 
-    <section class="section" id="faq"><div class="container narrow"><div class="section-head"><span class="eyebrow">أسئلة جغرافية</span><h2>أسئلة عن تغطية منطقة تبوك</h2></div>${faqs.map(([question,answer])=>`<details><summary>${question}</summary><p>${answer}</p></details>`).join("")}</div></section>
+    <section class="section"><div class="container"><div class="section-head"><span class="eyebrow">أدلة عملية</span><h2>جهّز طلبك قبل اختيار الخدمة</h2><p>اقرأ الأدلة المختصرة لتنظيم المستندات وتحديد الوقائع والمرحلة الحالية.</p></div><div class="related-services"><a href="articles.html#prepare-consultation">الاستعداد للاستشارة</a><a href="articles.html#organize-case-documents">تنظيم مستندات القضية</a><a href="articles.html#legal-request-summary">كتابة ملخص الطلب</a></div></div></section>
+
+    <section class="section alt" id="faq"><div class="container narrow"><div class="section-head"><span class="eyebrow">أسئلة جغرافية</span><h2>أسئلة عن تغطية منطقة تبوك</h2></div>${faqs.map(([question,answer])=>`<details><summary>${question}</summary><p>${answer}</p></details>`).join("")}</div></section>
     <section class="section contact-section"><div class="container"><div class="contact-card"><div><span class="eyebrow">ابدأ من موقعك</span><h2>اذكر المدينة أو المحافظة ونوع القضية</h2><p>يكفي في البداية تحديد الموقع والموضوع والمرحلة الحالية.</p></div><a class="primary-btn" href="https://wa.me/966506142113?text=${encodeURIComponent(message)}">ابدأ الطلب عبر واتساب</a></div></div></section>
   </main>
   ${footer(message)}
