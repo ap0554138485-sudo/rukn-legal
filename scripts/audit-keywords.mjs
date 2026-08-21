@@ -21,7 +21,7 @@ function normalize(value) {
 
 function targetFor(file, title) {
   if (file === "en.html") return null;
-  if (file === "index.html") return "خدمات واستشارات قانونية في السعودية";
+  if (file === "index.html") return "محامي وخدمات واستشارات قانونية في السعودية";
   if (file === "articles.html") return "مقالات وإرشادات قانونية";
   if (file === "legal-services-dammam.html") return "خدمات قانونية في الدمام";
   if (file === "legal-consultation-tabuk.html") return "استشارات قانونية في تبوك";
@@ -38,6 +38,8 @@ for (const file of files) {
   const title = capture(html, /<title>([\s\S]*?)<\/title>/i);
   const h1 = capture(html, /<h1\b[^>]*>([\s\S]*?)<\/h1>/i);
   const description = capture(html, /<meta\s+name="description"\s+content="([^"]+)"/i);
+  const robots = capture(html, /<meta\s+name="robots"\s+content="([^"]+)"/i);
+  if (/\bnoindex\b/i.test(robots)) continue;
   const target = targetFor(file, title);
   if (!target) continue;
   const normalizedTarget = normalize(target);

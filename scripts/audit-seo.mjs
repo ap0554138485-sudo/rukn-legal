@@ -48,6 +48,7 @@ for (const file of files) {
   const html = readFileSync(resolve(root, file), "utf8");
   const titles = matches(html, /<title>([\s\S]*?)<\/title>/gi);
   const descriptions = matches(html, /<meta\s+name="description"\s+content="([^"]+)"\s*\/?\s*>/gi);
+  const authors = matches(html, /<meta\s+name="author"\s+content="([^"]+)"\s*\/?\s*>/gi);
   const canonicals = matches(html, /<link\s+rel="canonical"\s+href="([^"]+)"\s*\/?\s*>/gi);
   const h1s = matches(html, /<h1\b[^>]*>([\s\S]*?)<\/h1>/gi).map(textContent);
   const robots = matches(html, /<meta\s+name="robots"\s+content="([^"]+)"\s*\/?\s*>/gi);
@@ -61,6 +62,7 @@ for (const file of files) {
   for (const [label, values] of [
     ["title", titles],
     ["meta description", descriptions],
+    ["author", authors],
     ["canonical", canonicals],
     ["H1", h1s],
     ["robots", robots],
@@ -80,7 +82,7 @@ for (const file of files) {
   if (!/rel="alternate"\s+hreflang="(?:ar|en)"/i.test(html)) errors.push(`${file}: missing language alternate`);
   if (!/rel="alternate"\s+hreflang="x-default"/i.test(html)) errors.push(`${file}: missing x-default alternate`);
 
-  const jsonLdBlocks = matches(html, /<script\s+type="application\/ld\+json">([\s\S]*?)<\/script>/gi);
+  const jsonLdBlocks = matches(html, /<script\s+type="application\/ld\+json"[^>]*>([\s\S]*?)<\/script>/gi);
   if (!jsonLdBlocks.length) errors.push(`${file}: missing JSON-LD`);
   for (const jsonLd of jsonLdBlocks) {
     try {
@@ -103,7 +105,7 @@ for (const file of files) {
   }
 
   const words = textContent(html).split(/\s+/).filter(Boolean).length;
-  if (words < 180) warnings.push(`${file}: only ${words} visible words`);
+  if (words < 180 && !isNoindex) warnings.push(`${file}: only ${words} visible words`);
   pages.set(file, {
     file,
     title: titles[0],
@@ -145,6 +147,12 @@ for (const page of pages.values()) {
 for (const location of sitemapLocations) {
   const target = localTarget(location);
   if (!target || !fileSet.has(target)) errors.push(`sitemap.xml: URL has no public HTML file (${location})`);
+}
+
+const robotsTxt = readFileSync(resolve(root, "robots.txt"), "utf8");
+if (!/User-agent:\s*\*/i.test(robotsTxt)) errors.push("robots.txt: missing global user-agent rule");
+if (!new RegExp(`Sitemap:\\s*${origin.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}/sitemap\\.xml`, "i").test(robotsTxt)) {
+  errors.push("robots.txt: missing production sitemap URL");
 }
 
 const indexable = [...pages.values()].filter((page) => !page.isNoindex);

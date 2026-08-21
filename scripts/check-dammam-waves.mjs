@@ -20,6 +20,7 @@ const titles = new Map();
 const descriptions = new Map();
 const h1s = new Map();
 const hashes = new Map();
+const inboundSources = new Map(generatedSlugs.map((slug) => [slug, new Set()]));
 
 for (const page of generatedPages) {
   const path = resolve(root, page.slug);
@@ -58,6 +59,16 @@ for (const page of generatedPages) {
       errors.push(`${page.slug}: invalid JSON-LD (${error.message}).`);
     }
   }
+
+  for (const match of html.matchAll(/href="([^"]+\.html)(?:#[^"]*)?"/g)) {
+    if (inboundSources.has(match[1]) && match[1] !== page.slug) inboundSources.get(match[1]).add(page.slug);
+  }
+}
+
+for (const page of generatedPages) {
+  if (page.kind === "hub") continue;
+  const inboundCount = inboundSources.get(page.slug)?.size || 0;
+  if (inboundCount < 2) errors.push(`${page.slug}: only ${inboundCount} inbound Dammam page link(s), expected at least 2.`);
 }
 
 const sitemap = readFileSync(resolve(root, "sitemap.xml"), "utf8");

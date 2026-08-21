@@ -261,7 +261,10 @@ function filterLocationDirectory() {
   });
 
   if (locationDirectoryCount) {
-    locationDirectoryCount.textContent = `${visibleCount} ${visibleCount === 1 ? "مركز ظاهر" : "مركزًا ظاهرًا"}`;
+    const isPageDirectory = locationDirectorySearch.dataset.directoryType === "pages";
+    locationDirectoryCount.textContent = isPageDirectory
+      ? `${visibleCount} صفحة ظاهرة`
+      : `${visibleCount} ${visibleCount === 1 ? "مركز ظاهر" : "مركزًا ظاهرًا"}`;
   }
   if (locationDirectoryEmpty) locationDirectoryEmpty.hidden = visibleCount !== 0;
 }

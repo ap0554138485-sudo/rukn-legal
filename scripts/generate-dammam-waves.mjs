@@ -260,6 +260,12 @@ function escapeHtml(value) {
   return String(value).replaceAll("&", "&amp;").replaceAll("<", "&lt;").replaceAll(">", "&gt;").replaceAll('"', "&quot;");
 }
 
+function circularPick(items, start, count) {
+  if (!items.length || count <= 0) return [];
+  const offset = ((start % items.length) + items.length) % items.length;
+  return Array.from({ length: Math.min(count, items.length) }, (_, index) => items[(offset + index) % items.length]);
+}
+
 function jsonLd(value) {
   return JSON.stringify(value).replace(/</g, "\\u003c");
 }
@@ -284,7 +290,8 @@ function pageShell({ page, title, description, h1, eyebrow, intro, asideTitle, a
 
 function servicePage(page) {
   const topic = topics[page.topic];
-  const related = serviceDefinitions.filter((item) => item.slug !== page.slug).slice((serviceDefinitions.indexOf(page) + 2) % 8, ((serviceDefinitions.indexOf(page) + 2) % 8) + 4);
+  const serviceIndex = serviceDefinitions.indexOf(page);
+  const related = circularPick(serviceDefinitions.filter((item) => item.slug !== page.slug), serviceIndex + 1, 4);
   const faqs = [
     [`كيف أبدأ طلب ${topic.short} من الدمام؟`, `ابدأ بتحديد الصفة والمرحلة والنتيجة المطلوبة، ثم أرفق المستند الأساسي واذكر أي موعد قريب.`],
     [`هل يلزم الحضور إلى مكتب داخل الدمام؟`, `يمكن بدء الاستقبال والمراجعة الأولية إلكترونيًا، ثم تتحدد طريقة تقديم الخدمة وإمكانها بعد فهم الملف.`],
@@ -299,7 +306,7 @@ function servicePage(page) {
 function neighborhoodPage(page) {
   const primary = topics[page.primary];
   const secondary = topics[page.secondary];
-  const nearby = neighborhoodDefinitions.filter((item) => item.slug !== page.slug).slice((page.index * 3) % 15, ((page.index * 3) % 15) + 4);
+  const nearby = circularPick(neighborhoodDefinitions.filter((item) => item.slug !== page.slug), page.index * 3, 4);
   const docs = [...primary.docs.slice(0, 3), ...secondary.docs.slice(0, 2), `اسم الشارع داخل حي ${page.name} إذا كان مؤثرًا في المستند أو الواقعة`];
   const faqs = [
     [`ما الخدمة الأبرز في صفحة حي ${page.name}؟`, `تركز الصفحة على ${primary.label} مع مسار مكمل هو ${secondary.label}، ويحدد الاختيار النهائي بعد الاطلاع على الملف.`],
@@ -314,9 +321,9 @@ function neighborhoodPage(page) {
 
 function guidePage(page) {
   const topic = topics[page.topic];
-  const neighborhoods = neighborhoodDefinitions.slice(page.index % 10, (page.index % 10) + 5);
-  const streets = streetGroups.flatMap(([, items]) => items).slice((page.index * 2) % 25, ((page.index * 2) % 25) + 4);
-  const related = guideDefinitions.filter((item) => item.topic === page.topic || Math.abs(item.index - page.index) <= 2).filter((item) => item.slug !== page.slug).slice(0, 4);
+  const neighborhoods = circularPick(neighborhoodDefinitions, page.index, 5);
+  const streets = circularPick(streetGroups.flatMap(([, items]) => items), page.index * 2, 4);
+  const related = circularPick(guideDefinitions.filter((item) => (item.topic === page.topic || Math.abs(item.index - page.index) <= 2) && item.slug !== page.slug), page.index, 4);
   const faqs = [
     [`لمن أُعد دليل ${page.title}؟`, `أُعد لـ${page.audience} ممن يحتاجون إلى تنظيم المستندات والأسئلة قبل بدء المراجعة القانونية.`],
     [`هل الخطوات الواردة بديل عن الاستشارة؟`, `لا. هي قائمة تنظيم عامة تساعد على تجهيز الملف، بينما يعتمد التقييم على الوقائع والمستندات والأنظمة السارية.`],
