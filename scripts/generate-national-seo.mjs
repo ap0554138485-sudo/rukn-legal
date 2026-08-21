@@ -7,7 +7,7 @@ const releaseDate = "2026-08-21";
 const phone = "+966506142113";
 const displayPhone = "+966 50 614 2113";
 const email = "ap0554138485@icloud.com";
-const assetVersion = "20260821c";
+const assetVersion = "20260821b";
 const stylesheetFile = `styles-${assetVersion}.css`;
 const fontStylesheet = "https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@400;500;600;700&family=Manrope:wght@400;500;600;700&display=swap";
 
@@ -58,6 +58,10 @@ function fontLinks() {
   return `<!-- site-fonts:start --><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link rel="preload" as="style" href="${fontStylesheet}"><link rel="stylesheet" href="${fontStylesheet}" media="print" onload="this.media='all'"><noscript><link rel="stylesheet" href="${fontStylesheet}"></noscript><!-- site-fonts:end -->`;
 }
 
+function accessibilityOverrides() {
+  return `<!-- accessibility-contrast:start --><style>:root{--muted:#536360}.brand span{color:#695f4e}.article-grid article>span{color:#715731}.footer p,.site-footer p{color:rgba(255,255,255,.72)}.footer a{color:rgba(255,255,255,.74)}.copyright{color:rgba(255,255,255,.68)}</style><!-- accessibility-contrast:end -->`;
+}
+
 function header() {
   return `<div class="topbar"><div class="container topbar-inner"><p class="topbar-status">استقبال إلكتروني من جميع مناطق المملكة</p><p>تواصل مباشر: <a href="tel:${phone}" dir="ltr">${displayPhone}</a></p></div></div>
   <header class="site-header simple-header"><div class="container nav-wrap"><a class="brand" href="/" aria-label="رُكن الأنظمة القانونية - الرئيسية"><div class="brand-mark"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v18M5 21h14M4 7h16M6 7l-3 7m3-7 3 7m9 0-3-7-3 7M2 14h8a4 4 0 0 1-8 0Zm12 0h8a4 4 0 0 1-8 0Z"/></svg></div><div><strong>رُكن الأنظمة القانونية</strong><span>LEGAL SYSTEMS CORNER</span></div></a><nav class="nav" id="nav" aria-label="التنقل الرئيسي"><a href="/">الرئيسية</a><a href="saudi-regions-guide.html">مناطق السعودية</a><a href="site-directory.html">دليل الصفحات</a><a href="about.html">عن الموقع</a></nav><div class="nav-actions"><a class="header-cta" href="https://wa.me/966506142113?text=${encodeURIComponent("السلام عليكم، أرغب في طلب خدمة قانونية. المنطقة ونوع الطلب: ")}">ابدأ طلبك</a><button class="menu-btn" id="menuBtn" aria-label="فتح القائمة" aria-expanded="false">☰</button></div></div></header>`;
@@ -93,6 +97,7 @@ function shell({ file, title, description, robots = "index,follow,max-image-prev
   ${schema.length ? jsonLd(schema) : ""}
   ${fontLinks()}
   <link rel="stylesheet" href="${stylesheetFile}">
+  ${accessibilityOverrides()}
 </head>
 <body>
   ${header()}
@@ -221,6 +226,13 @@ function enhanceHtml(file) {
     html = html.replace(/<!-- site-fonts:start -->[\s\S]*?<!-- site-fonts:end -->/i, fonts);
   } else {
     html = html.replace(/(<link\s+rel="stylesheet"\s+href="styles(?:-[a-z0-9]+)?\.css[^"]*"\s*\/?>)/i, `${fonts}\n  $1`);
+  }
+
+  const contrast = accessibilityOverrides();
+  if (/<!-- accessibility-contrast:start -->[\s\S]*?<!-- accessibility-contrast:end -->/i.test(html)) {
+    html = html.replace(/<!-- accessibility-contrast:start -->[\s\S]*?<!-- accessibility-contrast:end -->/i, contrast);
+  } else {
+    html = html.replace(/(<link\s+rel="stylesheet"\s+href="styles(?:-[a-z0-9]+)?\.css[^"]*"\s*\/?>)/i, `$1\n  ${contrast}`);
   }
 
   if (title && description && canonical) {
