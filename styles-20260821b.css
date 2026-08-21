@@ -1,3 +1,4 @@
+/* Versioned stylesheet: changing the path guarantees immediate CDN cache invalidation. */
 :root {
   --ink: #102a29;
   --ink-deep: #081d1c;

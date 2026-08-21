@@ -8,6 +8,7 @@ const phone = "+966506142113";
 const displayPhone = "+966 50 614 2113";
 const email = "ap0554138485@icloud.com";
 const assetVersion = "20260821b";
+const stylesheetFile = `styles-${assetVersion}.css`;
 const fontStylesheet = "https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@400;500;600;700&family=Manrope:wght@400;500;600;700&display=swap";
 
 const regions = [
@@ -91,7 +92,7 @@ function shell({ file, title, description, robots = "index,follow,max-image-prev
   <meta name="twitter:description" content="${escapeHtml(description)}">
   ${schema.length ? jsonLd(schema) : ""}
   ${fontLinks()}
-  <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="${stylesheetFile}">
 </head>
 <body>
   ${header()}
@@ -212,14 +213,14 @@ function enhanceHtml(file) {
   const canonical = html.match(/<link\s+rel="canonical"\s+href="([^"]+)"/i)?.[1]?.trim();
 
   html = html
-    .replace(/href="styles\.css(?:\?v=[^"]*)?"/gi, `href="styles.css?v=${assetVersion}"`)
+    .replace(/href="styles(?:-[a-z0-9]+)?\.css(?:\?v=[^"]*)?"/gi, `href="${stylesheetFile}"`)
     .replace(/src="script\.js(?:\?v=[^"]*)?"/gi, `src="script.js?v=${assetVersion}"`);
 
   const fonts = fontLinks();
   if (/<!-- site-fonts:start -->[\s\S]*?<!-- site-fonts:end -->/i.test(html)) {
     html = html.replace(/<!-- site-fonts:start -->[\s\S]*?<!-- site-fonts:end -->/i, fonts);
   } else {
-    html = html.replace(/(<link\s+rel="stylesheet"\s+href="styles\.css[^"]*"\s*\/?>)/i, `${fonts}\n  $1`);
+    html = html.replace(/(<link\s+rel="stylesheet"\s+href="styles(?:-[a-z0-9]+)?\.css[^"]*"\s*\/?>)/i, `${fonts}\n  $1`);
   }
 
   if (title && description && canonical) {
