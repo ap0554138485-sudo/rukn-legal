@@ -7,8 +7,8 @@ const releaseDate = "2026-08-22";
 const phone = "+966506142113";
 const displayPhone = "+966 50 614 2113";
 const email = "ap0554138485@icloud.com";
-const assetVersion = "20260821b";
-const stylesheetFile = `styles-${assetVersion}.css`;
+const assetVersion = "20260822a";
+const stylesheetFile = `styles-20260821b.css?v=${assetVersion}`;
 const fontStylesheet = "https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@400;500;600;700&family=Manrope:wght@400;500;600;700&display=swap";
 
 const regions = [
@@ -44,6 +44,20 @@ function escapeHtml(value) {
     .replaceAll("<", "&lt;")
     .replaceAll(">", "&gt;")
     .replaceAll('"', "&quot;");
+}
+
+function decodeHtml(value) {
+  return String(value)
+    .replaceAll("&amp;", "&")
+    .replaceAll("&quot;", '"')
+    .replaceAll("&#39;", "'")
+    .replaceAll("&apos;", "'")
+    .replaceAll("&lt;", "<")
+    .replaceAll("&gt;", ">");
+}
+
+function textContent(value) {
+  return decodeHtml(String(value).replace(/<[^>]+>/g, " ").replace(/\s+/g, " ").trim());
 }
 
 function jsonLd(value) {
@@ -203,9 +217,37 @@ function directoryPage() {
 
 function sitewideTrustBlock(language) {
   if (language === "en") {
-    return `<!-- sitewide-trust:start --><div class="container footer-trust-links" aria-label="Trust and policy links"><a href="/" hreflang="ar" lang="ar">العربية</a><a href="about.html">About and content method</a><a href="saudi-regions-guide.html">Saudi coverage</a><a href="site-directory.html">All pages</a><a href="privacy.html">Privacy</a></div><!-- sitewide-trust:end -->\n`;
+    return `<!-- sitewide-trust:start --><div class="container footer-trust-links" aria-label="Trust and policy links"><a href="/" hreflang="ar" lang="ar">العربية</a><a href="about.html">About and content method</a><a href="saudi-regions-guide.html">Saudi coverage</a><a href="site-directory.html">All pages</a><a href="privacy.html">Privacy</a></div><!-- sitewide-trust:end -->`;
   }
-  return `<!-- sitewide-trust:start --><div class="container footer-trust-links" aria-label="روابط الثقة والسياسات"><a href="en.html" hreflang="en" lang="en">English</a><a href="about.html">عن الموقع ومنهج المحتوى</a><a href="saudi-regions-guide.html">دليل مناطق السعودية</a><a href="site-directory.html">دليل جميع الصفحات</a><a href="privacy.html">سياسة الخصوصية</a></div><!-- sitewide-trust:end -->\n`;
+  return `<!-- sitewide-trust:start --><div class="container footer-trust-links" aria-label="روابط الثقة والسياسات"><a href="en.html" hreflang="en" lang="en">English</a><a href="about.html">عن الموقع ومنهج المحتوى</a><a href="saudi-regions-guide.html">دليل مناطق السعودية</a><a href="site-directory.html">دليل جميع الصفحات</a><a href="privacy.html">سياسة الخصوصية</a></div><!-- sitewide-trust:end -->`;
+}
+
+function contentAccountabilityBlock(language) {
+  if (language === "en") {
+    return `<!-- content-accountability:start --><aside class="content-accountability" data-content-accountability aria-label="Content information"><div class="container content-accountability-inner"><div><strong>Published and maintained by Legal Systems Corner</strong><span>General information to help organize an initial request; it does not replace a professional review of the facts and documents.</span></div><div class="content-accountability-meta"><time datetime="${releaseDate}">Content updated 22 August 2026</time><a href="about.html">How we prepare content</a></div></div></aside><!-- content-accountability:end -->`;
+  }
+  return `<!-- content-accountability:start --><aside class="content-accountability" data-content-accountability aria-label="معلومات المحتوى"><div class="container content-accountability-inner"><div><strong>النشر والتحديث: رُكن الأنظمة القانونية</strong><span>محتوى عام لتنظيم الطلب الأولي، ولا يغني عن تقييم الوقائع والمستندات من مختص.</span></div><div class="content-accountability-meta"><time datetime="${releaseDate}">تحديث المحتوى: 22 أغسطس 2026</time><a href="about.html">منهج إعداد المحتوى</a></div></div></aside><!-- content-accountability:end -->`;
+}
+
+function breadcrumbSchema(file, html, canonical, language) {
+  const htmlWithoutSitewideSchema = html.replace(/<script\s+type="application\/ld\+json"\s+data-sitewide-schema>[\s\S]*?<\/script>/i, "");
+  if (file === "index.html" || file === "en.html" || isNoindex(html) || /"BreadcrumbList"/i.test(htmlWithoutSitewideSchema)) return null;
+  const breadcrumbHtml = html.match(/<div[^>]*class="[^"]*\bbreadcrumb\b[^"]*"[^>]*>([\s\S]*?)<\/div>/i)?.[1];
+  if (!breadcrumbHtml) return null;
+  const labels = [...breadcrumbHtml.matchAll(/<span(?:\s[^>]*)?>([\s\S]*?)<\/span>/gi)]
+    .map((match) => textContent(match[1]))
+    .filter((label) => label && label !== "/");
+  const currentLabel = labels.at(-1);
+  if (!currentLabel) return null;
+  const homeLabel = language === "en" ? "Home" : "الرئيسية";
+  return {
+    "@type": "BreadcrumbList",
+    "@id": `${canonical}#breadcrumb`,
+    itemListElement: [
+      { "@type": "ListItem", position: 1, name: homeLabel, item: `${baseUrl}/` },
+      { "@type": "ListItem", position: 2, name: currentLabel, item: canonical }
+    ]
+  };
 }
 
 function enhanceHtml(file) {
@@ -213,8 +255,8 @@ function enhanceHtml(file) {
   let html = readFileSync(path, "utf8");
   const original = html;
   const language = html.match(/<html[^>]*\slang="([^"]+)"/i)?.[1]?.toLowerCase().startsWith("en") ? "en" : "ar";
-  const title = html.match(/<title>([\s\S]*?)<\/title>/i)?.[1]?.trim();
-  const description = html.match(/<meta\s+name="description"\s+content="([^"]+)"/i)?.[1]?.trim();
+  const title = decodeHtml(html.match(/<title>([\s\S]*?)<\/title>/i)?.[1]?.trim() || "");
+  const description = decodeHtml(html.match(/<meta\s+name="description"\s+content="([^"]+)"/i)?.[1]?.trim() || "");
   const canonical = html.match(/<link\s+rel="canonical"\s+href="([^"]+)"/i)?.[1]?.trim();
 
   html = html
@@ -241,7 +283,13 @@ function enhanceHtml(file) {
     } else {
       html = html.replace(/(<meta\s+name="description"\s+content="[^"]+"\s*\/?\s*>)/i, `$1\n  <meta name="author" content="رُكن الأنظمة القانونية">`);
     }
-    const schema = `<script type="application/ld+json" data-sitewide-schema>${JSON.stringify({ "@context": "https://schema.org", "@type": "WebPage", "@id": `${canonical}#webpage`, url: canonical, name: title, description, inLanguage: language === "en" ? "en" : "ar-SA", isPartOf: { "@id": `${baseUrl}/#website` }, publisher: { "@id": `${baseUrl}/#organization` }, dateModified: releaseDate })}</script>`;
+    const pageSchema = { "@type": "WebPage", "@id": `${canonical}#webpage`, url: canonical, name: title, description, inLanguage: language === "en" ? "en" : "ar-SA", isPartOf: { "@id": `${baseUrl}/#website` }, author: { "@id": `${baseUrl}/#organization` }, publisher: { "@id": `${baseUrl}/#organization` }, dateModified: releaseDate };
+    const breadcrumb = breadcrumbSchema(file, html, canonical, language);
+    if (breadcrumb) pageSchema.breadcrumb = { "@id": breadcrumb["@id"] };
+    const schemaPayload = breadcrumb
+      ? { "@context": "https://schema.org", "@graph": [pageSchema, breadcrumb] }
+      : { "@context": "https://schema.org", ...pageSchema };
+    const schema = `<script type="application/ld+json" data-sitewide-schema>${JSON.stringify(schemaPayload)}</script>`;
     if (/<script\s+type="application\/ld\+json"\s+data-sitewide-schema>[\s\S]*?<\/script>/i.test(html)) {
       html = html.replace(/<script\s+type="application\/ld\+json"\s+data-sitewide-schema>[\s\S]*?<\/script>/i, schema);
     } else {
@@ -249,13 +297,20 @@ function enhanceHtml(file) {
     }
   }
 
+  const accountability = contentAccountabilityBlock(language);
+  if (/<!-- content-accountability:start -->[\s\S]*?<!-- content-accountability:end -->\s*(?=<footer\b)/i.test(html)) {
+    html = html.replace(/<!-- content-accountability:start -->[\s\S]*?<!-- content-accountability:end -->\s*(?=<footer\b)/i, `${accountability}\n  `);
+  } else if (/<\/main>\s*(?=<footer\b)/i.test(html)) {
+    html = html.replace(/<\/main>\s*(?=<footer\b)/i, `</main>\n${accountability}\n  `);
+  }
+
   const trust = sitewideTrustBlock(language);
-  if (/<!-- sitewide-trust:start -->[\s\S]*?<!-- sitewide-trust:end -->/i.test(html)) {
-    html = html.replace(/<!-- sitewide-trust:start -->[\s\S]*?<!-- sitewide-trust:end -->/i, trust);
+  if (/<!-- sitewide-trust:start -->[\s\S]*?<!-- sitewide-trust:end -->\s*(?=<\/footer>)/i.test(html)) {
+    html = html.replace(/<!-- sitewide-trust:start -->[\s\S]*?<!-- sitewide-trust:end -->\s*(?=<\/footer>)/i, `${trust}\n`);
   } else if (/<\/footer>/i.test(html)) {
-    html = html.replace(/<\/footer>/i, `${trust}</footer>`);
+    html = html.replace(/<\/footer>/i, `${trust}\n</footer>`);
   } else {
-    html = html.replace(/<\/body>/i, `${trust}</body>`);
+    html = html.replace(/<\/body>/i, `${trust}\n</body>`);
   }
 
   if (html !== original) writeFileSync(path, html, "utf8");

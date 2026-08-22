@@ -218,6 +218,13 @@ html[dir="ltr"] #faq summary::before { right: auto; left: 21px; }
 .footer-trust-links { display: flex; flex-wrap: wrap; gap: 9px 18px; margin-top: 22px; padding-top: 18px; border-top: 1px solid rgba(255, 255, 255, 0.08); }
 .footer-trust-links a { color: rgba(255, 255, 255, 0.68); font-size: 12px; text-underline-offset: 4px; }
 .footer-trust-links a:hover { color: var(--gold-light); }
+.content-accountability { background: #f2eee5; border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); }
+.content-accountability-inner { min-height: 108px; display: flex; align-items: center; justify-content: space-between; gap: 30px; padding-top: 23px; padding-bottom: 23px; }
+.content-accountability strong { display: block; margin-bottom: 5px; color: var(--ink); font-size: 14px; }
+.content-accountability span { display: block; max-width: 760px; color: var(--muted); font-size: 13px; line-height: 1.8; }
+.content-accountability-meta { flex: 0 0 auto; display: flex; flex-direction: column; align-items: flex-end; gap: 6px; color: var(--muted); font-size: 12px; }
+.content-accountability-meta a { color: var(--ink-soft); font-weight: 700; text-underline-offset: 4px; }
+html[dir="ltr"] .content-accountability-meta { align-items: flex-start; }
 
 .whatsapp-float { position: fixed; left: 22px; bottom: 22px; z-index: 25; width: 58px; height: 58px; display: grid; place-items: center; color: #fff; background: var(--green); border: 4px solid var(--paper); border-radius: 50%; box-shadow: 0 14px 32px rgba(10, 50, 35, 0.24); font-size: 24px; text-decoration: none; transition: transform 0.2s ease; }
 html[dir="ltr"] .whatsapp-float { right: 22px; left: auto; }
@@ -440,6 +447,8 @@ html[dir="ltr"] .modal-close { right: 18px; left: auto; }
   .service-card { min-height: 235px; }
   .contact-card { align-items: flex-start; flex-direction: column; }
   .contact-card .primary-btn { width: 100%; }
+  .content-accountability-inner { align-items: flex-start; flex-direction: column; gap: 14px; }
+  .content-accountability-meta { align-items: flex-start; }
   .modal { padding: 10px; }
   .modal-card { max-height: 92vh; padding: 29px 18px 22px; }
   .regions-accordion .region-cities { grid-template-columns: repeat(2, minmax(0, 1fr)); }

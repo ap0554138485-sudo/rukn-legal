@@ -26,6 +26,12 @@ function textContent(html) {
     .trim();
 }
 
+function schemaNodes(value) {
+  if (!value || typeof value !== "object") return [];
+  if (Array.isArray(value)) return value.flatMap(schemaNodes);
+  return [value, ...Object.values(value).flatMap(schemaNodes)];
+}
+
 function localTarget(href) {
   if (!href || /^(?:#|mailto:|tel:|javascript:)/i.test(href)) return null;
   let value = href;
@@ -83,13 +89,22 @@ for (const file of files) {
   if (!/rel="alternate"\s+hreflang="x-default"/i.test(html)) errors.push(`${file}: missing x-default alternate`);
 
   const jsonLdBlocks = matches(html, /<script\s+type="application\/ld\+json"[^>]*>([\s\S]*?)<\/script>/gi);
+  const parsedJsonLd = [];
   if (!jsonLdBlocks.length) errors.push(`${file}: missing JSON-LD`);
   for (const jsonLd of jsonLdBlocks) {
     try {
-      JSON.parse(jsonLd);
+      parsedJsonLd.push(JSON.parse(jsonLd));
     } catch (error) {
       errors.push(`${file}: invalid JSON-LD (${error.message})`);
     }
+  }
+  const structuredNodes = parsedJsonLd.flatMap(schemaNodes);
+  if (!structuredNodes.some((node) => node["@type"] === "WebPage")) errors.push(`${file}: missing WebPage structured data`);
+  if (!/data-content-accountability/i.test(html)) errors.push(`${file}: missing visible content accountability block`);
+  if (!/<time\s+datetime="2026-08-22"/i.test(html)) errors.push(`${file}: missing current content update date`);
+  const hasVisibleBreadcrumb = /class="[^"]*\bbreadcrumb\b/i.test(html);
+  if (!isNoindex && hasVisibleBreadcrumb && !structuredNodes.some((node) => node["@type"] === "BreadcrumbList")) {
+    errors.push(`${file}: visible breadcrumb is missing BreadcrumbList structured data`);
   }
 
   for (const href of matches(html, /<a\b[^>]*\shref="([^"]+)"[^>]*>/gi)) {
