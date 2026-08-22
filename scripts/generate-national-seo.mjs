@@ -3,7 +3,7 @@ import { resolve } from "node:path";
 
 const root = resolve(import.meta.dirname, "..");
 const baseUrl = "https://rukn-legal-vwptio.cranl.net";
-const releaseDate = "2026-08-21";
+const releaseDate = "2026-08-22";
 const phone = "+966506142113";
 const displayPhone = "+966 50 614 2113";
 const email = "ap0554138485@icloud.com";
@@ -203,9 +203,9 @@ function directoryPage() {
 
 function sitewideTrustBlock(language) {
   if (language === "en") {
-    return `<!-- sitewide-trust:start --><div class="container footer-trust-links" aria-label="Trust and policy links"><a href="about.html">About and content method</a><a href="saudi-regions-guide.html">Saudi coverage</a><a href="site-directory.html">All pages</a><a href="privacy.html">Privacy</a></div><!-- sitewide-trust:end -->`;
+    return `<!-- sitewide-trust:start --><div class="container footer-trust-links" aria-label="Trust and policy links"><a href="/" hreflang="ar" lang="ar">العربية</a><a href="about.html">About and content method</a><a href="saudi-regions-guide.html">Saudi coverage</a><a href="site-directory.html">All pages</a><a href="privacy.html">Privacy</a></div><!-- sitewide-trust:end -->\n`;
   }
-  return `<!-- sitewide-trust:start --><div class="container footer-trust-links" aria-label="روابط الثقة والسياسات"><a href="about.html">عن الموقع ومنهج المحتوى</a><a href="saudi-regions-guide.html">دليل مناطق السعودية</a><a href="site-directory.html">دليل جميع الصفحات</a><a href="privacy.html">سياسة الخصوصية</a></div><!-- sitewide-trust:end -->`;
+  return `<!-- sitewide-trust:start --><div class="container footer-trust-links" aria-label="روابط الثقة والسياسات"><a href="en.html" hreflang="en" lang="en">English</a><a href="about.html">عن الموقع ومنهج المحتوى</a><a href="saudi-regions-guide.html">دليل مناطق السعودية</a><a href="site-directory.html">دليل جميع الصفحات</a><a href="privacy.html">سياسة الخصوصية</a></div><!-- sitewide-trust:end -->\n`;
 }
 
 function enhanceHtml(file) {
