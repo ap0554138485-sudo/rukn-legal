@@ -59,6 +59,23 @@ for (const file of files) {
   } else {
     targets.set(normalizedTarget, file);
   }
+
+  if (file === "lawyer-tabuk.html") {
+    const priorityPhrase = normalize("أفضل محامي في تبوك");
+    const normalizedHtml = normalize(html.replace(/<[^>]+>/g, " "));
+    if (!normalize(title).includes(priorityPhrase)) {
+      errors.push(`${file}: priority phrase "أفضل محامي في تبوك" missing from title`);
+    }
+    if (!normalizedHtml.includes(priorityPhrase)) {
+      errors.push(`${file}: priority phrase "أفضل محامي في تبوك" missing from visible content`);
+    }
+    if (!html.includes('id="best-lawyer"')) {
+      errors.push(`${file}: missing dedicated best-lawyer decision section`);
+    }
+    if (!html.includes("najiz.sa/applications/lawyers/LawyersInquire")) {
+      errors.push(`${file}: missing official lawyer-license verification link`);
+    }
+  }
 }
 
 console.log(`Keyword targets audited: ${targets.size}`);
