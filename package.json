@@ -9,10 +9,12 @@
     "generate:jeddah": "node scripts/generate-jeddah-wave3.js && node scripts/generate-national-seo.mjs",
     "generate:wave3": "node scripts/generate-jeddah-wave3.js && node scripts/generate-national-seo.mjs",
     "generate:tabuk-wave3": "node scripts/generate-tabuk-wave3.mjs && node scripts/generate-national-seo.mjs",
+    "generate:notary": "node scripts/generate-notary-pages.mjs && node scripts/generate-national-seo.mjs",
     "generate:dammam": "node scripts/generate-dammam-waves.mjs && node scripts/generate-national-seo.mjs",
     "generate:national": "node scripts/generate-national-seo.mjs",
-    "generate:all": "node scripts/generate-riyadh-wave2.js && node scripts/generate-jeddah-wave3.js && node scripts/generate-dammam-waves.mjs && node scripts/generate-national-seo.mjs",
+    "generate:all": "node scripts/generate-riyadh-wave2.js && node scripts/generate-jeddah-wave3.js && node scripts/generate-dammam-waves.mjs && node scripts/generate-tabuk-wave3.mjs && node scripts/generate-notary-pages.mjs && node scripts/generate-national-seo.mjs",
     "check:dammam": "node scripts/check-dammam-waves.mjs",
+    "check:notary": "node scripts/check-notary-pages.mjs",
     "audit:seo": "node scripts/audit-seo.mjs",
     "audit:keywords": "node scripts/audit-keywords.mjs"
   },

@@ -115,7 +115,7 @@ for (const file of files) {
     if (logoUrl !== `${origin}/logo-128-20260824.png`) errors.push(`${file}: Organization logo is missing or incorrect`);
   }
   if (!/data-content-accountability/i.test(html)) errors.push(`${file}: missing visible content accountability block`);
-  if (!/<time\s+datetime="2026-08-22"/i.test(html)) errors.push(`${file}: missing current content update date`);
+  if (!/<time\s+datetime="2026-08-24"/i.test(html)) errors.push(`${file}: missing current content update date`);
   const hasVisibleBreadcrumb = /class="[^"]*\bbreadcrumb\b/i.test(html);
   if (!isNoindex && hasVisibleBreadcrumb && !structuredNodes.some((node) => node["@type"] === "BreadcrumbList")) {
     errors.push(`${file}: visible breadcrumb is missing BreadcrumbList structured data`);
