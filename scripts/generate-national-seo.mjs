@@ -7,8 +7,10 @@ const releaseDate = "2026-08-22";
 const phone = "+966506142113";
 const displayPhone = "+966 50 614 2113";
 const email = "ap0554138485@icloud.com";
-const assetVersion = "20260824a";
+const assetVersion = "20260824b";
 const stylesheetFile = `styles-20260821b.css?v=${assetVersion}`;
+const scriptFile = `script-${assetVersion}.js`;
+const logoFile = "logo-128-20260824.png";
 const fontStylesheet = "https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@400;500;600;700&family=Manrope:wght@400;500;600;700&display=swap";
 
 const regions = [
@@ -69,7 +71,7 @@ function gaTag() {
 }
 
 function searchAppearanceTags() {
-  return `<!-- site-search-appearance:start --><link rel="icon" href="/favicon.ico"><link rel="apple-touch-icon" href="/logo-128.png"><meta name="theme-color" content="#102a29"><!-- site-search-appearance:end -->`;
+  return `<!-- site-search-appearance:start --><link rel="icon" href="/favicon.ico"><link rel="apple-touch-icon" href="/${logoFile}"><meta name="theme-color" content="#102a29"><!-- site-search-appearance:end -->`;
 }
 
 function fontLinks() {
@@ -123,7 +125,7 @@ function shell({ file, title, description, robots = "index,follow,max-image-prev
   ${body}
   ${footer()}
   <a class="whatsapp-float" href="https://wa.me/966506142113?text=${encodeURIComponent("السلام عليكم، أرغب في طلب خدمة قانونية. المنطقة ونوع الطلب: ")}" target="_blank" rel="noopener" aria-label="تواصل عبر واتساب"><svg viewBox="0 0 24 24" width="25" height="25" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 11.5a8.4 8.4 0 0 1-9 8.5 9.3 9.3 0 0 1-3.8-.8L3 21l1.8-5A8.5 8.5 0 1 1 21 11.5Z"/><path d="M8.2 8.1c.5 3.1 2.6 5.2 5.7 5.7l1.2-1.3 2 .5c-.4 2-1.7 3-3.4 2.8-3.8-.5-7-3.7-7.5-7.5C6 6.6 7 5.3 9 4.9l.5 2-1.3 1.2Z"/></svg></a>
-  <script src="script.js"></script>
+  <script src="${scriptFile}"></script>
 </body>
 </html>`;
 }
@@ -266,7 +268,7 @@ function enhanceHtml(file) {
 
   html = html
     .replace(/href="styles(?:-[a-z0-9]+)?\.css(?:\?v=[^"]*)?"/gi, `href="${stylesheetFile}"`)
-    .replace(/src="script\.js(?:\?v=[^"]*)?"/gi, `src="script.js?v=${assetVersion}"`)
+    .replace(/src="script(?:-[a-z0-9]+)?\.js(?:\?v=[^"]*)?"/gi, `src="${scriptFile}"`)
     .replace(/<link\s+rel="(?:icon|apple-touch-icon)"\s+href="[^"]+"\s*\/?\s*>/gi, "")
     .replace(/<meta\s+name="theme-color"\s+content="[^"]+"\s*\/?\s*>/gi, "");
 

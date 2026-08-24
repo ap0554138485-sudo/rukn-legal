@@ -91,7 +91,7 @@ for (const file of files) {
     errors.push(`${file}: og:url should be ${expectedCanonical}`);
   }
   if (faviconLinks[0] && faviconLinks[0] !== "/favicon.ico") errors.push(`${file}: favicon should use /favicon.ico`);
-  if (appleTouchIcons[0] && appleTouchIcons[0] !== "/logo-128.png") errors.push(`${file}: Apple touch icon should use /logo-128.png`);
+  if (appleTouchIcons[0] && appleTouchIcons[0] !== "/logo-128-20260824.png") errors.push(`${file}: Apple touch icon should use /logo-128-20260824.png`);
   if (themeColors[0] && themeColors[0] !== "#102a29") errors.push(`${file}: unexpected theme color ${themeColors[0]}`);
   if (!/G-KKGEYHSD29/.test(html)) errors.push(`${file}: missing Google Analytics tag`);
   if (!/rel="alternate"\s+hreflang="(?:ar|en)"/i.test(html)) errors.push(`${file}: missing language alternate`);
@@ -112,7 +112,7 @@ for (const file of files) {
   if (file === "index.html") {
     const organization = structuredNodes.find((node) => node["@type"] === "Organization" && node["@id"] === `${origin}/#organization`);
     const logoUrl = typeof organization?.logo === "string" ? organization.logo : organization?.logo?.url || organization?.logo?.contentUrl;
-    if (logoUrl !== `${origin}/logo-128.png`) errors.push(`${file}: Organization logo is missing or incorrect`);
+    if (logoUrl !== `${origin}/logo-128-20260824.png`) errors.push(`${file}: Organization logo is missing or incorrect`);
   }
   if (!/data-content-accountability/i.test(html)) errors.push(`${file}: missing visible content accountability block`);
   if (!/<time\s+datetime="2026-08-22"/i.test(html)) errors.push(`${file}: missing current content update date`);
@@ -184,7 +184,7 @@ if (!new RegExp(`Sitemap:\\s*${origin.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}/si
   errors.push("robots.txt: missing production sitemap URL");
 }
 
-for (const asset of ["favicon.ico", "logo-128.png"]) {
+for (const asset of ["favicon.ico", "logo-128-20260824.png", "script-20260824b.js"]) {
   if (!existsSync(resolve(root, asset))) errors.push(`${asset}: missing search appearance asset`);
 }
 
