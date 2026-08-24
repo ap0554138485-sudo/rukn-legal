@@ -61,6 +61,9 @@ for (const file of files) {
   const ogTitles = matches(html, /<meta\s+property="og:title"\s+content="([^"]+)"\s*\/?\s*>/gi);
   const ogDescriptions = matches(html, /<meta\s+property="og:description"\s+content="([^"]+)"\s*\/?\s*>/gi);
   const ogUrls = matches(html, /<meta\s+property="og:url"\s+content="([^"]+)"\s*\/?\s*>/gi);
+  const faviconLinks = matches(html, /<link\s+rel="icon"\s+href="([^"]+)"\s*\/?\s*>/gi);
+  const appleTouchIcons = matches(html, /<link\s+rel="apple-touch-icon"\s+href="([^"]+)"\s*\/?\s*>/gi);
+  const themeColors = matches(html, /<meta\s+name="theme-color"\s+content="([^"]+)"\s*\/?\s*>/gi);
   const expectedCanonical = file === "index.html" ? `${origin}/` : `${origin}/${file}`;
   const isNoindex = robots.some((value) => /\bnoindex\b/i.test(value));
   const internalTargets = new Set();
@@ -74,7 +77,10 @@ for (const file of files) {
     ["robots", robots],
     ["og:title", ogTitles],
     ["og:description", ogDescriptions],
-    ["og:url", ogUrls]
+    ["og:url", ogUrls],
+    ["favicon", faviconLinks],
+    ["Apple touch icon", appleTouchIcons],
+    ["theme color", themeColors]
   ]) {
     if (values.length !== 1) errors.push(`${file}: expected one ${label}, found ${values.length}`);
   }
@@ -84,6 +90,9 @@ for (const file of files) {
   if (ogUrls[0] && ogUrls[0] !== expectedCanonical) {
     errors.push(`${file}: og:url should be ${expectedCanonical}`);
   }
+  if (faviconLinks[0] && faviconLinks[0] !== "/favicon.ico") errors.push(`${file}: favicon should use /favicon.ico`);
+  if (appleTouchIcons[0] && appleTouchIcons[0] !== "/logo-128.png") errors.push(`${file}: Apple touch icon should use /logo-128.png`);
+  if (themeColors[0] && themeColors[0] !== "#102a29") errors.push(`${file}: unexpected theme color ${themeColors[0]}`);
   if (!/G-KKGEYHSD29/.test(html)) errors.push(`${file}: missing Google Analytics tag`);
   if (!/rel="alternate"\s+hreflang="(?:ar|en)"/i.test(html)) errors.push(`${file}: missing language alternate`);
   if (!/rel="alternate"\s+hreflang="x-default"/i.test(html)) errors.push(`${file}: missing x-default alternate`);
@@ -100,6 +109,11 @@ for (const file of files) {
   }
   const structuredNodes = parsedJsonLd.flatMap(schemaNodes);
   if (!structuredNodes.some((node) => node["@type"] === "WebPage")) errors.push(`${file}: missing WebPage structured data`);
+  if (file === "index.html") {
+    const organization = structuredNodes.find((node) => node["@type"] === "Organization" && node["@id"] === `${origin}/#organization`);
+    const logoUrl = typeof organization?.logo === "string" ? organization.logo : organization?.logo?.url || organization?.logo?.contentUrl;
+    if (logoUrl !== `${origin}/logo-128.png`) errors.push(`${file}: Organization logo is missing or incorrect`);
+  }
   if (!/data-content-accountability/i.test(html)) errors.push(`${file}: missing visible content accountability block`);
   if (!/<time\s+datetime="2026-08-22"/i.test(html)) errors.push(`${file}: missing current content update date`);
   const hasVisibleBreadcrumb = /class="[^"]*\bbreadcrumb\b/i.test(html);
@@ -168,6 +182,10 @@ const robotsTxt = readFileSync(resolve(root, "robots.txt"), "utf8");
 if (!/User-agent:\s*\*/i.test(robotsTxt)) errors.push("robots.txt: missing global user-agent rule");
 if (!new RegExp(`Sitemap:\\s*${origin.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}/sitemap\\.xml`, "i").test(robotsTxt)) {
   errors.push("robots.txt: missing production sitemap URL");
+}
+
+for (const asset of ["favicon.ico", "logo-128.png"]) {
+  if (!existsSync(resolve(root, asset))) errors.push(`${asset}: missing search appearance asset`);
 }
 
 const indexable = [...pages.values()].filter((page) => !page.isNoindex);

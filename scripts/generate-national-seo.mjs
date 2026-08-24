@@ -7,7 +7,7 @@ const releaseDate = "2026-08-22";
 const phone = "+966506142113";
 const displayPhone = "+966 50 614 2113";
 const email = "ap0554138485@icloud.com";
-const assetVersion = "20260822a";
+const assetVersion = "20260824a";
 const stylesheetFile = `styles-20260821b.css?v=${assetVersion}`;
 const fontStylesheet = "https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@400;500;600;700&family=Manrope:wght@400;500;600;700&display=swap";
 
@@ -68,6 +68,10 @@ function gaTag() {
   return `<script async src="https://www.googletagmanager.com/gtag/js?id=G-KKGEYHSD29"></script><script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments)}gtag('js',new Date());gtag('config','G-KKGEYHSD29');</script>`;
 }
 
+function searchAppearanceTags() {
+  return `<!-- site-search-appearance:start --><link rel="icon" href="/favicon.ico"><link rel="apple-touch-icon" href="/logo-128.png"><meta name="theme-color" content="#102a29"><!-- site-search-appearance:end -->`;
+}
+
 function fontLinks() {
   return `<!-- site-fonts:start --><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link rel="preload" as="style" href="${fontStylesheet}"><link rel="stylesheet" href="${fontStylesheet}" media="print" onload="this.media='all'"><noscript><link rel="stylesheet" href="${fontStylesheet}"></noscript><!-- site-fonts:end -->`;
 }
@@ -93,6 +97,7 @@ function shell({ file, title, description, robots = "index,follow,max-image-prev
   ${gaTag()}
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
+  ${searchAppearanceTags()}
   <meta name="robots" content="${robots}">
   <meta name="description" content="${escapeHtml(description)}">
   <title>${escapeHtml(title)}</title>
@@ -261,7 +266,16 @@ function enhanceHtml(file) {
 
   html = html
     .replace(/href="styles(?:-[a-z0-9]+)?\.css(?:\?v=[^"]*)?"/gi, `href="${stylesheetFile}"`)
-    .replace(/src="script\.js(?:\?v=[^"]*)?"/gi, `src="script.js?v=${assetVersion}"`);
+    .replace(/src="script\.js(?:\?v=[^"]*)?"/gi, `src="script.js?v=${assetVersion}"`)
+    .replace(/<link\s+rel="(?:icon|apple-touch-icon)"\s+href="[^"]+"\s*\/?\s*>/gi, "")
+    .replace(/<meta\s+name="theme-color"\s+content="[^"]+"\s*\/?\s*>/gi, "");
+
+  const searchAppearance = searchAppearanceTags();
+  if (/<!-- site-search-appearance:start -->[\s\S]*?<!-- site-search-appearance:end -->/i.test(html)) {
+    html = html.replace(/<!-- site-search-appearance:start -->[\s\S]*?<!-- site-search-appearance:end -->/i, searchAppearance);
+  } else {
+    html = html.replace(/(<meta\s+name="viewport"[^>]*>)/i, `$1\n  ${searchAppearance}`);
+  }
 
   const fonts = fontLinks();
   if (/<!-- site-fonts:start -->[\s\S]*?<!-- site-fonts:end -->/i.test(html)) {
