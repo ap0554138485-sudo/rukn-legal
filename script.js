@@ -31,6 +31,18 @@ function getInteractionLocation(element) {
   return "page";
 }
 
+function getInternalNavigationType(link) {
+  if (link.hasAttribute("hreflang")) return "language_switch";
+  if (link.closest(".article-action")) return "article_path";
+  if (link.closest(".directory-page")) return "directory_link";
+  if (link.closest(".related-services")) return "related_service";
+  if (link.closest(".specialty-card")) return "service_path";
+  if (link.closest(".breadcrumb")) return "breadcrumb";
+  if (link.closest(".footer-trust-links")) return "trust_link";
+  if (link.closest("#nav")) return "main_navigation";
+  return "";
+}
+
 function trackEvent(eventName, parameters = {}) {
   const eventParameters = {
     page_language: document.documentElement.lang || "ar",
@@ -187,10 +199,23 @@ document.addEventListener("click", (event) => {
     contactMethod = "email";
   }
 
-  if (!contactMethod) return;
+  if (contactMethod) {
+    trackLead(contactMethod, {
+      contact_location: getInteractionLocation(link),
+    });
+    return;
+  }
 
-  trackLead(contactMethod, {
-    contact_location: getInteractionLocation(link),
+  const navigationType = getInternalNavigationType(link);
+  if (!navigationType) return;
+
+  const destination = new URL(href, window.location.href);
+  if (destination.origin !== window.location.origin) return;
+
+  trackEvent("select_content", {
+    content_type: navigationType,
+    item_id: destination.pathname || "/",
+    link_location: getInteractionLocation(link),
   });
 });
 
@@ -221,6 +246,11 @@ document.addEventListener("keydown", (event) => {
 });
 
 document.getElementById("langBtn")?.addEventListener("click", () => {
+  trackEvent("select_content", {
+    content_type: "language_switch",
+    item_id: document.documentElement.lang === "en" ? "/" : "/en.html",
+    link_location: "header",
+  });
   window.location.href = document.documentElement.lang === "en" ? "index.html" : "en.html";
 });
 
@@ -269,4 +299,17 @@ function filterLocationDirectory() {
   if (locationDirectoryEmpty) locationDirectoryEmpty.hidden = visibleCount !== 0;
 }
 
-locationDirectorySearch?.addEventListener("input", filterLocationDirectory);
+let directorySearchTimer = null;
+
+locationDirectorySearch?.addEventListener("input", () => {
+  filterLocationDirectory();
+  window.clearTimeout(directorySearchTimer);
+  directorySearchTimer = window.setTimeout(() => {
+    if (!locationDirectorySearch.value.trim()) return;
+    const visibleResults = document.querySelectorAll("[data-location-item]:not([hidden])").length;
+    trackEvent("view_search_results", {
+      directory_type: locationDirectorySearch.dataset.directoryType || "locations",
+      result_count: visibleResults,
+    });
+  }, 800);
+});
