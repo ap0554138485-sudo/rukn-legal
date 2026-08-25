@@ -17,7 +17,7 @@ const fontStylesheet = "https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+A
 const regions = [
   ["منطقة الرياض", "الرياض، الخرج، الدرعية، الدوادمي، المجمعة ووادي الدواسر", "legal-services-riyadh.html", "دليل خدمات وأحياء الرياض"],
   ["منطقة مكة المكرمة", "مكة المكرمة، جدة، الطائف، رابغ، القنفذة والليث", "legal-services-jeddah.html", "دليل الخدمات القانونية في جدة"],
-  ["المنطقة الشرقية", "الدمام، الخبر، الظهران، الأحساء، الجبيل، القطيف وحفر الباطن", "legal-services-dammam.html", "دليل الخدمات القانونية في الدمام"],
+  ["المنطقة الشرقية", "الدمام، الخبر، الظهران، الأحساء، الجبيل، القطيف وحفر الباطن", "eastern-province-legal-services.html", "دليل المنطقة الشرقية الكامل"],
   ["منطقة تبوك", "تبوك، ضباء، الوجه، أملج، تيماء، حقل والبدع", "tabuk-region-lawyers.html", "دليل منطقة تبوك ومحافظاتها"],
   ["منطقة المدينة المنورة", "المدينة المنورة، ينبع، العلا، بدر وخيبر", "#start", "بدء طلب من المنطقة"],
   ["منطقة القصيم", "بريدة، عنيزة، الرس، البكيرية والمذنب", "#start", "بدء طلب من المنطقة"],
@@ -194,6 +194,7 @@ function isNoindex(html) {
 }
 
 function categoryFor(file) {
+  if (/^eastern-/.test(file)) return "المنطقة الشرقية";
   if (/tabuk|duba|umluj|tayma|haql|al-wajh|al-bad/.test(file)) return "منطقة تبوك";
   if (/riyadh/.test(file)) return "الرياض";
   if (/jeddah/.test(file)) return "جدة";
@@ -216,7 +217,7 @@ function directoryPage() {
     if (!groups.has(category)) groups.set(category, []);
     groups.get(category).push({ file: pageFile, title: pageTitle(html, pageFile) });
   }
-  const order = ["الصفحات العامة", "خدمات التوثيق", "منطقة تبوك", "الرياض", "جدة", "الدمام", "المقالات والأدلة"];
+  const order = ["الصفحات العامة", "خدمات التوثيق", "منطقة تبوك", "الرياض", "جدة", "المنطقة الشرقية", "الدمام", "المقالات والأدلة"];
   const sections = order.filter((key) => groups.has(key)).map((key) => `<section class="directory-group" data-location-group><h2>${key}</h2><div class="related-services directory-links">${groups.get(key).map((item) => `<a data-location-item href="${item.file}">${escapeHtml(item.title)}</a>`).join("")}</div></section>`).join("");
   const total = [...groups.values()].reduce((sum, items) => sum + items.length, 0);
   const body = `<main><div class="container breadcrumb" aria-label="مسار الصفحة"><a href="/">الرئيسية</a><span aria-hidden="true">/</span><span>دليل الصفحات</span></div><section class="hero service-detail-hero"><div class="container hero-grid"><div class="hero-copy"><span class="eyebrow">روابط قابلة للتصفح</span><h1>دليل صفحات رُكن الأنظمة القانونية<br><span>الخدمات والمدن والأدلة</span></h1><p>دليل بشري يساعد الزائر ومحركات البحث على الوصول إلى الصفحات المهمة ضمن بنية واضحة، بدل الاعتماد على صفحات معزولة أو روابط غير مباشرة.</p><div class="hero-actions"><a class="btn primary" href="#directory">تصفح الدليل</a><a class="btn secondary" href="saudi-regions-guide.html">مناطق السعودية</a></div><div class="trust-row"><div><b>${total} رابطًا</b><span>مفهرسًا في الدليل</span></div><div><b>4 مدن</b><span>بأدلة موسعة</span></div><div><b>13 منطقة</b><span>في الدليل الوطني</span></div></div></div><aside class="service-hero-aside"><span class="service-badge">بحث داخل الدليل</span><div class="service-symbol" aria-hidden="true">⌕</div><label for="locationDirectorySearch">اكتب اسم الخدمة أو المدينة</label><input id="locationDirectorySearch" class="directory-search" data-directory-type="pages" type="search" placeholder="مثال: عقود، تبوك، الرياض"><p id="locationDirectoryCount">${total} صفحة ظاهرة</p></aside></div></section><section class="section" id="directory"><div class="container directory-page">${sections}<p id="locationDirectoryEmpty" class="coverage-disclaimer" hidden>لا توجد صفحة مطابقة. جرّب كلمة أقصر أو انتقل إلى دليل مناطق السعودية.</p></div></section></main>`;
@@ -260,6 +261,7 @@ function breadcrumbSchema(file, html, canonical, language) {
 }
 
 function locationProfile(file) {
+  if (/^eastern-/i.test(file)) return { key: "eastern", label: "المنطقة الشرقية" };
   if (/riyadh/i.test(file)) return { key: "riyadh", label: "الرياض" };
   if (/dammam/i.test(file)) return { key: "dammam", label: "الدمام" };
   if (/jeddah/i.test(file)) return { key: "jeddah", label: "جدة" };
@@ -278,6 +280,12 @@ function clusterFor(file, html) {
 
 function legalIntentCards(locationKey) {
   const cards = {
+    eastern: [
+      ["دليل المنطقة الشرقية", "eastern-province-legal-services.html", "اختر المدينة أو المحافظة ثم المسار القانوني الأقرب لمرحلة الطلب."],
+      ["مراجعة عقد قبل التوقيع", "eastern-dammam-contract-risk-review.html", "رتّب البنود والضمانات والإنهاء قبل إنشاء التزام جديد."],
+      ["مراجعة طلب تنفيذ", "eastern-khobar-enforcement-application.html", "طابق السند والرصيد وبيانات الأطراف قبل تقديم الطلب."],
+      ["تنظيم نزاع تجاري", "eastern-jubail-supplier-dispute.html", "افصل التوريد والجودة والتأخير والدفعات في ملف واضح."]
+    ],
     tabuk: [
       ["استشارة قانونية قبل اتخاذ الإجراء", "legal-consultation-tabuk.html", "لفهم الصفة والمرحلة والخيارات قبل رفع الدعوى أو الرد عليها."],
       ["توكيل محامي ومتابعة القضية", "appoint-lawyer-tabuk.html", "لتحديد نطاق الوكالة والتمثيل والمتابعة والمواعيد المهمة."],
