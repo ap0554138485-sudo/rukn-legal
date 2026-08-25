@@ -49,7 +49,7 @@ $cranlHeaders = @{
   Accept = 'application/json'
 }
 
-function Get-LatestDeployment {
+function Get-Deployments {
   $deploymentResponse = Invoke-RestMethod -Method Get -Uri $deploymentEndpoint -Headers $cranlHeaders
   $deploymentItems = if ($deploymentResponse.deployments) {
     @($deploymentResponse.deployments)
@@ -57,7 +57,11 @@ function Get-LatestDeployment {
     @($deploymentResponse)
   }
 
-  return $deploymentItems |
+  return $deploymentItems
+}
+
+function Get-LatestDeployment {
+  return @(Get-Deployments) |
     Sort-Object { [DateTimeOffset]$_.createdAt } -Descending |
     Select-Object -First 1
 }
@@ -72,7 +76,11 @@ function Clear-ApplicationCache {
   Write-Host 'Application cache cleared.'
 }
 
-$previousDeployment = Get-LatestDeployment
+$previousDeployments = @(Get-Deployments)
+$previousDeploymentIds = @($previousDeployments | ForEach-Object { [string]$_.deploymentId })
+$previousDeployment = $previousDeployments |
+  Sort-Object { [DateTimeOffset]$_.createdAt } -Descending |
+  Select-Object -First 1
 
 if ($CheckOnly) {
   if (-not $previousDeployment) {
@@ -95,13 +103,25 @@ if ($LASTEXITCODE -ne 0) {
 
 $deploymentDeadline = [DateTimeOffset]::UtcNow.AddSeconds($TimeoutSeconds)
 $lastReportedStatus = ''
+$targetDeployment = $null
 
 do {
   Start-Sleep -Seconds 5
-  $latestDeployment = Get-LatestDeployment
+  $currentDeployments = @(Get-Deployments)
 
-  if ($latestDeployment -and $latestDeployment.deploymentId -ne $previousDeployment.deploymentId) {
-    $currentStatus = [string]$latestDeployment.status
+  if (-not $targetDeployment) {
+    $targetDeployment = $currentDeployments |
+      Where-Object { $previousDeploymentIds -notcontains [string]$_.deploymentId } |
+      Sort-Object { [DateTimeOffset]$_.createdAt } |
+      Select-Object -First 1
+  } else {
+    $targetDeployment = $currentDeployments |
+      Where-Object { $_.deploymentId -eq $targetDeployment.deploymentId } |
+      Select-Object -First 1
+  }
+
+  if ($targetDeployment) {
+    $currentStatus = [string]$targetDeployment.status
 
     if ($currentStatus -ne $lastReportedStatus) {
       Write-Host "Deployment status: $currentStatus"
@@ -110,12 +130,12 @@ do {
 
     if ($currentStatus -eq 'done') {
       Clear-ApplicationCache
-      Write-Host "Deployment completed: $($latestDeployment.title)"
+      Write-Host "Deployment completed: $($targetDeployment.title)"
       exit 0
     }
 
     if ($currentStatus -eq 'error') {
-      throw "Deployment failed: $($latestDeployment.title)"
+      throw "Deployment failed: $($targetDeployment.title)"
     }
   }
 } while ([DateTimeOffset]::UtcNow -lt $deploymentDeadline)
