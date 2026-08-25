@@ -3,12 +3,13 @@ import { resolve } from "node:path";
 
 const root = resolve(import.meta.dirname, "..");
 const baseUrl = "https://rukn-legal-vwptio.cranl.net";
-const releaseDate = "2026-08-24";
+const releaseDate = "2026-08-25";
 const phone = "+966506142113";
 const displayPhone = "+966 50 614 2113";
 const email = "ap0554138485@icloud.com";
 const assetVersion = "20260824b";
-const stylesheetFile = `styles-20260821b.css?v=${assetVersion}`;
+const stylesheetVersion = "20260825a";
+const stylesheetFile = `styles-20260821b.css?v=${stylesheetVersion}`;
 const scriptFile = `script-${assetVersion}.js`;
 const logoFile = "logo-128-20260824.png";
 const fontStylesheet = "https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@400;500;600;700&family=Manrope:wght@400;500;600;700&display=swap";
@@ -232,9 +233,9 @@ function sitewideTrustBlock(language) {
 
 function contentAccountabilityBlock(language) {
   if (language === "en") {
-    return `<!-- content-accountability:start --><aside class="content-accountability" data-content-accountability aria-label="Content information"><div class="container content-accountability-inner"><div><strong>Published and maintained by Legal Systems Corner</strong><span>General information to help organize an initial request; it does not replace a professional review of the facts and documents.</span></div><div class="content-accountability-meta"><time datetime="${releaseDate}">Content updated 24 August 2026</time><a href="about.html">How we prepare content</a></div></div></aside><!-- content-accountability:end -->`;
+    return `<!-- content-accountability:start --><aside class="content-accountability" data-content-accountability aria-label="Content information"><div class="container content-accountability-inner"><div><strong>Published and maintained by Legal Systems Corner</strong><span>General information to help organize an initial request; it does not replace a professional review of the facts and documents.</span></div><div class="content-accountability-meta"><time datetime="${releaseDate}">Content updated 25 August 2026</time><a href="about.html">How we prepare content</a></div></div></aside><!-- content-accountability:end -->`;
   }
-  return `<!-- content-accountability:start --><aside class="content-accountability" data-content-accountability aria-label="معلومات المحتوى"><div class="container content-accountability-inner"><div><strong>النشر والتحديث: رُكن الأنظمة القانونية</strong><span>محتوى عام لتنظيم الطلب الأولي، ولا يغني عن تقييم الوقائع والمستندات من مختص.</span></div><div class="content-accountability-meta"><time datetime="${releaseDate}">تحديث المحتوى: 24 أغسطس 2026</time><a href="about.html">منهج إعداد المحتوى</a></div></div></aside><!-- content-accountability:end -->`;
+  return `<!-- content-accountability:start --><aside class="content-accountability" data-content-accountability aria-label="معلومات المحتوى"><div class="container content-accountability-inner"><div><strong>النشر والتحديث: رُكن الأنظمة القانونية</strong><span>محتوى عام لتنظيم الطلب الأولي، ولا يغني عن تقييم الوقائع والمستندات من مختص.</span></div><div class="content-accountability-meta"><time datetime="${releaseDate}">تحديث المحتوى: 25 أغسطس 2026</time><a href="about.html">منهج إعداد المحتوى</a></div></div></aside><!-- content-accountability:end -->`;
 }
 
 function breadcrumbSchema(file, html, canonical, language) {
@@ -258,7 +259,146 @@ function breadcrumbSchema(file, html, canonical, language) {
   };
 }
 
-function enhanceHtml(file) {
+function locationProfile(file) {
+  if (/riyadh/i.test(file)) return { key: "riyadh", label: "الرياض" };
+  if (/dammam/i.test(file)) return { key: "dammam", label: "الدمام" };
+  if (/jeddah/i.test(file)) return { key: "jeddah", label: "جدة" };
+  if (/tabuk|duba|umluj|tayma|haql|al-wajh|al-bad/i.test(file)) return { key: "tabuk", label: "منطقة تبوك" };
+  return { key: "national", label: "السعودية" };
+}
+
+function isNotaryPage(file, html) {
+  return /notary|notarization/i.test(file) || /<meta\s+name="page-family"\s+content="notary-/i.test(html);
+}
+
+function clusterFor(file, html) {
+  const location = locationProfile(file);
+  return `${isNotaryPage(file, html) ? "notary" : "legal"}-${location.key}`;
+}
+
+function legalIntentCards(locationKey) {
+  const cards = {
+    tabuk: [
+      ["استشارة قانونية قبل اتخاذ الإجراء", "legal-consultation-tabuk.html", "لفهم الصفة والمرحلة والخيارات قبل رفع الدعوى أو الرد عليها."],
+      ["توكيل محامي ومتابعة القضية", "appoint-lawyer-tabuk.html", "لتحديد نطاق الوكالة والتمثيل والمتابعة والمواعيد المهمة."],
+      ["كتابة اعتراض أو مذكرة قانونية", "objection-memorandum-tabuk.html", "لترتيب الوقائع والطلبات والأسانيد والمرفقات بصورة واضحة."],
+      ["مراجعة عقد أو مطالبة مالية", "contracts-lawyer-tabuk.html", "لفحص الالتزامات والدفعات والإخلال والنتيجة المطلوبة."]
+    ],
+    dammam: [
+      ["استشارة قانونية قبل اتخاذ الإجراء", "legal-consultation-dammam.html", "لفهم الموقف والمستند والجهة والمدة قبل بدء الإجراء."],
+      ["توكيل محامي ومتابعة القضية", "lawyer-dammam.html", "لتحديد القضية ونطاق التمثيل والخطوات والمواعيد القادمة."],
+      ["اعتراض أو استئناف على حكم", "appeals-lawyer-dammam.html", "لمراجعة الحكم وأسبابه والمدة والمستندات المؤثرة."],
+      ["مراجعة عقد أو مطالبة مالية", "contracts-lawyer-dammam.html", "لفحص العقد والالتزام والإخلال والمطالبة المناسبة."]
+    ],
+    riyadh: [
+      ["استشارة قانونية قبل اتخاذ الإجراء", "lawyer-riyadh.html", "لفهم الصفة والمرحلة والخيارات قبل رفع الدعوى أو الرد عليها."],
+      ["توكيل محامي ومتابعة قضية", "legal-services-riyadh.html", "لاختيار التخصص المناسب وترتيب المستندات والمواعيد."],
+      ["تنفيذ حكم أو سند", "execution-lawyer-riyadh.html", "لتحديد السند التنفيذي والطلبات والعوائق والإجراء التالي."],
+      ["مراجعة عقد أو اتفاقية", "contracts-lawyer-riyadh.html", "لفحص الالتزامات والدفعات والضمانات والإنهاء قبل التوقيع أو المطالبة."]
+    ],
+    jeddah: [
+      ["استشارة قانونية قبل اتخاذ الإجراء", "lawyer-jeddah.html", "لفهم الوقائع والصفة والمرحلة قبل اختيار مسار القضية."],
+      ["توكيل محامي ومتابعة قضية", "legal-services-jeddah.html", "لاختيار التخصص وترتيب المستندات والإجراءات والمواعيد."],
+      ["تنفيذ حكم أو مطالبة", "execution-lawyer-jeddah.html", "لتحديد السند والمبلغ والعائق والطلب التنفيذي المناسب."],
+      ["مراجعة عقد أو اتفاقية", "contracts-lawyer-jeddah.html", "لفحص الالتزامات والمقابل والضمان والإنهاء قبل التوقيع أو النزاع."]
+    ],
+    national: [
+      ["ابدأ بطلب استشارة قانونية", "/#contact", "حدّد نوع المسألة والمدينة والمرحلة والمستند الأساسي."],
+      ["اختر دليل مدينتك", "saudi-regions-guide.html", "انتقل إلى المدينة أو المنطقة الأقرب إلى موقع الطلب."],
+      ["تعرّف على موضوعك القانوني", "articles.html", "اقرأ الأدلة العملية قبل إرسال ملخص الطلب."],
+      ["تصفح جميع الخدمات المنشورة", "site-directory.html", "استخدم الدليل للوصول إلى صفحة التخصص أو المدينة المناسبة."]
+    ]
+  };
+  return cards[locationKey] || cards.national;
+}
+
+function notaryIntentCards(locationKey) {
+  const city = ["dammam", "riyadh", "tabuk"].includes(locationKey) ? locationKey : null;
+  const cityRequest = city ? `request-notary-${city}.html` : "notary-services-saudi.html";
+  const licensePage = city ? `verify-notary-license-${city}.html` : "notary-services-saudi.html";
+  const powerOfAttorneyPage = city ? `power-of-attorney-notary-${city}.html` : "power-of-attorney-notarization-saudi.html";
+  const realEstatePage = city ? `real-estate-transfer-notary-${city}.html` : "real-estate-transfer-notarization-saudi.html";
+  return [
+    ["البحث عن موثق مرخص", licensePage, "تحقق من الترخيص والنطاق المتاح عبر المنصة الرسمية قبل إرسال المستندات."],
+    ["طلب موثق وتحديد نوع المعاملة", cityRequest, "حدّد المدينة ونوع التوثيق وصفة الأطراف والموعد المطلوب."],
+    ["توثيق وكالة أو فسخ وكالة", powerOfAttorneyPage, "راجع بيانات الموكل والوكيل والصلاحيات قبل إصدار الوكالة أو فسخها."],
+    ["توثيق نقل ملكية عقار", realEstatePage, "جهّز بيانات العقار والأطراف والمقابل والمتطلبات المرتبطة بالتصرف."]
+  ];
+}
+
+function clientIntentBlock(file, html, catalog) {
+  if (isNoindex(html) || /<html[^>]*\slang="en/i.test(html)) return "";
+  const location = locationProfile(file);
+  const notary = isNotaryPage(file, html);
+  const currentTitle = pageTitle(html, file).split("|")[0].trim();
+  const catalogFiles = new Set(catalog.map((page) => page.file));
+  const cards = (notary ? notaryIntentCards(location.key) : legalIntentCards(location.key))
+    .filter(([, href]) => {
+      const target = href === "/#contact" ? "index.html" : href.split("#")[0];
+      return target !== file && catalogFiles.has(target);
+    })
+    .map(([label, href, copy]) => `<article class="intent-card"><h3><a href="${href}">${label}</a></h3><p>${copy}</p></article>`)
+    .join("");
+
+  const cluster = clusterFor(file, html);
+  const clusterPages = catalog.filter((page) => page.cluster === cluster).sort((a, b) => a.file.localeCompare(b.file));
+  const currentIndex = clusterPages.findIndex((page) => page.file === file);
+  const related = [];
+  for (let offset = 1; offset < clusterPages.length && related.length < 6; offset += 1) {
+    const candidate = clusterPages[(currentIndex + offset) % clusterPages.length];
+    if (candidate && !related.some((item) => item.file === candidate.file)) related.push(candidate);
+  }
+  const relatedLinks = related.map((page) => `<a href="${page.file}">${escapeHtml(page.title.split("|")[0].trim())}</a>`).join("");
+  const heading = notary ? "ما خدمة التوثيق التي تحتاجها الآن؟" : "هل تحتاج استشارة قانونية أم توكيل محامي؟";
+  const intro = notary
+    ? `ابدأ من نوع المعاملة، ثم تحقق من الموثق المرخص والمتطلبات الرسمية. هذه المسارات تساعدك على الانتقال من ${escapeHtml(currentTitle)} إلى الإجراء الأقرب لطلبك.`
+    : `حدّد هدفك أولًا: استشارة لفهم الموقف، توكيل لمتابعة قضية، إعداد اعتراض أو مذكرة، أو مراجعة عقد ومطالبة. اختر المسار الأقرب إلى ${escapeHtml(currentTitle)}.`;
+  const relatedHeading = notary ? `صفحات توثيق مرتبطة في ${location.label}` : `خدمات قانونية مرتبطة في ${location.label}`;
+  return `<!-- client-intent:start --><section class="section client-intent-section" data-client-intent><div class="container"><div class="section-head"><span class="eyebrow">اختر حسب هدفك</span><h2>${heading}</h2><p>${intro}</p></div><div class="intent-grid">${cards}</div>${relatedLinks ? `<div class="topic-links" data-topic-links><strong>${relatedHeading}</strong><div class="related-services">${relatedLinks}</div></div>` : ""}</div></section><!-- client-intent:end -->`;
+}
+
+function updateJsonLdServiceName(html, previousName, nextName) {
+  return html.replace(/(<script\s+type="application\/ld\+json"[^>]*>)([\s\S]*?)(<\/script>)/gi, (block, open, json, close) => {
+    try {
+      const value = JSON.parse(json);
+      const visit = (node) => {
+        if (!node || typeof node !== "object") return;
+        if (Array.isArray(node)) return node.forEach(visit);
+        if (node["@type"] === "Service" && node.name === previousName) node.name = nextName;
+        Object.values(node).forEach(visit);
+      };
+      visit(value);
+      return `${open}${JSON.stringify(value)}${close}`;
+    } catch {
+      return block;
+    }
+  });
+}
+
+function optimizeLocalServiceMetadata(file) {
+  if (!/^legal-services-(?:riyadh|dammam)-.+\.html$/i.test(file)) return;
+  const path = resolve(root, file);
+  let html = readFileSync(path, "utf8");
+  const original = html;
+  const previousTitle = decodeHtml(html.match(/<title>([\s\S]*?)<\/title>/i)?.[1]?.trim() || "");
+  const previousName = previousTitle.split("|")[0].trim();
+  if (!previousName.startsWith("خدمات قانونية")) return;
+  const nextName = previousName.replace(/^خدمات قانونية/, "محامي وخدمات قانونية");
+  const nextDescription = decodeHtml(html.match(/<meta\s+name="description"\s+content="([^"]+)"/i)?.[1]?.trim() || "")
+    .replace(/^خدمات قانونية/, "محامي وخدمات قانونية");
+  html = html
+    .replace(/<title>[\s\S]*?<\/title>/i, `<title>${escapeHtml(nextName)}</title>`)
+    .replace(/<meta\s+name="description"\s+content="[^"]+"\s*\/?\s*>/i, `<meta name="description" content="${escapeHtml(nextDescription)}">`)
+    .replace(/<meta\s+property="og:title"\s+content="[^"]+"\s*\/?\s*>/i, `<meta property="og:title" content="${escapeHtml(nextName)}">`)
+    .replace(/<meta\s+property="og:description"\s+content="[^"]+"\s*\/?\s*>/i, `<meta property="og:description" content="${escapeHtml(nextDescription)}">`)
+    .replace(/<meta\s+name="twitter:title"\s+content="[^"]+"\s*\/?\s*>/i, `<meta name="twitter:title" content="${escapeHtml(nextName)}">`)
+    .replace(/<meta\s+name="twitter:description"\s+content="[^"]+"\s*\/?\s*>/i, `<meta name="twitter:description" content="${escapeHtml(nextDescription)}">`)
+    .replace(/(<h1\b[^>]*>)([\s\S]*?)(<\/h1>)/i, (match, open, content, close) => `${open}${content.replace(/^\s*خدمات قانونية/, "محامي وخدمات قانونية")}${close}`);
+  html = updateJsonLdServiceName(html, previousName, nextName);
+  if (html !== original) writeFileSync(path, html, "utf8");
+}
+
+function enhanceHtml(file, catalog = []) {
   const path = resolve(root, file);
   let html = readFileSync(path, "utf8");
   const original = html;
@@ -314,6 +454,15 @@ function enhanceHtml(file) {
     }
   }
 
+  const clientIntent = clientIntentBlock(file, html, catalog);
+  if (clientIntent) {
+    if (/<!-- client-intent:start -->[\s\S]*?<!-- client-intent:end -->/i.test(html)) {
+      html = html.replace(/<!-- client-intent:start -->[\s\S]*?<!-- client-intent:end -->/i, clientIntent);
+    } else {
+      html = html.replace(/<\/main>/i, `${clientIntent}\n</main>`);
+    }
+  }
+
   const accountability = contentAccountabilityBlock(language);
   if (/<!-- content-accountability:start -->[\s\S]*?<!-- content-accountability:end -->\s*(?=<footer\b)/i.test(html)) {
     html = html.replace(/<!-- content-accountability:start -->[\s\S]*?<!-- content-accountability:end -->\s*(?=<footer\b)/i, `${accountability}\n  `);
@@ -357,11 +506,22 @@ function generate() {
   directoryPage();
 
   const htmlFiles = readdirSync(root).filter((file) => file.endsWith(".html") && !file.startsWith("google"));
-  for (const file of htmlFiles) enhanceHtml(file);
+  for (const file of htmlFiles) optimizeLocalServiceMetadata(file);
+  const catalog = htmlFiles
+    .map((file) => {
+      const html = readFileSync(resolve(root, file), "utf8");
+      return { file, html, title: pageTitle(html, file), cluster: clusterFor(file, html) };
+    })
+    .filter((page) => !isNoindex(page.html));
+  for (const file of htmlFiles) enhanceHtml(file, catalog);
 
   // Regenerate once more so the directory includes the final set of indexable pages.
   directoryPage();
-  enhanceHtml("site-directory.html");
+  const finalDirectoryHtml = readFileSync(resolve(root, "site-directory.html"), "utf8");
+  const finalCatalog = catalog.map((page) => page.file === "site-directory.html"
+    ? { ...page, html: finalDirectoryHtml, title: pageTitle(finalDirectoryHtml, page.file), cluster: clusterFor(page.file, finalDirectoryHtml) }
+    : page);
+  enhanceHtml("site-directory.html", finalCatalog);
   updateSitemap();
   writeFileSync(resolve(root, "robots.txt"), `User-agent: *\nAllow: /\n\nSitemap: ${baseUrl}/sitemap.xml\n`, "utf8");
   console.log(`Generated national SEO pages and enhanced ${htmlFiles.length} public HTML files.`);

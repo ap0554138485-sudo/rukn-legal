@@ -115,7 +115,10 @@ for (const file of files) {
     if (logoUrl !== `${origin}/logo-128-20260824.png`) errors.push(`${file}: Organization logo is missing or incorrect`);
   }
   if (!/data-content-accountability/i.test(html)) errors.push(`${file}: missing visible content accountability block`);
-  if (!/<time\s+datetime="2026-08-24"/i.test(html)) errors.push(`${file}: missing current content update date`);
+  if (!/<time\s+datetime="2026-08-25"/i.test(html)) errors.push(`${file}: missing current content update date`);
+  const isArabic = !/<html[^>]*\slang="en/i.test(html);
+  if (!isNoindex && isArabic && !/data-client-intent/i.test(html)) errors.push(`${file}: missing client-intent navigation`);
+  if (!isNoindex && isArabic && !/data-topic-links/i.test(html)) errors.push(`${file}: missing contextual topic links`);
   const hasVisibleBreadcrumb = /class="[^"]*\bbreadcrumb\b/i.test(html);
   if (!isNoindex && hasVisibleBreadcrumb && !structuredNodes.some((node) => node["@type"] === "BreadcrumbList")) {
     errors.push(`${file}: visible breadcrumb is missing BreadcrumbList structured data`);
@@ -169,6 +172,9 @@ for (const page of pages.values()) {
   if (!page.isNoindex && !sitemapSet.has(expected)) errors.push(`${page.file}: indexable page missing from sitemap`);
   if (!page.isNoindex && page.file !== "index.html" && inbound.get(page.file).size === 0) {
     errors.push(`${page.file}: indexable orphan page with no internal links pointing to it`);
+  }
+  if (!page.isNoindex && page.file !== "index.html" && inbound.get(page.file).size < 5) {
+    warnings.push(`${page.file}: weak internal discovery with only ${inbound.get(page.file).size} source pages`);
   }
   if (!page.isNoindex && page.internalTargets.size === 0) warnings.push(`${page.file}: no outgoing links to another public page`);
 }

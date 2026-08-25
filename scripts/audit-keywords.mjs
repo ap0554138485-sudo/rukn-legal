@@ -6,6 +6,7 @@ const files = readdirSync(root).filter((file) => file.endsWith(".html") && !file
 const errors = [];
 const warnings = [];
 const targets = new Map();
+let clientIntentPages = 0;
 
 function capture(html, pattern) {
   return html.match(pattern)?.[1]?.replace(/<[^>]+>/g, " ").replace(/\s+/g, " ").trim() || "";
@@ -60,6 +61,18 @@ for (const file of files) {
     targets.set(normalizedTarget, file);
   }
 
+  const visibleText = normalize(html.replace(/<script\b[\s\S]*?<\/script>/gi, " ").replace(/<style\b[\s\S]*?<\/style>/gi, " ").replace(/<[^>]+>/g, " "));
+  const notaryPage = /notary|notarization/i.test(file) || /page-family"\s+content="notary-/i.test(html);
+  const requiredIntent = notaryPage ? "موثق مرخص" : "استشارة قانونية";
+  if (!visibleText.includes(normalize(requiredIntent))) {
+    errors.push(`${file}: client search intent "${requiredIntent}" missing from visible content`);
+  } else {
+    clientIntentPages += 1;
+  }
+  if (/^legal-services-(?:riyadh|dammam)-.+\.html$/i.test(file) && !normalize(title).startsWith(normalize("محامي وخدمات قانونية"))) {
+    errors.push(`${file}: local page title does not start with client phrase "محامي وخدمات قانونية"`);
+  }
+
   if (file === "lawyer-tabuk.html") {
     const priorityPhrase = normalize("أفضل محامي في تبوك");
     const normalizedHtml = normalize(html.replace(/<[^>]+>/g, " "));
@@ -79,6 +92,7 @@ for (const file of files) {
 }
 
 console.log(`Keyword targets audited: ${targets.size}`);
+console.log(`Pages with verified client-search intent: ${clientIntentPages}`);
 console.log(`Warnings: ${warnings.length}`);
 if (warnings.length) console.log(warnings.join("\n"));
 console.log(`Errors: ${errors.length}`);
