@@ -8,11 +8,10 @@ const phone = "+966506142113";
 const displayPhone = "+966 50 614 2113";
 const email = "ap0554138485@icloud.com";
 const assetVersion = "20260824b";
-const stylesheetVersion = "20260825a";
+const stylesheetVersion = "20260825b";
 const stylesheetFile = `styles-20260821b.css?v=${stylesheetVersion}`;
 const scriptFile = `script-${assetVersion}.js`;
 const logoFile = "logo-128-20260824.png";
-const fontStylesheet = "https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@400;500;600;700&family=Manrope:wght@400;500;600;700&display=swap";
 
 const regions = [
   ["منطقة الرياض", "الرياض، الخرج، الدرعية، الدوادمي، المجمعة ووادي الدواسر", "legal-services-riyadh.html", "دليل خدمات وأحياء الرياض"],
@@ -68,7 +67,7 @@ function jsonLd(value) {
 }
 
 function gaTag() {
-  return `<script async src="https://www.googletagmanager.com/gtag/js?id=G-KKGEYHSD29"></script><script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments)}gtag('js',new Date());gtag('config','G-KKGEYHSD29');</script>`;
+  return `<!-- site-analytics:start --><script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments)}gtag('js',new Date());gtag('config','G-KKGEYHSD29');(()=>{let loaded=false;const load=()=>{if(loaded)return;loaded=true;const script=document.createElement('script');script.async=true;script.src='https://www.googletagmanager.com/gtag/js?id=G-KKGEYHSD29';document.head.appendChild(script)};['pointerdown','keydown','touchstart','scroll'].forEach(name=>window.addEventListener(name,load,{once:true,passive:true}));window.addEventListener('load',()=>window.setTimeout(load,6000),{once:true})})();</script><!-- site-analytics:end -->`;
 }
 
 function searchAppearanceTags() {
@@ -76,7 +75,7 @@ function searchAppearanceTags() {
 }
 
 function fontLinks() {
-  return `<!-- site-fonts:start --><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link rel="preload" as="style" href="${fontStylesheet}"><link rel="stylesheet" href="${fontStylesheet}" media="print" onload="this.media='all'"><noscript><link rel="stylesheet" href="${fontStylesheet}"></noscript><!-- site-fonts:end -->`;
+  return `<!-- site-fonts:start --><!-- Fast system fonts; no render-blocking external font request. --><!-- site-fonts:end -->`;
 }
 
 function accessibilityOverrides() {
@@ -126,7 +125,7 @@ function shell({ file, title, description, robots = "index,follow,max-image-prev
   ${body}
   ${footer()}
   <a class="whatsapp-float" href="https://wa.me/966506142113?text=${encodeURIComponent("السلام عليكم، أرغب في طلب خدمة قانونية. المنطقة ونوع الطلب: ")}" target="_blank" rel="noopener" aria-label="تواصل عبر واتساب"><svg viewBox="0 0 24 24" width="25" height="25" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 11.5a8.4 8.4 0 0 1-9 8.5 9.3 9.3 0 0 1-3.8-.8L3 21l1.8-5A8.5 8.5 0 1 1 21 11.5Z"/><path d="M8.2 8.1c.5 3.1 2.6 5.2 5.7 5.7l1.2-1.3 2 .5c-.4 2-1.7 3-3.4 2.8-3.8-.5-7-3.7-7.5-7.5C6 6.6 7 5.3 9 4.9l.5 2-1.3 1.2Z"/></svg></a>
-  <script src="${scriptFile}"></script>
+  <script src="${scriptFile}" defer></script>
 </body>
 </html>`;
 }
@@ -415,9 +414,17 @@ function enhanceHtml(file, catalog = []) {
   const description = decodeHtml(html.match(/<meta\s+name="description"\s+content="([^"]+)"/i)?.[1]?.trim() || "");
   const canonical = html.match(/<link\s+rel="canonical"\s+href="([^"]+)"/i)?.[1]?.trim();
 
+  const analytics = gaTag();
+  if (/<!-- site-analytics:start -->[\s\S]*?<!-- site-analytics:end -->/i.test(html)) {
+    html = html.replace(/<!-- site-analytics:start -->[\s\S]*?<!-- site-analytics:end -->/i, analytics);
+  } else {
+    html = html.replace(/<script\s+async\s+src="https:\/\/www\.googletagmanager\.com\/gtag\/js\?id=G-KKGEYHSD29"><\/script>\s*<script>[\s\S]*?gtag\(\s*['"]config['"]\s*,\s*['"]G-KKGEYHSD29['"]\s*\);?[\s\S]*?<\/script>/i, analytics);
+  }
+
   html = html
+    .replace(/(<a\s+class="brand"\s+href="[^"]+")\s+aria-label="[^"]*"/gi, "$1")
     .replace(/href="styles(?:-[a-z0-9]+)?\.css(?:\?v=[^"]*)?"/gi, `href="${stylesheetFile}"`)
-    .replace(/src="script(?:-[a-z0-9]+)?\.js(?:\?v=[^"]*)?"/gi, `src="${scriptFile}"`)
+    .replace(/<script\s+src="script(?:-[a-z0-9]+)?\.js(?:\?v=[^"]*)?"(?:\s+defer)?\s*><\/script>/gi, `<script src="${scriptFile}" defer></script>`)
     .replace(/<link\s+rel="(?:icon|apple-touch-icon)"\s+href="[^"]+"\s*\/?\s*>/gi, "")
     .replace(/<meta\s+name="theme-color"\s+content="[^"]+"\s*\/?\s*>/gi, "");
 

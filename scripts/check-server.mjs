@@ -48,10 +48,15 @@ try {
   assert(home.headers.get("x-content-type-options") === "nosniff", "X-Content-Type-Options is missing");
   assert(home.headers.get("strict-transport-security")?.includes("max-age=31536000"), "HSTS is missing");
   assert(home.headers.get("permissions-policy")?.includes("geolocation=()"), "Permissions-Policy is missing");
+  assert(home.headers.get("etag"), "ETag is missing");
+  assert(home.headers.get("last-modified"), "Last-Modified is missing");
   const csp = home.headers.get("content-security-policy") || "";
   assert(csp.includes("frame-ancestors 'none'"), "CSP frame protection is missing");
   assert(csp.includes("https://www.googletagmanager.com"), "CSP blocks Google Analytics scripts");
-  assert(csp.includes("https://fonts.googleapis.com"), "CSP blocks the site fonts");
+  assert(!csp.includes("fonts.googleapis.com"), "CSP still permits removed third-party font styles");
+
+  const notModified = await fetch(origin, { headers: { "if-none-match": home.headers.get("etag") } });
+  assert(notModified.status === 304, `conditional request returned ${notModified.status}`);
 
   const head = await fetch(`${origin}/articles.html`, { method: "HEAD" });
   assert(head.status === 200, `HEAD returned ${head.status}`);
@@ -65,6 +70,11 @@ try {
     const response = await fetch(`${origin}${publicPath}`);
     assert(response.status === 200, `${publicPath} returned ${response.status}`);
   }
+
+  const versionedAsset = await fetch(`${origin}/styles-20260821b.css`);
+  assert(versionedAsset.headers.get("cache-control")?.includes("immutable"), "versioned assets are not cached immutably");
+  const sitemap = await fetch(`${origin}/sitemap.xml`);
+  assert(sitemap.headers.get("cache-control")?.includes("max-age=0"), "sitemap may remain stale in crawler caches");
 
   for (const privatePath of ["/package.json", "/server.js", "/DEPLOYMENT.md", "/.git/config", "/scripts/generate-notary-pages.mjs"]) {
     const response = await fetch(`${origin}${privatePath}`);

@@ -188,6 +188,8 @@ html[dir="ltr"] .article-grid article::after { right: auto; left: 27px; }
 .article-grid article > a b { margin-inline-start: 5px; color: var(--gold); font-size: 16px; }
 .article-grid article > a:hover { color: var(--gold); }
 .articles-all { display: flex; justify-content: center; margin-top: 28px; }
+.articles-all .secondary-btn { color: var(--ink); background: transparent; border-color: rgba(16, 42, 41, 0.32); }
+.articles-all .secondary-btn:hover { color: var(--ink-deep); background: rgba(16, 42, 41, 0.06); border-color: rgba(16, 42, 41, 0.55); }
 
 #faq details { margin-bottom: 11px; overflow: hidden; background: rgba(255, 253, 248, 0.82); border: 1px solid rgba(16, 42, 41, 0.12); border-radius: var(--radius-sm); }
 #faq details[open] { background: var(--white); border-color: rgba(184, 146, 84, 0.55); }
