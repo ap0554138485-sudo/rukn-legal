@@ -43,6 +43,7 @@ $cranlApiRoot = if ($cranlConfig.api_url) {
 }
 
 $deploymentEndpoint = "$cranlApiRoot/api/applications/$AppId/deployments"
+$purgeCacheEndpoint = "$cranlApiRoot/api/applications/$AppId/purge-cache"
 $cranlHeaders = @{
   Authorization = 'Bearer ' + $cranlConfig.api_key
   Accept = 'application/json'
@@ -59,6 +60,16 @@ function Get-LatestDeployment {
   return $deploymentItems |
     Sort-Object { [DateTimeOffset]$_.createdAt } -Descending |
     Select-Object -First 1
+}
+
+function Clear-ApplicationCache {
+  $purgeResponse = Invoke-RestMethod -Method Post -Uri $purgeCacheEndpoint -Headers $cranlHeaders
+
+  if (-not $purgeResponse.success) {
+    throw 'The deployment completed, but Cranl did not confirm that the application cache was cleared.'
+  }
+
+  Write-Host 'Application cache cleared.'
 }
 
 $previousDeployment = Get-LatestDeployment
@@ -98,6 +109,7 @@ do {
     }
 
     if ($currentStatus -eq 'done') {
+      Clear-ApplicationCache
       Write-Host "Deployment completed: $($latestDeployment.title)"
       exit 0
     }
