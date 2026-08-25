@@ -1,7 +1,7 @@
 [CmdletBinding()]
 param(
   [string]$AppId = 'f3d8bfeb-3712-4ca1-ab4c-72317e96d297',
-  [int]$TimeoutSeconds = 300,
+  [int]$TimeoutSeconds = 900,
   [switch]$CheckOnly
 )
 
