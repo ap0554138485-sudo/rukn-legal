@@ -8,7 +8,7 @@ const phone = "+966506142113";
 const displayPhone = "+966 50 614 2113";
 const email = "ap0554138485@icloud.com";
 const assetVersion = "20260824b";
-const scriptVersion = "20260827a";
+const scriptVersion = "20260827b";
 const stylesheetVersion = "20260825b";
 const stylesheetFile = `styles-20260821b.css?v=${stylesheetVersion}`;
 const scriptFile = `script-${assetVersion}.js?v=${scriptVersion}`;

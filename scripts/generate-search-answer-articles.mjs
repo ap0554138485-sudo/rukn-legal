@@ -216,7 +216,7 @@ function renderArticle(article) {
   <section class="section contact-section"><div class="container"><div class="contact-card"><div><span class="eyebrow">مراجعة أولية</span><h2>أرسل ملخصًا منظمًا بدل كامل الملف</h2><p>اذكر المدينة والصفة والمرحلة والنتيجة المطلوبة وأقرب موعد، ثم انتظر تحديد المستندات اللازمة.</p></div><a class="primary-btn" href="${whatsapp}">إرسال الطلب عبر واتساب</a></div></div></section>
 </main>
 <footer><div class="container footer-grid"><div><a class="brand footer-brand" href="/"><div class="brand-mark" aria-hidden="true">⚖</div><div><strong>رُكن الأنظمة القانونية</strong><span>LEGAL SYSTEMS CORNER</span></div></a><p>محتوى قانوني عام لتنظيم الطلب الأولي، ولا يغني عن مراجعة مختص للوقائع والمستندات.</p></div><div><h3>روابط سريعة</h3><a href="articles.html">المقالات</a><a href="site-directory.html">دليل الصفحات</a><a href="privacy.html">الخصوصية</a></div><div><h3>التواصل</h3><a href="tel:${phone}" dir="ltr">${displayPhone}</a><a href="mailto:ap0554138485@icloud.com">ap0554138485@icloud.com</a></div></div><div class="container footer-bottom"><p>© 2026 رُكن الأنظمة القانونية.</p><p>المعلومات المنشورة لا تمثل وعدًا بنتيجة.</p></div></footer>
-<script src="script-20260824b.js?v=20260827a" defer></script>
+<script src="script-20260824b.js?v=20260827b" defer></script>
 </body>
 </html>`;
 }
