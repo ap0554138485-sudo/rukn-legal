@@ -251,7 +251,7 @@ document.getElementById("langBtn")?.addEventListener("click", () => {
     item_id: document.documentElement.lang === "en" ? "/" : "/en.html",
     link_location: "header",
   });
-  window.location.href = document.documentElement.lang === "en" ? "index.html" : "en.html";
+  window.location.href = document.documentElement.lang === "en" ? "/" : "en.html";
 });
 
 const locationDirectorySearch = document.getElementById("locationDirectorySearch");

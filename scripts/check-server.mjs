@@ -55,6 +55,10 @@ try {
   assert(csp.includes("https://www.googletagmanager.com"), "CSP blocks Google Analytics scripts");
   assert(!csp.includes("fonts.googleapis.com"), "CSP still permits removed third-party font styles");
 
+  const legacyHome = await fetch(`${origin}/index.html`, { redirect: "manual" });
+  assert(legacyHome.status === 301, `/index.html returned ${legacyHome.status} instead of 301`);
+  assert(legacyHome.headers.get("location") === "/", "/index.html does not redirect to the canonical root URL");
+
   const notModified = await fetch(origin, { headers: { "if-none-match": home.headers.get("etag") } });
   assert(notModified.status === 304, `conditional request returned ${notModified.status}`);
 

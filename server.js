@@ -136,6 +136,16 @@ http.createServer((req, res) => {
     return res.end('Bad Request');
   }
 
+  if (pathname.toLowerCase() === '/index.html') {
+    res.writeHead(301, {
+      Location: '/',
+      'Cache-Control': 'public, max-age=3600',
+      'X-Content-Type-Options': 'nosniff',
+      'Referrer-Policy': 'strict-origin-when-cross-origin'
+    });
+    return res.end();
+  }
+
   if (pathname === '/') pathname = '/index.html';
 
   const relativePath = pathname.replace(/^\/+/, '');
