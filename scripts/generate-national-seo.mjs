@@ -515,8 +515,9 @@ function updateSitemap() {
   pages.sort((a, b) => (a.file === "index.html" ? -1 : b.file === "index.html" ? 1 : a.file.localeCompare(b.file)));
   const entries = pages.map(({ file, html }) => {
     const canonical = canonicalFor(file, html);
+    const lastModified = /data-national-wave="[4-7]"/i.test(html) || ["saudi-regions-guide.html", "site-directory.html"].includes(file) ? "2026-08-29" : releaseDate;
     const alternates = file === "index.html" || file === "en.html" ? `\n    <xhtml:link rel="alternate" hreflang="ar" href="${baseUrl}/" />\n    <xhtml:link rel="alternate" hreflang="en" href="${baseUrl}/en.html" />\n    <xhtml:link rel="alternate" hreflang="x-default" href="${baseUrl}/" />` : "";
-    return `  <url>\n    <loc>${canonical}</loc>\n    <lastmod>${releaseDate}</lastmod>${alternates}\n  </url>`;
+    return `  <url>\n    <loc>${canonical}</loc>\n    <lastmod>${lastModified}</lastmod>${alternates}\n  </url>`;
   });
   writeFileSync(resolve(root, "sitemap.xml"), `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:xhtml="http://www.w3.org/1999/xhtml">\n${entries.join("\n")}\n</urlset>\n`, "utf8");
 }
