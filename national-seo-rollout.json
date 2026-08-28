@@ -1,12 +1,13 @@
 {
-  "updated": "2026-08-27",
+  "updated": "2026-08-28",
   "targetPages": 1000,
   "pagesPerDay": 100,
   "completedBatches": [
     1,
-    2
+    2,
+    3
   ],
-  "publishedPages": 200,
-  "remainingPages": 800,
-  "nextBatch": 3
+  "publishedPages": 300,
+  "remainingPages": 700,
+  "nextBatch": 4
 }
