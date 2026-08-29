@@ -6,10 +6,9 @@ const origin = "https://rukn-legal-vwptio.cranl.net";
 const phone = "+966506142113";
 const displayPhone = "+966 50 614 2113";
 const email = "ap0554138485@icloud.com";
-const modified = "2026-08-24";
+const modified = "2026-08-25";
 const officialSearch = "https://mwathiq.sa/MowathiqenSearch/MowathiqenSearchIndex";
 const officialService = "https://www.moj.gov.sa/ar/eservices/pages/72679ac6-599e-4d44-8e6d-3aec3f8b29ce.aspx";
-const officialHome = "https://mwathiq.sa/";
 
 const cities = [
   {
@@ -166,7 +165,12 @@ function pageLinks(page) {
   }
   const cluster = cityPages.filter((item) => item.city.key === page.city.key);
   if (page.index === 0) return cluster.map((item) => [item.file, item.keyword]);
-  const related = cluster.filter((item) => item.category === page.category && item.file !== page.file).slice(0, 6);
+  const categoryPages = cluster.filter((item) => item.category === page.category);
+  const position = categoryPages.findIndex((item) => item.file === page.file);
+  const related = Array.from(
+    { length: Math.min(6, Math.max(0, categoryPages.length - 1)) },
+    (_, offset) => categoryPages[(position + offset + 1) % categoryPages.length]
+  );
   return [
     [`notary-${page.city.key}.html`, `دليل الموثق في ${page.city.name}`],
     ["notary-services-saudi.html", "دليل خدمات الموثق في السعودية"],
@@ -242,7 +246,7 @@ function renderPage(page) {
     <div class="container breadcrumb" aria-label="مسار الصفحة"><a href="/">الرئيسية</a><span aria-hidden="true">/</span><a href="notary-services-saudi.html">خدمات الموثق</a><span aria-hidden="true">/</span><span>${page.keyword}</span></div>
     <section class="hero service-detail-hero"><div class="container hero-grid"><div class="hero-copy"><span class="eyebrow">${category.label}</span><h1>${page.keyword}<br><span>${page.tail}</span></h1><p>${page.focus} يوضح هذا الدليل التجهيز والاختيار، بينما يتم طلب الموثق وإجراء التوثيق من خلال القنوات الرسمية.</p><div class="hero-actions"><a class="btn primary" href="${officialSearch}" target="_blank" rel="noopener external">البحث في قائمة الموثقين</a><a class="btn secondary" href="${whatsapp}">مراجعة المستند قبل التوثيق</a></div><div class="trust-row"><div><b>مصدر رسمي</b><span>وزارة العدل ومنصة الموثق</span></div><div><b>${locationLabel}</b><span>دليل موقع لا ادعاء فرع</span></div><div><b>خصوصية أولًا</b><span>لا ترسل بيانات حساسة</span></div></div></div><aside class="service-hero-aside" aria-label="نطاق الخدمة"><span class="service-badge">${category.label}</span><div class="service-symbol" aria-hidden="true">و</div><h2>ما الذي يقدمه هذا الدليل؟</h2><p>${category.scope}</p><ul class="service-hero-points"><li>فهم نوع معاملة التوثيق</li><li>تجهيز البيانات والمستندات</li><li>الوصول إلى الموثق الرسمي</li></ul></aside></div></section>
     <div class="service-jump-wrap"><nav class="container service-jump" aria-label="روابط داخل الصفحة"><a href="#official">تنبيه مهم</a><a href="#decision">قرار المعاملة</a><a href="#steps">خطوات الطلب</a><a href="#documents">المستندات</a><a href="#coverage">النطاق</a><a href="#faq">الأسئلة</a></nav></div>
-    <section class="section" id="official"><div class="container"><div class="locality-panels"><article class="locality-panel"><span class="eyebrow">شفافية الخدمة</span><h2>هذا دليل وليس ادعاء ترخيص</h2><p><strong>رُكن الأنظمة القانونية ليس منصة الموثق الحكومية ولا يدعي وجود موثق تابع له أو فرع توثيق في ${page.city?.name || "أي مدينة"}.</strong> يمكننا مراجعة المستندات القانونية قبل التقديم، أما اختيار الموثق وإتمام التوثيق فيتم رسميًا.</p></article><article class="locality-panel"><span class="eyebrow">روابط رسمية</span><h2>تحقق قبل مشاركة مستنداتك</h2><p><a href="${officialService}" target="_blank" rel="noopener external">وزارة العدل: خدمات الموثق</a><br><a href="${officialHome}" target="_blank" rel="noopener external">منصة الموثق الرسمية</a><br><a href="${officialSearch}" target="_blank" rel="noopener external">قائمة الموثقين المرخصين</a></p></article></div></div></section>
+    <section class="section" id="official"><div class="container"><div class="locality-panels"><article class="locality-panel"><span class="eyebrow">شفافية الخدمة</span><h2>هذا دليل وليس ادعاء ترخيص</h2><p><strong>رُكن الأنظمة القانونية ليس منصة الموثق الحكومية ولا يدعي وجود موثق تابع له أو فرع توثيق في ${page.city?.name || "أي مدينة"}.</strong> يمكننا مراجعة المستندات القانونية قبل التقديم، أما اختيار الموثق وإتمام التوثيق فيتم رسميًا.</p></article><article class="locality-panel"><span class="eyebrow">روابط رسمية</span><h2>تحقق قبل مشاركة مستنداتك</h2><p><a href="${officialService}" target="_blank" rel="noopener external">وزارة العدل: خدمات الموثق</a><br><a href="${officialSearch}" target="_blank" rel="noopener external">قائمة الموثقين المرخصين</a></p></article></div></div></section>
     ${decisionSection}
     <section class="section alt" id="steps"><div class="container"><div class="section-head"><span class="eyebrow">من الاحتياج إلى الوثيقة</span><h2>خطوات ${page.keyword}</h2><p>${category.scope} وتوضح وزارة العدل أن المسار يبدأ بتسجيل الدخول واختيار الخدمة والبحث عن الموثق ثم طلب الخدمة وإتمام التوثيق.</p></div><div class="process-grid">${stepCards}</div></div></section>
     <section class="section" id="documents"><div class="container prep-layout"><div class="prep-intro"><span class="eyebrow">قائمة تجهيز أولية</span><h2>ماذا تراجع قبل طلب الموثق؟</h2><p>${page.focus} قد تختلف المتطلبات بحسب المعاملة وصفة الأطراف وبيانات النموذج الرسمي؛ لذلك راجع المطلوب داخل المنصة قبل الموعد.</p></div><ol class="document-list">${documents}</ol></div></section>

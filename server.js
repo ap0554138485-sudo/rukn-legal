@@ -23,6 +23,20 @@ const types = {
 
 const compressible = new Set(['.html', '.css', '.js', '.xml', '.txt', '.json', '.svg']);
 const longCache = new Set(['.css', '.js', '.png', '.jpg', '.jpeg', '.svg', '.ico']);
+const publicFiles = new Set(['favicon.ico', 'robots.txt', 'sitemap.xml']);
+const contentSecurityPolicy = [
+  "default-src 'self'",
+  "base-uri 'self'",
+  "object-src 'none'",
+  "frame-ancestors 'none'",
+  "form-action 'self'",
+  "script-src 'self' 'unsafe-inline' https://www.googletagmanager.com",
+  "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
+  "font-src 'self' https://fonts.gstatic.com",
+  "connect-src 'self' https://*.google-analytics.com https://www.googletagmanager.com",
+  "img-src 'self' data: https://*.google-analytics.com https://www.googletagmanager.com",
+  'upgrade-insecure-requests'
+].join('; ');
 
 function responseHeaders(ext, encoding) {
   const headers = {
@@ -31,7 +45,12 @@ function responseHeaders(ext, encoding) {
       ? 'public, max-age=86400, stale-while-revalidate=604800'
       : 'public, max-age=300, must-revalidate',
     'X-Content-Type-Options': 'nosniff',
-    'Referrer-Policy': 'strict-origin-when-cross-origin'
+    'Referrer-Policy': 'strict-origin-when-cross-origin',
+    'Content-Security-Policy': contentSecurityPolicy,
+    'Permissions-Policy': 'camera=(), microphone=(), geolocation=()',
+    'Strict-Transport-Security': 'max-age=31536000; includeSubDomains',
+    'X-Frame-Options': 'DENY',
+    'X-XSS-Protection': '0'
   };
 
   if (encoding) {
@@ -45,51 +64,72 @@ function responseHeaders(ext, encoding) {
 function sendFile(req, res, filePath, statusCode = 200) {
   const ext = path.extname(filePath).toLowerCase();
   const accepted = String(req.headers['accept-encoding'] || '');
-  const stream = fs.createReadStream(filePath);
   let encoding = '';
-  let output = stream;
 
   if (compressible.has(ext) && accepted.includes('br')) {
     encoding = 'br';
-    output = stream.pipe(zlib.createBrotliCompress());
   } else if (compressible.has(ext) && accepted.includes('gzip')) {
     encoding = 'gzip';
-    output = stream.pipe(zlib.createGzip());
   }
 
   res.writeHead(statusCode, responseHeaders(ext, encoding));
+  if (req.method === 'HEAD') return res.end();
+
+  const stream = fs.createReadStream(filePath);
+  let output = stream;
+  if (encoding === 'br') output = stream.pipe(zlib.createBrotliCompress());
+  if (encoding === 'gzip') output = stream.pipe(zlib.createGzip());
   output.pipe(res);
 }
 
+function isPublicFile(relativePath) {
+  if (!relativePath || relativePath.includes('/') || relativePath.includes('\\')) return false;
+  if (/^[a-z0-9-]+\.html$/i.test(relativePath)) return true;
+  if (/^styles(?:-[a-z0-9]+)?\.css$/i.test(relativePath)) return true;
+  if (/^script(?:-[a-z0-9]+)?\.js$/i.test(relativePath)) return true;
+  if (/^logo(?:-[a-z0-9]+)*\.(?:png|jpe?g|svg)$/i.test(relativePath)) return true;
+  return publicFiles.has(relativePath.toLowerCase());
+}
+
+function sendNotFound(req, res) {
+  const notFoundPath = path.resolve(root, '404.html');
+  fs.stat(notFoundPath, (error, stat) => {
+    if (!error && stat.isFile()) return sendFile(req, res, notFoundPath, 404);
+    res.writeHead(404, responseHeaders('.txt'));
+    return res.end('Not Found');
+  });
+}
+
 http.createServer((req, res) => {
+  if (!['GET', 'HEAD'].includes(req.method)) {
+    res.writeHead(405, { ...responseHeaders('.txt'), Allow: 'GET, HEAD' });
+    return res.end('Method Not Allowed');
+  }
+
   let pathname;
 
   try {
     pathname = decodeURIComponent(new URL(req.url, 'http://localhost').pathname);
   } catch {
-    res.writeHead(400, { 'Content-Type': 'text/plain; charset=utf-8' });
+    res.writeHead(400, responseHeaders('.txt'));
     return res.end('Bad Request');
   }
 
   if (pathname === '/') pathname = '/index.html';
 
   const relativePath = pathname.replace(/^\/+/, '');
+  if (!isPublicFile(relativePath)) return sendNotFound(req, res);
+
   const filePath = path.resolve(root, relativePath);
 
   if (!filePath.startsWith(rootPath + path.sep)) {
-    res.writeHead(403, { 'Content-Type': 'text/plain; charset=utf-8' });
+    res.writeHead(403, responseHeaders('.txt'));
     return res.end('Forbidden');
   }
 
   fs.stat(filePath, (error, stat) => {
     if (!error && stat.isFile()) return sendFile(req, res, filePath);
-
-    const notFoundPath = path.resolve(root, '404.html');
-    fs.stat(notFoundPath, (notFoundError, notFoundStat) => {
-      if (!notFoundError && notFoundStat.isFile()) return sendFile(req, res, notFoundPath, 404);
-      res.writeHead(404, { 'Content-Type': 'text/plain; charset=utf-8' });
-      return res.end('Not Found');
-    });
+    return sendNotFound(req, res);
   });
 }).listen(port, '0.0.0.0', () => {
   console.log('Rukn Legal running');
