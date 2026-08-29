@@ -3,6 +3,7 @@ import { basename, resolve } from "node:path";
 
 const root = resolve(import.meta.dirname, "..");
 const origin = "https://rukn-legal-vwptio.cranl.net";
+const releaseDate = "2026-08-29";
 const files = readdirSync(root)
   .filter((file) => file.endsWith(".html") && !file.startsWith("google"))
   .sort();
@@ -115,13 +116,25 @@ for (const file of files) {
     if (logoUrl !== `${origin}/logo-128-20260824.png`) errors.push(`${file}: Organization logo is missing or incorrect`);
   }
   if (!/data-content-accountability/i.test(html)) errors.push(`${file}: missing visible content accountability block`);
-  if (!/<time\s+datetime="2026-08-27"/i.test(html)) errors.push(`${file}: missing current content update date`);
+  if (!new RegExp(`<time\\s+datetime="${releaseDate}"`, "i").test(html)) errors.push(`${file}: missing current content update date`);
   const htmlTag = html.match(/<html\b([^>]*)>/i)?.[1] || "";
   const isEnglish = /\blang="en(?:-[^"]+)?"/i.test(htmlTag);
   if (isEnglish && !/\bdir="ltr"/i.test(htmlTag)) errors.push(`${file}: English page must use left-to-right direction`);
   if (!isEnglish && (!/\blang="ar(?:-[^"]+)?"/i.test(htmlTag) || !/\bdir="rtl"/i.test(htmlTag))) {
     errors.push(`${file}: Arabic page must declare Arabic and right-to-left direction`);
   }
+  const mainTag = html.match(/<main\b([^>]*)>/i)?.[1] || "";
+  const mainId = mainTag.match(/\bid="([^"]+)"/i)?.[1];
+  if (!mainId) errors.push(`${file}: main landmark is missing an ID`);
+  if (!/\btabindex="-1"/i.test(mainTag)) errors.push(`${file}: main landmark is not keyboard focusable`);
+  if (!mainId || !new RegExp(`<a\\b[^>]*class="[^"]*\\bskip-link\\b[^"]*"[^>]*href="#${mainId}"`, "i").test(html)) {
+    errors.push(`${file}: missing working skip-to-content link`);
+  }
+  if (!isEnglish && !/class="[^"]*\bfooter-region-directory\b/i.test(html)) errors.push(`${file}: missing Saudi region footer navigation`);
+  if (!/<meta\s+name="color-scheme"\s+content="light"/i.test(html)) errors.push(`${file}: missing color-scheme metadata`);
+  if (!/<meta\s+name="format-detection"\s+content="telephone=no"/i.test(html)) errors.push(`${file}: missing telephone format metadata`);
+  if (!/styles-20260821b\.css\?v=20260829a/i.test(html)) errors.push(`${file}: stale stylesheet version`);
+  if (!/script-20260824b\.js\?v=20260829a/i.test(html)) errors.push(`${file}: stale script version`);
 
   const ids = matches(html, /\bid="([^"]+)"/gi);
   const duplicateIds = [...new Set(ids.filter((id, index) => ids.indexOf(id) !== index))];

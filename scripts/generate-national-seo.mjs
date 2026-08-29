@@ -3,13 +3,13 @@ import { resolve } from "node:path";
 
 const root = resolve(import.meta.dirname, "..");
 const baseUrl = "https://rukn-legal-vwptio.cranl.net";
-const releaseDate = "2026-08-27";
+const releaseDate = "2026-08-29";
 const phone = "+966506142113";
 const displayPhone = "+966 50 614 2113";
 const email = "ap0554138485@icloud.com";
 const assetVersion = "20260824b";
-const scriptVersion = "20260827b";
-const stylesheetVersion = "20260825b";
+const scriptVersion = "20260829a";
+const stylesheetVersion = "20260829a";
 const stylesheetFile = `styles-20260821b.css?v=${stylesheetVersion}`;
 const scriptFile = `script-${assetVersion}.js?v=${scriptVersion}`;
 const logoFile = "logo-128-20260824.png";
@@ -72,7 +72,7 @@ function gaTag() {
 }
 
 function searchAppearanceTags() {
-  return `<!-- site-search-appearance:start --><link rel="icon" href="/favicon.ico"><link rel="apple-touch-icon" href="/${logoFile}"><meta name="theme-color" content="#102a29"><!-- site-search-appearance:end -->`;
+  return `<!-- site-search-appearance:start --><link rel="icon" href="/favicon.ico"><link rel="apple-touch-icon" href="/${logoFile}"><meta name="theme-color" content="#102a29"><meta name="color-scheme" content="light"><meta name="format-detection" content="telephone=no"><!-- site-search-appearance:end -->`;
 }
 
 function fontLinks() {
@@ -235,14 +235,15 @@ function sitewideTrustBlock(language) {
   if (language === "en") {
     return `<!-- sitewide-trust:start --><div class="container footer-trust-links" aria-label="Trust and policy links"><a href="/" hreflang="ar" lang="ar">العربية</a><a href="notary-services-saudi.html">Notary guides</a><a href="about.html">About and content method</a><a href="saudi-regions-guide.html">Saudi coverage</a><a href="site-directory.html">All pages</a><a href="privacy.html">Privacy</a></div><!-- sitewide-trust:end -->`;
   }
-  return `<!-- sitewide-trust:start --><div class="container footer-trust-links" aria-label="روابط الثقة والسياسات"><a href="en.html" hreflang="en" lang="en">English</a><a href="notary-services-saudi.html">دليل خدمات الموثق</a><a href="about.html">عن الموقع ومنهج المحتوى</a><a href="saudi-regions-guide.html">دليل مناطق السعودية</a><a href="site-directory.html">دليل جميع الصفحات</a><a href="privacy.html">سياسة الخصوصية</a></div><!-- sitewide-trust:end -->`;
+  const regionLinks = regions.map(([name, , href]) => `<a href="${href}">${name.replace(/^منطقة\s+/, "")}</a>`).join("");
+  return `<!-- sitewide-trust:start --><div class="container footer-trust-links" aria-label="روابط الثقة والسياسات"><a href="en.html" hreflang="en" lang="en">English</a><a href="notary-services-saudi.html">دليل خدمات الموثق</a><a href="about.html">عن الموقع ومنهج المحتوى</a><a href="saudi-regions-guide.html">دليل مناطق السعودية</a><a href="site-directory.html">دليل جميع الصفحات</a><a href="privacy.html">سياسة الخصوصية</a></div><nav class="container footer-region-directory" aria-label="مناطق السعودية"><strong>انتقل مباشرة إلى منطقتك</strong><div>${regionLinks}</div></nav><!-- sitewide-trust:end -->`;
 }
 
 function contentAccountabilityBlock(language) {
   if (language === "en") {
-    return `<!-- content-accountability:start --><aside class="content-accountability" data-content-accountability aria-label="Content information"><div class="container content-accountability-inner"><div><strong>Published and maintained by Legal Systems Corner</strong><span>General information to help organize an initial request; it does not replace a professional review of the facts and documents.</span></div><div class="content-accountability-meta"><time datetime="${releaseDate}">Content updated 27 August 2026</time><a href="about.html">How we prepare content</a></div></div></aside><!-- content-accountability:end -->`;
+    return `<!-- content-accountability:start --><aside class="content-accountability" data-content-accountability aria-label="Content information"><div class="container content-accountability-inner"><div><strong>Published and maintained by Legal Systems Corner</strong><span>General information to help organize an initial request; it does not replace a professional review of the facts and documents.</span></div><div class="content-accountability-meta"><time datetime="${releaseDate}">Content updated 29 August 2026</time><a href="about.html">How we prepare content</a></div></div></aside><!-- content-accountability:end -->`;
   }
-  return `<!-- content-accountability:start --><aside class="content-accountability" data-content-accountability aria-label="معلومات المحتوى"><div class="container content-accountability-inner"><div><strong>النشر والتحديث: رُكن الأنظمة القانونية</strong><span>محتوى عام لتنظيم الطلب الأولي، ولا يغني عن تقييم الوقائع والمستندات من مختص.</span></div><div class="content-accountability-meta"><time datetime="${releaseDate}">تحديث المحتوى: 27 أغسطس 2026</time><a href="about.html">منهج إعداد المحتوى</a></div></div></aside><!-- content-accountability:end -->`;
+  return `<!-- content-accountability:start --><aside class="content-accountability" data-content-accountability aria-label="معلومات المحتوى"><div class="container content-accountability-inner"><div><strong>النشر والتحديث: رُكن الأنظمة القانونية</strong><span>محتوى عام لتنظيم الطلب الأولي، ولا يغني عن تقييم الوقائع والمستندات من مختص.</span></div><div class="content-accountability-meta"><time datetime="${releaseDate}">تحديث المحتوى: 29 أغسطس 2026</time><a href="about.html">منهج إعداد المحتوى</a></div></div></aside><!-- content-accountability:end -->`;
 }
 
 function breadcrumbSchema(file, html, canonical, language) {
@@ -455,6 +456,21 @@ function enhanceHtml(file, catalog = []) {
     html = html.replace(/<!-- accessibility-contrast:start -->[\s\S]*?<!-- accessibility-contrast:end -->/i, contrast);
   } else {
     html = html.replace(/(<link\s+rel="stylesheet"\s+href="styles(?:-[a-z0-9]+)?\.css[^"]*"\s*\/?>)/i, `$1\n  ${contrast}`);
+  }
+
+  html = html.replace(/<main\b([^>]*)>/i, (match, attributes) => {
+    let nextAttributes = attributes;
+    if (!/\bid\s*=/i.test(nextAttributes)) nextAttributes += ` id="main-content"`;
+    if (!/\btabindex\s*=/i.test(nextAttributes)) nextAttributes += ` tabindex="-1"`;
+    return `<main${nextAttributes}>`;
+  });
+  const mainId = html.match(/<main\b[^>]*\bid="([^"]+)"/i)?.[1] || "main-content";
+  const skipLabel = language === "en" ? "Skip to main content" : "تجاوز إلى المحتوى الرئيسي";
+  const accessibilityNavigation = `<!-- accessibility-navigation:start --><a class="skip-link" href="#${escapeHtml(mainId)}">${skipLabel}</a><!-- accessibility-navigation:end -->`;
+  if (/<!-- accessibility-navigation:start -->[\s\S]*?<!-- accessibility-navigation:end -->/i.test(html)) {
+    html = html.replace(/<!-- accessibility-navigation:start -->[\s\S]*?<!-- accessibility-navigation:end -->/i, accessibilityNavigation);
+  } else {
+    html = html.replace(/(<body\b[^>]*>)/i, `$1\n  ${accessibilityNavigation}`);
   }
 
   if (title && description && canonical) {

@@ -36,7 +36,7 @@ function similarity(first, second) {
 
 for (const file of files) {
   const html = readFileSync(resolve(root, file), "utf8");
-  const main = capture(html, /<main>([\s\S]*?)<\/main>/i);
+  const main = capture(html, /<main\b[^>]*>([\s\S]*?)<\/main>/i);
   const fields = {
     title: capture(html, /<title>([\s\S]*?)<\/title>/i),
     description: capture(html, /<meta name="description" content="([^"]+)"/i),

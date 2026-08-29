@@ -220,6 +220,16 @@ html[dir="ltr"] #faq summary::before { right: auto; left: 21px; }
 .footer-trust-links { display: flex; flex-wrap: wrap; gap: 9px 18px; margin-top: 22px; padding-top: 18px; border-top: 1px solid rgba(255, 255, 255, 0.08); }
 .footer-trust-links a { color: rgba(255, 255, 255, 0.68); font-size: 12px; text-underline-offset: 4px; }
 .footer-trust-links a:hover { color: var(--gold-light); }
+.footer-region-directory { margin-top: 18px; padding-top: 18px; border-top: 1px solid rgba(255, 255, 255, 0.08); }
+.footer-region-directory strong { display: block; margin-bottom: 11px; color: rgba(255, 255, 255, 0.88); font-size: 13px; }
+.footer-region-directory div { display: flex; flex-wrap: wrap; gap: 8px; }
+.footer-region-directory a { color: rgba(255, 255, 255, 0.7); background: rgba(255, 255, 255, 0.045); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 999px; padding: 5px 10px; font-size: 11px; text-decoration: none; }
+.footer-region-directory a:hover { color: var(--gold-light); border-color: rgba(215, 189, 136, 0.45); }
+.skip-link { position: fixed; z-index: 10000; top: 12px; right: 12px; color: #fff; background: var(--ink-deep); border: 2px solid var(--gold-light); border-radius: 10px; padding: 11px 15px; font-size: 13px; font-weight: 700; text-decoration: none; transform: translateY(-160%); transition: transform 0.18s ease; }
+.skip-link:focus { transform: translateY(0); }
+.back-to-top { position: fixed; z-index: 80; right: 18px; bottom: 18px; width: 46px; height: 46px; display: grid; place-items: center; color: #fff; background: var(--ink); border: 1px solid rgba(215, 189, 136, 0.5); border-radius: 50%; box-shadow: 0 12px 26px rgba(16, 42, 41, 0.24); cursor: pointer; opacity: 0; visibility: hidden; transform: translateY(12px); transition: opacity 0.2s ease, transform 0.2s ease, visibility 0.2s ease; }
+.back-to-top.is-visible { opacity: 1; visibility: visible; transform: translateY(0); }
+.back-to-top:hover { color: var(--ink); background: var(--gold-light); }
 .content-accountability { background: #f2eee5; border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); }
 .content-accountability-inner { min-height: 108px; display: flex; align-items: center; justify-content: space-between; gap: 30px; padding-top: 23px; padding-bottom: 23px; }
 .content-accountability strong { display: block; margin-bottom: 5px; color: var(--ink); font-size: 14px; }
@@ -475,6 +485,7 @@ html[dir="ltr"] .modal-close { right: 18px; left: auto; }
   .modal-card { max-height: 92vh; padding: 29px 18px 22px; }
   .regions-accordion .region-cities { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .whatsapp-float { left: 15px; bottom: 15px; }
+  .back-to-top { right: 15px; bottom: 15px; width: 43px; height: 43px; }
   html[dir="ltr"] .whatsapp-float { right: 15px; left: auto; }
 }
 

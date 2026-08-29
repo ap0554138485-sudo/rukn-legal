@@ -258,6 +258,15 @@ menuButton?.addEventListener("click", () => {
 
 document.querySelectorAll("#nav a").forEach((link) => link.addEventListener("click", closeMenu));
 
+const currentPath = window.location.pathname.replace(/\/index\.html$/i, "/");
+document.querySelectorAll("#nav a[href]").forEach((link) => {
+  const destination = new URL(link.getAttribute("href"), window.location.href);
+  const destinationPath = destination.pathname.replace(/\/index\.html$/i, "/");
+  if (destination.origin === window.location.origin && destinationPath === currentPath) {
+    link.setAttribute("aria-current", "page");
+  }
+});
+
 document.addEventListener("click", (event) => {
   if (!nav?.classList.contains("open")) return;
   if (!nav.contains(event.target) && !menuButton?.contains(event.target)) closeMenu();
@@ -268,6 +277,40 @@ document.addEventListener("keydown", (event) => {
     if (modal?.classList.contains("open")) closeModal();
     closeMenu();
   }
+});
+
+modal?.addEventListener("keydown", (event) => {
+  if (event.key !== "Tab" || !modal.classList.contains("open")) return;
+  const focusable = [...modal.querySelectorAll('button:not([disabled]), a[href], input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])')]
+    .filter((element) => !element.hidden && element.getClientRects().length > 0);
+  if (!focusable.length) return;
+  const first = focusable[0];
+  const last = focusable[focusable.length - 1];
+  if (event.shiftKey && document.activeElement === first) {
+    event.preventDefault();
+    last.focus();
+  } else if (!event.shiftKey && document.activeElement === last) {
+    event.preventDefault();
+    first.focus();
+  }
+});
+
+const backToTopButton = document.createElement("button");
+backToTopButton.type = "button";
+backToTopButton.className = "back-to-top";
+backToTopButton.setAttribute("aria-label", document.documentElement.lang === "en" ? "Back to top" : "العودة إلى أعلى الصفحة");
+backToTopButton.textContent = "↑";
+document.body.appendChild(backToTopButton);
+
+function updateBackToTopVisibility() {
+  backToTopButton.classList.toggle("is-visible", window.scrollY > 700);
+}
+
+window.addEventListener("scroll", updateBackToTopVisibility, { passive: true });
+updateBackToTopVisibility();
+backToTopButton.addEventListener("click", () => {
+  trackEvent("select_content", { content_type: "back_to_top", link_location: "page" });
+  window.scrollTo({ top: 0, behavior: "smooth" });
 });
 
 document.getElementById("langBtn")?.addEventListener("click", () => {
