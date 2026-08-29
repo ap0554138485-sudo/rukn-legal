@@ -7,10 +7,10 @@ const releaseDate = "2026-08-29";
 const phone = "+966506142113";
 const displayPhone = "+966 50 614 2113";
 const email = "ap0554138485@icloud.com";
-const assetVersion = "20260824b";
+const assetVersion = "20260829a";
 const scriptVersion = "20260829a";
 const stylesheetVersion = "20260829a";
-const stylesheetFile = `styles-20260821b.css?v=${stylesheetVersion}`;
+const stylesheetFile = `styles-${assetVersion}.css?v=${stylesheetVersion}`;
 const scriptFile = `script-${assetVersion}.js?v=${scriptVersion}`;
 const logoFile = "logo-128-20260824.png";
 
@@ -538,7 +538,13 @@ function updateSitemap() {
   writeFileSync(resolve(root, "sitemap.xml"), `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:xhtml="http://www.w3.org/1999/xhtml">\n${entries.join("\n")}\n</urlset>\n`, "utf8");
 }
 
+function syncVersionedAssets() {
+  writeFileSync(resolve(root, `script-${assetVersion}.js`), readFileSync(resolve(root, "script.js"), "utf8"), "utf8");
+  writeFileSync(resolve(root, `styles-${assetVersion}.css`), readFileSync(resolve(root, "styles-20260821b.css"), "utf8"), "utf8");
+}
+
 function generate() {
+  syncVersionedAssets();
   nationalGuide();
   aboutPage();
   privacyPage();
