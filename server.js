@@ -31,19 +31,30 @@ const contentSecurityPolicy = [
   "frame-ancestors 'none'",
   "form-action 'self'",
   "script-src 'self' 'unsafe-inline' https://www.googletagmanager.com",
-  "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
-  "font-src 'self' https://fonts.gstatic.com",
+  "style-src 'self' 'unsafe-inline'",
+  "font-src 'self'",
   "connect-src 'self' https://*.google-analytics.com https://www.googletagmanager.com",
   "img-src 'self' data: https://*.google-analytics.com https://www.googletagmanager.com",
   'upgrade-insecure-requests'
 ].join('; ');
 
-function responseHeaders(ext, encoding) {
+function cacheControl(filePath, ext) {
+  const fileName = path.basename(filePath || '');
+  if (/^(?:styles|script|logo)-[a-z0-9]+\.(?:css|js|png|jpe?g|svg)$/i.test(fileName)) {
+    return 'public, max-age=31536000, immutable';
+  }
+  if (fileName === 'sitemap.xml' || fileName === 'robots.txt') {
+    return 'public, max-age=0, must-revalidate';
+  }
+  return longCache.has(ext)
+    ? 'public, max-age=86400, stale-while-revalidate=604800'
+    : 'public, max-age=300, must-revalidate';
+}
+
+function responseHeaders(ext, encoding, filePath, stat) {
   const headers = {
     'Content-Type': types[ext] || 'application/octet-stream',
-    'Cache-Control': longCache.has(ext)
-      ? 'public, max-age=86400, stale-while-revalidate=604800'
-      : 'public, max-age=300, must-revalidate',
+    'Cache-Control': cacheControl(filePath, ext),
     'X-Content-Type-Options': 'nosniff',
     'Referrer-Policy': 'strict-origin-when-cross-origin',
     'Content-Security-Policy': contentSecurityPolicy,
@@ -58,10 +69,15 @@ function responseHeaders(ext, encoding) {
     headers.Vary = 'Accept-Encoding';
   }
 
+  if (stat) {
+    headers.ETag = `W/"${stat.size.toString(16)}-${Math.trunc(stat.mtimeMs).toString(16)}"`;
+    headers['Last-Modified'] = stat.mtime.toUTCString();
+  }
+
   return headers;
 }
 
-function sendFile(req, res, filePath, statusCode = 200) {
+function sendFile(req, res, filePath, statusCode = 200, stat) {
   const ext = path.extname(filePath).toLowerCase();
   const accepted = String(req.headers['accept-encoding'] || '');
   let encoding = '';
@@ -72,7 +88,12 @@ function sendFile(req, res, filePath, statusCode = 200) {
     encoding = 'gzip';
   }
 
-  res.writeHead(statusCode, responseHeaders(ext, encoding));
+  const headers = responseHeaders(ext, encoding, filePath, stat);
+  if (statusCode === 200 && stat && req.headers['if-none-match'] === headers.ETag) {
+    res.writeHead(304, headers);
+    return res.end();
+  }
+  res.writeHead(statusCode, headers);
   if (req.method === 'HEAD') return res.end();
 
   const stream = fs.createReadStream(filePath);
@@ -94,7 +115,7 @@ function isPublicFile(relativePath) {
 function sendNotFound(req, res) {
   const notFoundPath = path.resolve(root, '404.html');
   fs.stat(notFoundPath, (error, stat) => {
-    if (!error && stat.isFile()) return sendFile(req, res, notFoundPath, 404);
+    if (!error && stat.isFile()) return sendFile(req, res, notFoundPath, 404, stat);
     res.writeHead(404, responseHeaders('.txt'));
     return res.end('Not Found');
   });
@@ -115,6 +136,16 @@ http.createServer((req, res) => {
     return res.end('Bad Request');
   }
 
+  if (pathname.toLowerCase() === '/index.html') {
+    res.writeHead(301, {
+      Location: '/',
+      'Cache-Control': 'public, max-age=3600',
+      'X-Content-Type-Options': 'nosniff',
+      'Referrer-Policy': 'strict-origin-when-cross-origin'
+    });
+    return res.end();
+  }
+
   if (pathname === '/') pathname = '/index.html';
 
   const relativePath = pathname.replace(/^\/+/, '');
@@ -128,7 +159,7 @@ http.createServer((req, res) => {
   }
 
   fs.stat(filePath, (error, stat) => {
-    if (!error && stat.isFile()) return sendFile(req, res, filePath);
+    if (!error && stat.isFile()) return sendFile(req, res, filePath, 200, stat);
     return sendNotFound(req, res);
   });
 }).listen(port, '0.0.0.0', () => {

@@ -1,7 +1,7 @@
 [CmdletBinding()]
 param(
   [string]$AppId = 'f3d8bfeb-3712-4ca1-ab4c-72317e96d297',
-  [int]$TimeoutSeconds = 300,
+  [int]$TimeoutSeconds = 900,
   [switch]$CheckOnly
 )
 
@@ -43,12 +43,13 @@ $cranlApiRoot = if ($cranlConfig.api_url) {
 }
 
 $deploymentEndpoint = "$cranlApiRoot/api/applications/$AppId/deployments"
+$purgeCacheEndpoint = "$cranlApiRoot/api/applications/$AppId/purge-cache"
 $cranlHeaders = @{
   Authorization = 'Bearer ' + $cranlConfig.api_key
   Accept = 'application/json'
 }
 
-function Get-LatestDeployment {
+function Get-Deployments {
   $deploymentResponse = Invoke-RestMethod -Method Get -Uri $deploymentEndpoint -Headers $cranlHeaders
   $deploymentItems = if ($deploymentResponse.deployments) {
     @($deploymentResponse.deployments)
@@ -56,12 +57,30 @@ function Get-LatestDeployment {
     @($deploymentResponse)
   }
 
-  return $deploymentItems |
+  return $deploymentItems
+}
+
+function Get-LatestDeployment {
+  return @(Get-Deployments) |
     Sort-Object { [DateTimeOffset]$_.createdAt } -Descending |
     Select-Object -First 1
 }
 
-$previousDeployment = Get-LatestDeployment
+function Clear-ApplicationCache {
+  $purgeResponse = Invoke-RestMethod -Method Post -Uri $purgeCacheEndpoint -Headers $cranlHeaders
+
+  if (-not $purgeResponse.success) {
+    throw 'The deployment completed, but Cranl did not confirm that the application cache was cleared.'
+  }
+
+  Write-Host 'Application cache cleared.'
+}
+
+$previousDeployments = @(Get-Deployments)
+$previousDeploymentIds = @($previousDeployments | ForEach-Object { [string]$_.deploymentId })
+$previousDeployment = $previousDeployments |
+  Sort-Object { [DateTimeOffset]$_.createdAt } -Descending |
+  Select-Object -First 1
 
 if ($CheckOnly) {
   if (-not $previousDeployment) {
@@ -84,13 +103,25 @@ if ($LASTEXITCODE -ne 0) {
 
 $deploymentDeadline = [DateTimeOffset]::UtcNow.AddSeconds($TimeoutSeconds)
 $lastReportedStatus = ''
+$targetDeployment = $null
 
 do {
   Start-Sleep -Seconds 5
-  $latestDeployment = Get-LatestDeployment
+  $currentDeployments = @(Get-Deployments)
 
-  if ($latestDeployment -and $latestDeployment.deploymentId -ne $previousDeployment.deploymentId) {
-    $currentStatus = [string]$latestDeployment.status
+  if (-not $targetDeployment) {
+    $targetDeployment = $currentDeployments |
+      Where-Object { $previousDeploymentIds -notcontains [string]$_.deploymentId } |
+      Sort-Object { [DateTimeOffset]$_.createdAt } |
+      Select-Object -First 1
+  } else {
+    $targetDeployment = $currentDeployments |
+      Where-Object { $_.deploymentId -eq $targetDeployment.deploymentId } |
+      Select-Object -First 1
+  }
+
+  if ($targetDeployment) {
+    $currentStatus = [string]$targetDeployment.status
 
     if ($currentStatus -ne $lastReportedStatus) {
       Write-Host "Deployment status: $currentStatus"
@@ -98,12 +129,13 @@ do {
     }
 
     if ($currentStatus -eq 'done') {
-      Write-Host "Deployment completed: $($latestDeployment.title)"
+      Clear-ApplicationCache
+      Write-Host "Deployment completed: $($targetDeployment.title)"
       exit 0
     }
 
     if ($currentStatus -eq 'error') {
-      throw "Deployment failed: $($latestDeployment.title)"
+      throw "Deployment failed: $($targetDeployment.title)"
     }
   }
 } while ([DateTimeOffset]::UtcNow -lt $deploymentDeadline)

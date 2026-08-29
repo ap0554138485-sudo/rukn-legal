@@ -115,8 +115,34 @@ for (const file of files) {
     if (logoUrl !== `${origin}/logo-128-20260824.png`) errors.push(`${file}: Organization logo is missing or incorrect`);
   }
   if (!/data-content-accountability/i.test(html)) errors.push(`${file}: missing visible content accountability block`);
-  if (!/<time\s+datetime="2026-08-25"/i.test(html)) errors.push(`${file}: missing current content update date`);
-  const isArabic = !/<html[^>]*\slang="en/i.test(html);
+  if (!/<time\s+datetime="2026-08-27"/i.test(html)) errors.push(`${file}: missing current content update date`);
+  const htmlTag = html.match(/<html\b([^>]*)>/i)?.[1] || "";
+  const isEnglish = /\blang="en(?:-[^"]+)?"/i.test(htmlTag);
+  if (isEnglish && !/\bdir="ltr"/i.test(htmlTag)) errors.push(`${file}: English page must use left-to-right direction`);
+  if (!isEnglish && (!/\blang="ar(?:-[^"]+)?"/i.test(htmlTag) || !/\bdir="rtl"/i.test(htmlTag))) {
+    errors.push(`${file}: Arabic page must declare Arabic and right-to-left direction`);
+  }
+
+  const ids = matches(html, /\bid="([^"]+)"/gi);
+  const duplicateIds = [...new Set(ids.filter((id, index) => ids.indexOf(id) !== index))];
+  if (duplicateIds.length) errors.push(`${file}: duplicate element IDs (${duplicateIds.join(", ")})`);
+
+  for (const image of html.match(/<img\b[^>]*>/gi) || []) {
+    if (!/\balt="[^"]*"/i.test(image)) errors.push(`${file}: image is missing alt text`);
+  }
+  for (const anchor of html.match(/<a\b[^>]*\btarget="_blank"[^>]*>/gi) || []) {
+    if (!/\brel="[^"]*\bnoopener\b[^"]*"/i.test(anchor)) errors.push(`${file}: external new-tab link is missing noopener`);
+  }
+
+  for (const asset of [
+    ...matches(html, /<script\b[^>]*\bsrc="([^"]+)"[^>]*>/gi),
+    ...matches(html, /<link\b[^>]*\brel="stylesheet"[^>]*\bhref="([^"]+)"[^>]*>/gi)
+  ]) {
+    if (/^(?:https?:)?\/\//i.test(asset)) continue;
+    const assetPath = asset.split("?")[0].replace(/^\//, "");
+    if (assetPath && !existsSync(resolve(root, assetPath))) errors.push(`${file}: missing local asset ${asset}`);
+  }
+  const isArabic = !isEnglish;
   if (!isNoindex && isArabic && !/data-client-intent/i.test(html)) errors.push(`${file}: missing client-intent navigation`);
   if (!isNoindex && isArabic && !/data-topic-links/i.test(html)) errors.push(`${file}: missing contextual topic links`);
   const hasVisibleBreadcrumb = /class="[^"]*\bbreadcrumb\b/i.test(html);
@@ -125,6 +151,7 @@ for (const file of files) {
   }
 
   for (const href of matches(html, /<a\b[^>]*\shref="([^"]+)"[^>]*>/gi)) {
+    if (/^(?:\/)?index\.html(?:[#?]|$)/i.test(href)) errors.push(`${file}: internal link should use / instead of ${href}`);
     const target = localTarget(href);
     if (!target) continue;
     if (!existsSync(resolve(root, target))) {

@@ -8,6 +8,30 @@ let selectedService = "";
 let selectedRegion = "";
 let lastFocusedElement = null;
 
+function getCampaignAttribution() {
+  const search = new URLSearchParams(window.location.search);
+  const current = {
+    campaign_source: search.get("utm_source") || "",
+    campaign_medium: search.get("utm_medium") || "",
+    campaign_name: search.get("utm_campaign") || "",
+    campaign_term: search.get("utm_term") || "",
+  };
+  const hasCurrentCampaign = Object.values(current).some(Boolean);
+
+  try {
+    if (hasCurrentCampaign) {
+      window.sessionStorage.setItem("rukn_campaign", JSON.stringify(current));
+      return current;
+    }
+    const saved = JSON.parse(window.sessionStorage.getItem("rukn_campaign") || "null");
+    return saved && typeof saved === "object" ? saved : current;
+  } catch {
+    return current;
+  }
+}
+
+const campaignAttribution = getCampaignAttribution();
+
 function updateSelectedRegionNotice() {
   document.querySelectorAll("[data-selected-region]").forEach((notice) => {
     notice.hidden = !selectedRegion;
@@ -48,6 +72,7 @@ function trackEvent(eventName, parameters = {}) {
     page_language: document.documentElement.lang || "ar",
     page_path: window.location.pathname,
     transport_type: "beacon",
+    ...campaignAttribution,
     ...parameters,
   };
 
@@ -251,7 +276,7 @@ document.getElementById("langBtn")?.addEventListener("click", () => {
     item_id: document.documentElement.lang === "en" ? "/" : "/en.html",
     link_location: "header",
   });
-  window.location.href = document.documentElement.lang === "en" ? "index.html" : "en.html";
+  window.location.href = document.documentElement.lang === "en" ? "/" : "en.html";
 });
 
 const locationDirectorySearch = document.getElementById("locationDirectorySearch");

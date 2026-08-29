@@ -32,3 +32,13 @@ See `DEPLOYMENT.md` for the full operational guide.
 ## Generated Riyadh service pages
 
 The second-wave Riyadh service pages are generated from `scripts/generate-riyadh-wave2.js`. Edit the data and shared template there, then run `npm run generate:riyadh`. Commit both the generator and the resulting HTML files. Do not hand-edit generated Riyadh service pages without updating the generator, or the next regeneration will overwrite the change.
+
+## National SEO rollout
+
+- The ten-day national rollout publishes at most 100 reviewed pages per batch.
+- Batches one through three are generated from `scripts/generate-national-wave1.mjs`, `scripts/generate-national-wave2.mjs`, and `scripts/generate-national-wave3.mjs`.
+- Batches four through seven are generated from `scripts/generate-national-waves4-7.mjs` with source data in `scripts/national-waves4-7-data.mjs`; never hand-edit generated `saudi-guide-w1-*.html` through `saudi-guide-w7-*.html` files.
+- For batch three, run `npm run generate:national-wave3`, then `npm run check:national-wave3`, `npm run audit:seo`, `npm run audit:keywords`, and `npm run check:server` before committing.
+- To rebuild batches four through seven, run `npm run generate:national-waves4-7`, then `npm run check:national-waves4-7`, `npm run audit:seo`, `npm run audit:keywords`, and `npm run check:server` before committing.
+- `national-seo-rollout.json` records completed and remaining batches. Future batches must use new legal topics, cover all 13 regions, preserve the no-local-branch disclaimer, and pass a maximum five-word-shingle similarity of 50%.
+- Do not create street or neighborhood pages whose only unique value is the place name. Every indexable page must address a distinct legal problem, document, decision, or stage.

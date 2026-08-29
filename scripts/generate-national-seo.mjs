@@ -3,31 +3,31 @@ import { resolve } from "node:path";
 
 const root = resolve(import.meta.dirname, "..");
 const baseUrl = "https://rukn-legal-vwptio.cranl.net";
-const releaseDate = "2026-08-25";
+const releaseDate = "2026-08-27";
 const phone = "+966506142113";
 const displayPhone = "+966 50 614 2113";
 const email = "ap0554138485@icloud.com";
 const assetVersion = "20260824b";
-const stylesheetVersion = "20260825a";
+const scriptVersion = "20260827b";
+const stylesheetVersion = "20260825b";
 const stylesheetFile = `styles-20260821b.css?v=${stylesheetVersion}`;
-const scriptFile = `script-${assetVersion}.js`;
+const scriptFile = `script-${assetVersion}.js?v=${scriptVersion}`;
 const logoFile = "logo-128-20260824.png";
-const fontStylesheet = "https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@400;500;600;700&family=Manrope:wght@400;500;600;700&display=swap";
 
 const regions = [
   ["منطقة الرياض", "الرياض، الخرج، الدرعية، الدوادمي، المجمعة ووادي الدواسر", "legal-services-riyadh.html", "دليل خدمات وأحياء الرياض"],
-  ["منطقة مكة المكرمة", "مكة المكرمة، جدة، الطائف، رابغ، القنفذة والليث", "legal-services-jeddah.html", "دليل الخدمات القانونية في جدة"],
+  ["منطقة مكة المكرمة", "مكة المكرمة، جدة، الطائف، رابغ، القنفذة والليث", "makkah-region-legal-services.html", "دليل منطقة مكة المكرمة"],
   ["المنطقة الشرقية", "الدمام، الخبر، الظهران، الأحساء، الجبيل، القطيف وحفر الباطن", "eastern-province-legal-services.html", "دليل المنطقة الشرقية الكامل"],
   ["منطقة تبوك", "تبوك، ضباء، الوجه، أملج، تيماء، حقل والبدع", "tabuk-region-lawyers.html", "دليل منطقة تبوك ومحافظاتها"],
-  ["منطقة المدينة المنورة", "المدينة المنورة، ينبع، العلا، بدر وخيبر", "#start", "بدء طلب من المنطقة"],
-  ["منطقة القصيم", "بريدة، عنيزة، الرس، البكيرية والمذنب", "#start", "بدء طلب من المنطقة"],
-  ["منطقة عسير", "أبها، خميس مشيط، بيشة، محايل والنماص", "#start", "بدء طلب من المنطقة"],
-  ["منطقة حائل", "حائل، بقعاء، الشنان والغزالة", "#start", "بدء طلب من المنطقة"],
-  ["منطقة الحدود الشمالية", "عرعر، رفحاء، طريف والعويقيلة", "#start", "بدء طلب من المنطقة"],
-  ["منطقة جازان", "جازان، صبيا، أبو عريش، صامطة وبيش", "#start", "بدء طلب من المنطقة"],
-  ["منطقة نجران", "نجران، شرورة، حبونا وبدر الجنوب", "#start", "بدء طلب من المنطقة"],
-  ["منطقة الباحة", "الباحة، بلجرشي، المندق والمخواة", "#start", "بدء طلب من المنطقة"],
-  ["منطقة الجوف", "سكاكا، القريات، دومة الجندل وطبرجل", "#start", "بدء طلب من المنطقة"]
+  ["منطقة المدينة المنورة", "المدينة المنورة، ينبع، العلا، بدر وخيبر", "medina-region-legal-services.html", "دليل منطقة المدينة المنورة"],
+  ["منطقة القصيم", "بريدة، عنيزة، الرس، البكيرية والمذنب", "qassim-region-legal-services.html", "دليل منطقة القصيم"],
+  ["منطقة عسير", "أبها، خميس مشيط، بيشة، محايل والنماص", "asir-region-legal-services.html", "دليل منطقة عسير"],
+  ["منطقة حائل", "حائل، بقعاء، الشنان والغزالة", "hail-region-legal-services.html", "دليل منطقة حائل"],
+  ["منطقة الحدود الشمالية", "عرعر، رفحاء، طريف والعويقيلة", "northern-borders-region-legal-services.html", "دليل منطقة الحدود الشمالية"],
+  ["منطقة جازان", "جازان، صبيا، أبو عريش، صامطة وبيش", "jazan-region-legal-services.html", "دليل منطقة جازان"],
+  ["منطقة نجران", "نجران، شرورة، حبونا وبدر الجنوب", "najran-region-legal-services.html", "دليل منطقة نجران"],
+  ["منطقة الباحة", "الباحة، بلجرشي، المندق والمخواة", "al-baha-region-legal-services.html", "دليل منطقة الباحة"],
+  ["منطقة الجوف", "سكاكا، القريات، دومة الجندل وطبرجل", "al-jouf-region-legal-services.html", "دليل منطقة الجوف"]
 ];
 
 const services = [
@@ -68,7 +68,7 @@ function jsonLd(value) {
 }
 
 function gaTag() {
-  return `<script async src="https://www.googletagmanager.com/gtag/js?id=G-KKGEYHSD29"></script><script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments)}gtag('js',new Date());gtag('config','G-KKGEYHSD29');</script>`;
+  return `<!-- site-analytics:start --><script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments)}gtag('js',new Date());gtag('config','G-KKGEYHSD29');(()=>{let loaded=false;const load=()=>{if(loaded)return;loaded=true;const script=document.createElement('script');script.async=true;script.src='https://www.googletagmanager.com/gtag/js?id=G-KKGEYHSD29';document.head.appendChild(script)};['pointerdown','keydown','touchstart','scroll'].forEach(name=>window.addEventListener(name,load,{once:true,passive:true}));window.addEventListener('load',()=>window.setTimeout(load,6000),{once:true})})();</script><!-- site-analytics:end -->`;
 }
 
 function searchAppearanceTags() {
@@ -76,7 +76,7 @@ function searchAppearanceTags() {
 }
 
 function fontLinks() {
-  return `<!-- site-fonts:start --><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link rel="preload" as="style" href="${fontStylesheet}"><link rel="stylesheet" href="${fontStylesheet}" media="print" onload="this.media='all'"><noscript><link rel="stylesheet" href="${fontStylesheet}"></noscript><!-- site-fonts:end -->`;
+  return `<!-- site-fonts:start --><!-- Fast system fonts; no render-blocking external font request. --><!-- site-fonts:end -->`;
 }
 
 function accessibilityOverrides() {
@@ -126,7 +126,7 @@ function shell({ file, title, description, robots = "index,follow,max-image-prev
   ${body}
   ${footer()}
   <a class="whatsapp-float" href="https://wa.me/966506142113?text=${encodeURIComponent("السلام عليكم، أرغب في طلب خدمة قانونية. المنطقة ونوع الطلب: ")}" target="_blank" rel="noopener" aria-label="تواصل عبر واتساب"><svg viewBox="0 0 24 24" width="25" height="25" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 11.5a8.4 8.4 0 0 1-9 8.5 9.3 9.3 0 0 1-3.8-.8L3 21l1.8-5A8.5 8.5 0 1 1 21 11.5Z"/><path d="M8.2 8.1c.5 3.1 2.6 5.2 5.7 5.7l1.2-1.3 2 .5c-.4 2-1.7 3-3.4 2.8-3.8-.5-7-3.7-7.5-7.5C6 6.6 7 5.3 9 4.9l.5 2-1.3 1.2Z"/></svg></a>
-  <script src="${scriptFile}"></script>
+  <script src="${scriptFile}" defer></script>
 </body>
 </html>`;
 }
@@ -137,6 +137,11 @@ function nationalGuide() {
   const description = "دليل الخدمات القانونية في مناطق السعودية يوضح اختيار الخدمة وتجهيز الطلب وبدء التواصل إلكترونيًا من المناطق الثلاث عشرة دون ادعاء وجود فروع محلية.";
   const regionCards = regions.map(([name, cities, href, label], index) => `<article class="locality-panel" data-number="${String(index + 1).padStart(2, "0")}"><h3>${name}</h3><p>${cities}.</p><a href="${href}">${label}</a></article>`).join("");
   const serviceCards = services.map(([name, text], index) => `<article class="specialty-card" data-number="${String(index + 1).padStart(2, "0")}"><h3>${name}</h3><p>${text}</p></article>`).join("");
+  const waveGuides = readdirSync(root)
+    .filter((name) => /^saudi-guide-w\d+-.+\.html$/i.test(name))
+    .sort()
+    .map((name) => ({ name, title: pageTitle(readFileSync(resolve(root, name), "utf8"), name) }));
+  const waveGuideLinks = waveGuides.map((guide) => `<a href="${guide.name}">${escapeHtml(guide.title)}</a>`).join("");
   const faqs = [
     ["هل يستقبل الموقع طلبات من جميع مناطق السعودية؟", "نعم، يمكن بدء الطلب إلكترونيًا من المناطق الثلاث عشرة. ويعتمد تحديد المسار على نوع المسألة والصفة والمرحلة والمستند، ولا يعني ذكر المنطقة وجود فرع فعلي فيها."],
     ["كيف أختار صفحة الخدمة المناسبة؟", "ابدأ بجوهر الطلب: أسرة أو عمل أو تجارة أو تنفيذ أو عقود أو عقار أو قضية جنائية، ثم اختر دليل المدينة المتاح أو أرسل المنطقة ونوع الطلب في رسالة البداية."],
@@ -145,9 +150,10 @@ function nationalGuide() {
   ];
   const body = `<main><div class="container breadcrumb" aria-label="مسار الصفحة"><a href="/">الرئيسية</a><span aria-hidden="true">/</span><span>دليل مناطق السعودية</span></div>
   <section class="hero service-detail-hero"><div class="container hero-grid"><div class="hero-copy"><span class="eyebrow">تغطية وطنية واضحة</span><h1>دليل الخدمات القانونية في مناطق السعودية<br><span>من المنطقة إلى المسار المناسب</span></h1><p>صفحة وطنية واحدة تساعدك على تحديد نوع الخدمة وتجهيز الطلب والوصول إلى الأدلة المحلية المتاحة، دون إنشاء صفحات متشابهة لكل مدينة أو ادعاء وجود فروع.</p><div class="hero-actions"><a class="btn primary" href="#regions">اختر منطقتك</a><a class="btn secondary" href="#services">اختر نوع الخدمة</a></div><div class="trust-row"><div><b>13 منطقة</b><span>تغطية المملكة</span></div><div><b>8 مسارات</b><span>قانونية رئيسية</span></div><div><b>استقبال إلكتروني</b><span>دون ادعاء فروع</span></div></div></div><aside class="service-hero-aside"><span class="service-badge">دليل السعودية</span><div class="service-symbol" aria-hidden="true">13</div><h2>ابدأ بثلاث معلومات</h2><ul class="service-hero-points"><li>المنطقة والمدينة</li><li>نوع المسألة والصفة</li><li>المرحلة وأقرب موعد</li></ul></aside></div></section>
-  <div class="service-jump-wrap"><nav class="container service-jump" aria-label="روابط داخل الصفحة"><a href="#regions">المناطق</a><a href="#services">الخدمات</a><a href="#prepare">تجهيز الطلب</a><a href="#faq">الأسئلة</a></nav></div>
+  <div class="service-jump-wrap"><nav class="container service-jump" aria-label="روابط داخل الصفحة"><a href="#regions">المناطق</a><a href="#services">الخدمات</a>${waveGuides.length ? '<a href="#national-guides">الأدلة الوطنية</a>' : ""}<a href="#prepare">تجهيز الطلب</a><a href="#faq">الأسئلة</a></nav></div>
   <section class="section" id="regions"><div class="container"><div class="section-head"><span class="eyebrow">المناطق الإدارية الثلاث عشرة</span><h2>اختر منطقتك ثم حدّد المدينة</h2><p>تساعد المدينة في وصف موقع الطلب، بينما يحدد نوع القضية أو المعاملة الصفحة القانونية الأنسب.</p></div><div class="locality-panels national-region-grid">${regionCards}</div><p class="coverage-disclaimer">التغطية تعني إمكانية بدء الطلب إلكترونيًا، ولا تعني وجود مكتب أو فرع فعلي في كل مدينة أو محافظة.</p></div></section>
   <section class="section alt" id="services"><div class="container"><div class="section-head"><span class="eyebrow">الكلمات مرتبطة بالاحتياج</span><h2>اختر الخدمة بحسب موضوع الطلب</h2><p>تجنب اختيار الصفحة على اسم المدينة فقط؛ الصفحة الأفضل هي التي تطابق الموضوع والمرحلة والمستند.</p></div><div class="specialty-grid">${serviceCards}</div><div class="related-services national-hubs"><a href="lawyer-tabuk.html">محامي في تبوك</a><a href="lawyer-riyadh.html">محامي في الرياض</a><a href="lawyer-jeddah.html">محامي في جدة</a><a href="lawyer-dammam.html">محامي في الدمام</a><a href="site-directory.html">دليل جميع صفحات الخدمات</a></div></div></section>
+  ${waveGuides.length ? `<section class="section" id="national-guides"><div class="container"><div class="section-head"><span class="eyebrow">${waveGuides.length} موضوعًا وطنيًا مختلفًا</span><h2>أدلة عملية حسب المشكلة والمستند والمرحلة</h2><p>كل رابط يعالج مسألة قانونية مستقلة؛ اختر المشكلة المطابقة لطلبك، ولا تعتمد على اسم المدينة وحده.</p></div><div class="related-services directory-links">${waveGuideLinks}</div></div></section>` : ""}
   <section class="section" id="prepare"><div class="container prep-layout"><div class="prep-intro"><span class="eyebrow">ملف أولي منظم</span><h2>ما الذي تجهزه قبل التواصل؟</h2><p>كلما كانت الرسالة الأولى محددة، كان فهم المسار والمتطلبات أسرع. لا ترسل بيانات شديدة الحساسية قبل تحديد قناة الاستلام المناسبة.</p></div><ol class="document-list"><li>اسم المنطقة والمدينة كما يظهران في المستند</li><li>نوع المسألة والنتيجة المطلوبة</li><li>صفة مقدم الطلب والطرف الآخر</li><li>المرحلة الحالية والجهة وأقرب موعد</li><li>المستند الأساسي وتسلسل زمني مختصر</li></ol></div></section>
   <section class="section alt" id="start"><div class="container"><div class="contact-card"><div><span class="eyebrow">بدء طلب من أي منطقة</span><h2>اذكر المنطقة ونوع الخدمة في رسالة واحدة</h2><p>أرسل ملخصًا دون كلمات مرور أو بيانات بنكية أو أصول مستندات.</p></div><a class="primary-btn" href="https://wa.me/966506142113?text=${encodeURIComponent("السلام عليكم، أرغب في خدمة قانونية. المنطقة والمدينة: — نوع الطلب ومرحلته: ")}">إرسال الطلب عبر واتساب</a></div></div></section>
   <section class="section" id="faq"><div class="container faq-wrap"><div class="section-head"><span class="eyebrow">أسئلة شائعة</span><h2>أسئلة عن التغطية داخل المملكة</h2></div>${faqs.map(([q, a]) => `<details><summary>${q}<span>+</span></summary><p>${a}</p></details>`).join("")}</div></section></main>`;
@@ -234,9 +240,9 @@ function sitewideTrustBlock(language) {
 
 function contentAccountabilityBlock(language) {
   if (language === "en") {
-    return `<!-- content-accountability:start --><aside class="content-accountability" data-content-accountability aria-label="Content information"><div class="container content-accountability-inner"><div><strong>Published and maintained by Legal Systems Corner</strong><span>General information to help organize an initial request; it does not replace a professional review of the facts and documents.</span></div><div class="content-accountability-meta"><time datetime="${releaseDate}">Content updated 25 August 2026</time><a href="about.html">How we prepare content</a></div></div></aside><!-- content-accountability:end -->`;
+    return `<!-- content-accountability:start --><aside class="content-accountability" data-content-accountability aria-label="Content information"><div class="container content-accountability-inner"><div><strong>Published and maintained by Legal Systems Corner</strong><span>General information to help organize an initial request; it does not replace a professional review of the facts and documents.</span></div><div class="content-accountability-meta"><time datetime="${releaseDate}">Content updated 27 August 2026</time><a href="about.html">How we prepare content</a></div></div></aside><!-- content-accountability:end -->`;
   }
-  return `<!-- content-accountability:start --><aside class="content-accountability" data-content-accountability aria-label="معلومات المحتوى"><div class="container content-accountability-inner"><div><strong>النشر والتحديث: رُكن الأنظمة القانونية</strong><span>محتوى عام لتنظيم الطلب الأولي، ولا يغني عن تقييم الوقائع والمستندات من مختص.</span></div><div class="content-accountability-meta"><time datetime="${releaseDate}">تحديث المحتوى: 25 أغسطس 2026</time><a href="about.html">منهج إعداد المحتوى</a></div></div></aside><!-- content-accountability:end -->`;
+  return `<!-- content-accountability:start --><aside class="content-accountability" data-content-accountability aria-label="معلومات المحتوى"><div class="container content-accountability-inner"><div><strong>النشر والتحديث: رُكن الأنظمة القانونية</strong><span>محتوى عام لتنظيم الطلب الأولي، ولا يغني عن تقييم الوقائع والمستندات من مختص.</span></div><div class="content-accountability-meta"><time datetime="${releaseDate}">تحديث المحتوى: 27 أغسطس 2026</time><a href="about.html">منهج إعداد المحتوى</a></div></div></aside><!-- content-accountability:end -->`;
 }
 
 function breadcrumbSchema(file, html, canonical, language) {
@@ -356,7 +362,7 @@ function clientIntentBlock(file, html, catalog) {
     const candidate = clusterPages[(currentIndex + offset) % clusterPages.length];
     if (candidate && !related.some((item) => item.file === candidate.file)) related.push(candidate);
   }
-  const relatedLinks = related.map((page) => `<a href="${page.file}">${escapeHtml(page.title.split("|")[0].trim())}</a>`).join("");
+  const relatedLinks = related.map((page) => `<a href="${page.file === "index.html" ? "/" : page.file}">${escapeHtml(page.title.split("|")[0].trim())}</a>`).join("");
   const heading = notary ? "ما خدمة التوثيق التي تحتاجها الآن؟" : "هل تحتاج استشارة قانونية أم توكيل محامي؟";
   const intro = notary
     ? `ابدأ من نوع المعاملة، ثم تحقق من الموثق المرخص والمتطلبات الرسمية. هذه المسارات تساعدك على الانتقال من ${escapeHtml(currentTitle)} إلى الإجراء الأقرب لطلبك.`
@@ -415,9 +421,18 @@ function enhanceHtml(file, catalog = []) {
   const description = decodeHtml(html.match(/<meta\s+name="description"\s+content="([^"]+)"/i)?.[1]?.trim() || "");
   const canonical = html.match(/<link\s+rel="canonical"\s+href="([^"]+)"/i)?.[1]?.trim();
 
+  const analytics = gaTag();
+  if (/<!-- site-analytics:start -->[\s\S]*?<!-- site-analytics:end -->/i.test(html)) {
+    html = html.replace(/<!-- site-analytics:start -->[\s\S]*?<!-- site-analytics:end -->/i, analytics);
+  } else {
+    html = html.replace(/<script\s+async\s+src="https:\/\/www\.googletagmanager\.com\/gtag\/js\?id=G-KKGEYHSD29"><\/script>\s*<script>[\s\S]*?gtag\(\s*['"]config['"]\s*,\s*['"]G-KKGEYHSD29['"]\s*\);?[\s\S]*?<\/script>/i, analytics);
+  }
+
   html = html
+    .replace(/(<a\s+class="brand"\s+href="[^"]+")\s+aria-label="[^"]*"/gi, "$1")
+    .replace(/href="index\.html(#[^"]*)?"/gi, (match, hash = "") => `href="/${hash}"`)
     .replace(/href="styles(?:-[a-z0-9]+)?\.css(?:\?v=[^"]*)?"/gi, `href="${stylesheetFile}"`)
-    .replace(/src="script(?:-[a-z0-9]+)?\.js(?:\?v=[^"]*)?"/gi, `src="${scriptFile}"`)
+    .replace(/<script\s+src="script(?:-[a-z0-9]+)?\.js(?:\?v=[^"]*)?"(?:\s+defer)?\s*><\/script>/gi, `<script src="${scriptFile}" defer></script>`)
     .replace(/<link\s+rel="(?:icon|apple-touch-icon)"\s+href="[^"]+"\s*\/?\s*>/gi, "")
     .replace(/<meta\s+name="theme-color"\s+content="[^"]+"\s*\/?\s*>/gi, "");
 
@@ -500,8 +515,9 @@ function updateSitemap() {
   pages.sort((a, b) => (a.file === "index.html" ? -1 : b.file === "index.html" ? 1 : a.file.localeCompare(b.file)));
   const entries = pages.map(({ file, html }) => {
     const canonical = canonicalFor(file, html);
+    const lastModified = /data-national-wave="[4-7]"/i.test(html) || ["saudi-regions-guide.html", "site-directory.html"].includes(file) ? "2026-08-29" : releaseDate;
     const alternates = file === "index.html" || file === "en.html" ? `\n    <xhtml:link rel="alternate" hreflang="ar" href="${baseUrl}/" />\n    <xhtml:link rel="alternate" hreflang="en" href="${baseUrl}/en.html" />\n    <xhtml:link rel="alternate" hreflang="x-default" href="${baseUrl}/" />` : "";
-    return `  <url>\n    <loc>${canonical}</loc>\n    <lastmod>${releaseDate}</lastmod>${alternates}\n  </url>`;
+    return `  <url>\n    <loc>${canonical}</loc>\n    <lastmod>${lastModified}</lastmod>${alternates}\n  </url>`;
   });
   writeFileSync(resolve(root, "sitemap.xml"), `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:xhtml="http://www.w3.org/1999/xhtml">\n${entries.join("\n")}\n</urlset>\n`, "utf8");
 }
