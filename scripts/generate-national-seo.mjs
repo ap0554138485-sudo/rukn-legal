@@ -7,12 +7,14 @@ const releaseDate = "2026-08-29";
 const phone = "+966506142113";
 const displayPhone = "+966 50 614 2113";
 const email = "ap0554138485@icloud.com";
-const assetVersion = "20260829a";
-const scriptVersion = "20260829a";
-const stylesheetVersion = "20260829a";
+const assetVersion = "20260829b";
+const scriptVersion = "20260829b";
+const stylesheetVersion = "20260829b";
 const stylesheetFile = `styles-${assetVersion}.css?v=${stylesheetVersion}`;
 const scriptFile = `script-${assetVersion}.js?v=${scriptVersion}`;
 const logoFile = "logo-128-20260824.png";
+const whatsappMessage = "السلام عليكم، أرغب في طلب خدمة قانونية. نوع المسألة، المدينة، والمرحلة الحالية: ";
+const whatsappUrl = `https://wa.me/966506142113?text=${encodeURIComponent(whatsappMessage)}`;
 
 const regions = [
   ["منطقة الرياض", "الرياض، الخرج، الدرعية، الدوادمي، المجمعة ووادي الدواسر", "legal-services-riyadh.html", "دليل خدمات وأحياء الرياض"],
@@ -85,7 +87,16 @@ function accessibilityOverrides() {
 
 function header() {
   return `<div class="topbar"><div class="container topbar-inner"><p class="topbar-status">استقبال إلكتروني من جميع مناطق المملكة</p><p>تواصل مباشر: <a href="tel:${phone}" dir="ltr">${displayPhone}</a></p></div></div>
-  <header class="site-header simple-header"><div class="container nav-wrap"><a class="brand" href="/" aria-label="رُكن الأنظمة القانونية - الرئيسية"><div class="brand-mark"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v18M5 21h14M4 7h16M6 7l-3 7m3-7 3 7m9 0-3-7-3 7M2 14h8a4 4 0 0 1-8 0Zm12 0h8a4 4 0 0 1-8 0Z"/></svg></div><div><strong>رُكن الأنظمة القانونية</strong><span>LEGAL SYSTEMS CORNER</span></div></a><nav class="nav" id="nav" aria-label="التنقل الرئيسي"><a href="/">الرئيسية</a><a href="notary-services-saudi.html">خدمات الموثق</a><a href="saudi-regions-guide.html">مناطق السعودية</a><a href="site-directory.html">دليل الصفحات</a><a href="about.html">عن الموقع</a></nav><div class="nav-actions"><a class="header-cta" href="https://wa.me/966506142113?text=${encodeURIComponent("السلام عليكم، أرغب في طلب خدمة قانونية. المنطقة ونوع الطلب: ")}">ابدأ طلبك</a><button class="menu-btn" id="menuBtn" aria-label="فتح القائمة" aria-expanded="false">☰</button></div></div></header>`;
+  <header class="site-header simple-header"><div class="container nav-wrap"><a class="brand" href="/" aria-label="رُكن الأنظمة القانونية - الرئيسية"><div class="brand-mark"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v18M5 21h14M4 7h16M6 7l-3 7m3-7 3 7m9 0-3-7-3 7M2 14h8a4 4 0 0 1-8 0Zm12 0h8a4 4 0 0 1-8 0Z"/></svg></div><div><strong>رُكن الأنظمة القانونية</strong><span>LEGAL SYSTEMS CORNER</span></div></a><nav class="nav" id="nav" aria-label="التنقل الرئيسي"><a href="/">الرئيسية</a><a href="notary-services-saudi.html">خدمات الموثق</a><a href="saudi-regions-guide.html">مناطق السعودية</a><a href="site-directory.html">دليل الصفحات</a><a href="about.html">عن الموقع</a></nav><div class="nav-actions"><a class="header-cta" href="${whatsappUrl}" target="_blank" rel="noopener">واتساب مباشر</a><button class="menu-btn" id="menuBtn" aria-label="فتح القائمة" aria-expanded="false">☰</button></div></div></header>`;
+}
+
+function floatingContactLink(language) {
+  const isEnglish = language === "en";
+  const message = isEnglish
+    ? "Hello, I would like to request a legal service. Matter type, city, and current stage: "
+    : whatsappMessage;
+  const label = isEnglish ? "WhatsApp" : "واتساب مباشر";
+  return `<a class="whatsapp-float whatsapp-float--labelled" href="https://wa.me/966506142113?text=${encodeURIComponent(message)}" target="_blank" rel="noopener" aria-label="${label}"><svg viewBox="0 0 24 24" width="25" height="25" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 11.5a8.4 8.4 0 0 1-9 8.5 9.3 9.3 0 0 1-3.8-.8L3 21l1.8-5A8.5 8.5 0 1 1 21 11.5Z"/><path d="M8.2 8.1c.5 3.1 2.6 5.2 5.7 5.7l1.2-1.3 2 .5c-.4 2-1.7 3-3.4 2.8-3.8-.5-7-3.7-7.5-7.5C6 6.6 7 5.3 9 4.9l.5 2-1.3 1.2Z"/></svg><span>${label}</span></a>`;
 }
 
 function footer(message = "خدمات واستشارات قانونية للأفراد والمنشآت في مختلف مناطق المملكة.") {
@@ -125,7 +136,7 @@ function shell({ file, title, description, robots = "index,follow,max-image-prev
   ${header()}
   ${body}
   ${footer()}
-  <a class="whatsapp-float" href="https://wa.me/966506142113?text=${encodeURIComponent("السلام عليكم، أرغب في طلب خدمة قانونية. المنطقة ونوع الطلب: ")}" target="_blank" rel="noopener" aria-label="تواصل عبر واتساب"><svg viewBox="0 0 24 24" width="25" height="25" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 11.5a8.4 8.4 0 0 1-9 8.5 9.3 9.3 0 0 1-3.8-.8L3 21l1.8-5A8.5 8.5 0 1 1 21 11.5Z"/><path d="M8.2 8.1c.5 3.1 2.6 5.2 5.7 5.7l1.2-1.3 2 .5c-.4 2-1.7 3-3.4 2.8-3.8-.5-7-3.7-7.5-7.5C6 6.6 7 5.3 9 4.9l.5 2-1.3 1.2Z"/></svg></a>
+  ${floatingContactLink("ar")}
   <script src="${scriptFile}" defer></script>
 </body>
 </html>`;
@@ -244,6 +255,14 @@ function contentAccountabilityBlock(language) {
     return `<!-- content-accountability:start --><aside class="content-accountability" data-content-accountability aria-label="Content information"><div class="container content-accountability-inner"><div><strong>Published and maintained by Legal Systems Corner</strong><span>General information to help organize an initial request; it does not replace a professional review of the facts and documents.</span></div><div class="content-accountability-meta"><time datetime="${releaseDate}">Content updated 29 August 2026</time><a href="about.html">How we prepare content</a></div></div></aside><!-- content-accountability:end -->`;
   }
   return `<!-- content-accountability:start --><aside class="content-accountability" data-content-accountability aria-label="معلومات المحتوى"><div class="container content-accountability-inner"><div><strong>النشر والتحديث: رُكن الأنظمة القانونية</strong><span>محتوى عام لتنظيم الطلب الأولي، ولا يغني عن تقييم الوقائع والمستندات من مختص.</span></div><div class="content-accountability-meta"><time datetime="${releaseDate}">تحديث المحتوى: 29 أغسطس 2026</time><a href="about.html">منهج إعداد المحتوى</a></div></div></aside><!-- content-accountability:end -->`;
+}
+
+function conversionPanelBlock(language) {
+  if (language === "en") {
+    const message = encodeURIComponent("Hello, I would like to request a legal service. Matter type, city, and current stage: ");
+    return `<!-- conversion-panel:start --><section class="conversion-panel" data-conversion-panel aria-labelledby="sitewide-contact-title"><div class="container conversion-panel-card"><div class="conversion-panel-copy"><span class="eyebrow">Direct contact — no account required</span><h2 id="sitewide-contact-title">Start with three short details</h2><p>Send the matter type, city, and current stage. Do not send passwords, banking data, or sensitive documents in the first message.</p><ul class="conversion-facts" aria-label="Contact information"><li>Electronic initial intake</li><li>WhatsApp or phone</li><li>No guaranteed legal outcome</li></ul></div><div class="conversion-panel-actions"><a class="primary-btn conversion-whatsapp" href="https://wa.me/966506142113?text=${message}" target="_blank" rel="noopener">Contact on WhatsApp</a><a class="secondary-btn conversion-call" href="tel:${phone}">Call ${displayPhone}</a><a class="conversion-method" href="about.html">How requests are handled</a></div></div></section><!-- conversion-panel:end -->`;
+  }
+  return `<!-- conversion-panel:start --><section class="conversion-panel" data-conversion-panel aria-labelledby="sitewide-contact-title"><div class="container conversion-panel-card"><div class="conversion-panel-copy"><span class="eyebrow">تواصل مباشر بلا تسجيل</span><h2 id="sitewide-contact-title">ابدأ بملخص من ثلاث معلومات</h2><p>أرسل نوع المسألة، المدينة، والمرحلة الحالية. لا ترسل كلمات مرور أو بيانات بنكية أو مستندات حساسة في الرسالة الأولى.</p><ul class="conversion-facts" aria-label="معلومات التواصل"><li>استقبال أولي إلكتروني</li><li>واتساب أو اتصال مباشر</li><li>لا توجد نتيجة قانونية مضمونة</li></ul></div><div class="conversion-panel-actions"><a class="primary-btn conversion-whatsapp" href="${whatsappUrl}" target="_blank" rel="noopener">ابدأ عبر واتساب</a><a class="secondary-btn conversion-call" href="tel:${phone}" dir="ltr">اتصل ${displayPhone}</a><a class="conversion-method" href="about.html">كيف نتعامل مع الطلب؟</a></div></div></section><!-- conversion-panel:end -->`;
 }
 
 function breadcrumbSchema(file, html, canonical, language) {
@@ -473,6 +492,13 @@ function enhanceHtml(file, catalog = []) {
     html = html.replace(/(<body\b[^>]*>)/i, `$1\n  ${accessibilityNavigation}`);
   }
 
+  const floatingContact = floatingContactLink(language);
+  if (/<a\b[^>]*class="[^"]*\bwhatsapp-float\b[^"]*"[^>]*>[\s\S]*?<\/a>/i.test(html)) {
+    html = html.replace(/<a\b[^>]*class="[^"]*\bwhatsapp-float\b[^"]*"[^>]*>[\s\S]*?<\/a>/i, floatingContact);
+  } else {
+    html = html.replace(/(<script\s+src="script(?:-[a-z0-9]+)?\.js[^>]*><\/script>)/i, `${floatingContact}\n  $1`);
+  }
+
   if (title && description && canonical) {
     if (/<meta\s+name="author"/i.test(html)) {
       html = html.replace(/<meta\s+name="author"\s+content="[^"]*"\s*\/?\s*>/i, `<meta name="author" content="رُكن الأنظمة القانونية">`);
@@ -500,6 +526,17 @@ function enhanceHtml(file, catalog = []) {
     } else {
       html = html.replace(/<\/main>/i, `${clientIntent}\n</main>`);
     }
+  }
+
+  if (!isNoindex(html)) {
+    const conversionPanel = conversionPanelBlock(language);
+    if (/<!-- conversion-panel:start -->[\s\S]*?<!-- conversion-panel:end -->/i.test(html)) {
+      html = html.replace(/<!-- conversion-panel:start -->[\s\S]*?<!-- conversion-panel:end -->/i, conversionPanel);
+    } else {
+      html = html.replace(/<\/main>/i, `${conversionPanel}\n</main>`);
+    }
+  } else {
+    html = html.replace(/\s*<!-- conversion-panel:start -->[\s\S]*?<!-- conversion-panel:end -->/i, "");
   }
 
   const accountability = contentAccountabilityBlock(language);

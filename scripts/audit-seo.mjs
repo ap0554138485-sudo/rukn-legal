@@ -133,8 +133,8 @@ for (const file of files) {
   if (!isEnglish && !/class="[^"]*\bfooter-region-directory\b/i.test(html)) errors.push(`${file}: missing Saudi region footer navigation`);
   if (!/<meta\s+name="color-scheme"\s+content="light"/i.test(html)) errors.push(`${file}: missing color-scheme metadata`);
   if (!/<meta\s+name="format-detection"\s+content="telephone=no"/i.test(html)) errors.push(`${file}: missing telephone format metadata`);
-  if (!/styles-20260829a\.css\?v=20260829a/i.test(html)) errors.push(`${file}: stale stylesheet version`);
-  if (!/script-20260829a\.js\?v=20260829a/i.test(html)) errors.push(`${file}: stale script version`);
+  if (!/styles-20260829b\.css\?v=20260829b/i.test(html)) errors.push(`${file}: stale stylesheet version`);
+  if (!/script-20260829b\.js\?v=20260829b/i.test(html)) errors.push(`${file}: stale script version`);
 
   const ids = matches(html, /\bid="([^"]+)"/gi);
   const duplicateIds = [...new Set(ids.filter((id, index) => ids.indexOf(id) !== index))];
@@ -156,6 +156,10 @@ for (const file of files) {
     if (assetPath && !existsSync(resolve(root, assetPath))) errors.push(`${file}: missing local asset ${asset}`);
   }
   const isArabic = !isEnglish;
+  if (!isNoindex && !/data-conversion-panel/i.test(html)) errors.push(`${file}: missing direct conversion panel`);
+  if (!isNoindex && !/class="[^"]*\bconversion-whatsapp\b/i.test(html)) errors.push(`${file}: missing priority WhatsApp action`);
+  if (!isNoindex && !/class="[^"]*\bconversion-call\b/i.test(html)) errors.push(`${file}: missing priority phone action`);
+  if (!/class="[^"]*\bwhatsapp-float--labelled\b/i.test(html)) errors.push(`${file}: floating WhatsApp action needs a visible label`);
   if (!isNoindex && isArabic && !/data-client-intent/i.test(html)) errors.push(`${file}: missing client-intent navigation`);
   if (!isNoindex && isArabic && !/data-topic-links/i.test(html)) errors.push(`${file}: missing contextual topic links`);
   const hasVisibleBreadcrumb = /class="[^"]*\bbreadcrumb\b/i.test(html);
@@ -230,7 +234,7 @@ if (!new RegExp(`Sitemap:\\s*${origin.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}/si
   errors.push("robots.txt: missing production sitemap URL");
 }
 
-for (const asset of ["favicon.ico", "logo-128-20260824.png", "script-20260829a.js", "styles-20260829a.css"]) {
+for (const asset of ["favicon.ico", "logo-128-20260824.png", "script-20260829b.js", "styles-20260829b.css"]) {
   if (!existsSync(resolve(root, asset))) errors.push(`${asset}: missing search appearance asset`);
 }
 
