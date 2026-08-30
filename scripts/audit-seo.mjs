@@ -133,8 +133,8 @@ for (const file of files) {
   if (!isEnglish && !/class="[^"]*\bfooter-region-directory\b/i.test(html)) errors.push(`${file}: missing Saudi region footer navigation`);
   if (!/<meta\s+name="color-scheme"\s+content="light"/i.test(html)) errors.push(`${file}: missing color-scheme metadata`);
   if (!/<meta\s+name="format-detection"\s+content="telephone=no"/i.test(html)) errors.push(`${file}: missing telephone format metadata`);
-  if (!/styles-20260830a\.css\?v=20260830a/i.test(html)) errors.push(`${file}: stale stylesheet version`);
-  if (!/script-20260830a\.js\?v=20260830a/i.test(html)) errors.push(`${file}: stale script version`);
+  if (!/styles-20260829b\.css\?v=20260830b/i.test(html)) errors.push(`${file}: stale stylesheet version`);
+  if (!/script-20260829b\.js\?v=20260830b/i.test(html)) errors.push(`${file}: stale script version`);
 
   const ids = matches(html, /\bid="([^"]+)"/gi);
   const duplicateIds = [...new Set(ids.filter((id, index) => ids.indexOf(id) !== index))];
@@ -234,7 +234,7 @@ if (!new RegExp(`Sitemap:\\s*${origin.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}/si
   errors.push("robots.txt: missing production sitemap URL");
 }
 
-for (const asset of ["favicon.ico", "logo-128-20260824.png", "script-20260830a.js", "styles-20260830a.css"]) {
+for (const asset of ["favicon.ico", "logo-128-20260824.png", "script-20260829b.js", "styles-20260829b.css"]) {
   if (!existsSync(resolve(root, asset))) errors.push(`${asset}: missing search appearance asset`);
 }
 

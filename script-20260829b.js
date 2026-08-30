@@ -49,6 +49,8 @@ function getInteractionLocation(element) {
   if (element.closest(".topbar")) return "topbar";
   if (element.closest("header")) return "header";
   if (element.closest(".hero")) return "hero";
+  if (element.closest(".conversion-panel")) return "conversion_panel";
+  if (element.closest(".client-intent-section")) return "keyword_path";
   if (element.closest(".contact-section, #contact")) return "contact_section";
   if (element.closest("footer")) return "footer";
   if (element.closest("#serviceModal")) return "service_modal";
@@ -58,6 +60,7 @@ function getInteractionLocation(element) {
 function getInternalNavigationType(link) {
   if (link.hasAttribute("hreflang")) return "language_switch";
   if (link.closest(".article-action")) return "article_path";
+  if (link.closest(".intent-card")) return "keyword_path";
   if (link.closest(".directory-page")) return "directory_link";
   if (link.closest(".related-services")) return "related_service";
   if (link.closest(".specialty-card")) return "service_path";
@@ -86,8 +89,13 @@ function trackEvent(eventName, parameters = {}) {
 }
 
 function trackLead(contactMethod, parameters = {}) {
+  const pageTopic = (document.querySelector("h1")?.textContent || document.title || "")
+    .replace(/\s+/g, " ")
+    .trim()
+    .slice(0, 120);
   trackEvent("generate_lead", {
     contact_method: contactMethod,
+    page_topic: pageTopic || "unspecified",
     ...parameters,
   });
 }
