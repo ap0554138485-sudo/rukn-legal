@@ -3,18 +3,30 @@ import { resolve } from "node:path";
 
 const root = resolve(import.meta.dirname, "..");
 const baseUrl = "https://rukn-legal-vwptio.cranl.net";
-const releaseDate = "2026-08-29";
+const releaseDate = "2026-08-30";
 const phone = "+966506142113";
 const displayPhone = "+966 50 614 2113";
 const email = "ap0554138485@icloud.com";
-const assetVersion = "20260829b";
-const scriptVersion = "20260829b";
-const stylesheetVersion = "20260829b";
+const assetVersion = "20260830a";
+const scriptVersion = "20260830a";
+const stylesheetVersion = "20260830a";
 const stylesheetFile = `styles-${assetVersion}.css?v=${stylesheetVersion}`;
 const scriptFile = `script-${assetVersion}.js?v=${scriptVersion}`;
 const logoFile = "logo-128-20260824.png";
 const whatsappMessage = "السلام عليكم، أرغب في طلب خدمة قانونية. نوع المسألة، المدينة، والمرحلة الحالية: ";
 const whatsappUrl = `https://wa.me/966506142113?text=${encodeURIComponent(whatsappMessage)}`;
+
+function pageContactUrl(title, language = "ar") {
+  const topic = String(title || "")
+    .split("|")[0]
+    .replace(/\s+/g, " ")
+    .trim()
+    .slice(0, 90);
+  const message = language === "en"
+    ? `Hello, I came from the "${topic || "Legal Systems Corner"}" page and would like to request a legal service. Matter type, city, and current stage: `
+    : `السلام عليكم، وصلت من صفحة «${topic || "رُكن الأنظمة القانونية"}» وأرغب في طلب خدمة قانونية. نوع المسألة، المدينة، والمرحلة الحالية: `;
+  return `https://wa.me/966506142113?text=${encodeURIComponent(message)}`;
+}
 
 const regions = [
   ["منطقة الرياض", "الرياض، الخرج، الدرعية، الدوادمي، المجمعة ووادي الدواسر", "legal-services-riyadh.html", "دليل خدمات وأحياء الرياض"],
@@ -90,13 +102,10 @@ function header() {
   <header class="site-header simple-header"><div class="container nav-wrap"><a class="brand" href="/" aria-label="رُكن الأنظمة القانونية - الرئيسية"><div class="brand-mark"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v18M5 21h14M4 7h16M6 7l-3 7m3-7 3 7m9 0-3-7-3 7M2 14h8a4 4 0 0 1-8 0Zm12 0h8a4 4 0 0 1-8 0Z"/></svg></div><div><strong>رُكن الأنظمة القانونية</strong><span>LEGAL SYSTEMS CORNER</span></div></a><nav class="nav" id="nav" aria-label="التنقل الرئيسي"><a href="/">الرئيسية</a><a href="notary-services-saudi.html">خدمات الموثق</a><a href="saudi-regions-guide.html">مناطق السعودية</a><a href="site-directory.html">دليل الصفحات</a><a href="about.html">عن الموقع</a></nav><div class="nav-actions"><a class="header-cta" href="${whatsappUrl}" target="_blank" rel="noopener">واتساب مباشر</a><button class="menu-btn" id="menuBtn" aria-label="فتح القائمة" aria-expanded="false">☰</button></div></div></header>`;
 }
 
-function floatingContactLink(language) {
+function floatingContactLink(language, title) {
   const isEnglish = language === "en";
-  const message = isEnglish
-    ? "Hello, I would like to request a legal service. Matter type, city, and current stage: "
-    : whatsappMessage;
   const label = isEnglish ? "WhatsApp" : "واتساب مباشر";
-  return `<a class="whatsapp-float whatsapp-float--labelled" href="https://wa.me/966506142113?text=${encodeURIComponent(message)}" target="_blank" rel="noopener" aria-label="${label}"><svg viewBox="0 0 24 24" width="25" height="25" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 11.5a8.4 8.4 0 0 1-9 8.5 9.3 9.3 0 0 1-3.8-.8L3 21l1.8-5A8.5 8.5 0 1 1 21 11.5Z"/><path d="M8.2 8.1c.5 3.1 2.6 5.2 5.7 5.7l1.2-1.3 2 .5c-.4 2-1.7 3-3.4 2.8-3.8-.5-7-3.7-7.5-7.5C6 6.6 7 5.3 9 4.9l.5 2-1.3 1.2Z"/></svg><span>${label}</span></a>`;
+  return `<a class="whatsapp-float whatsapp-float--labelled" href="${pageContactUrl(title, language)}" target="_blank" rel="noopener" aria-label="${label}"><svg viewBox="0 0 24 24" width="25" height="25" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 11.5a8.4 8.4 0 0 1-9 8.5 9.3 9.3 0 0 1-3.8-.8L3 21l1.8-5A8.5 8.5 0 1 1 21 11.5Z"/><path d="M8.2 8.1c.5 3.1 2.6 5.2 5.7 5.7l1.2-1.3 2 .5c-.4 2-1.7 3-3.4 2.8-3.8-.5-7-3.7-7.5-7.5C6 6.6 7 5.3 9 4.9l.5 2-1.3 1.2Z"/></svg><span>${label}</span></a>`;
 }
 
 function footer(message = "خدمات واستشارات قانونية للأفراد والمنشآت في مختلف مناطق المملكة.") {
@@ -190,7 +199,7 @@ function privacyPage() {
   const file = "privacy.html";
   const title = "سياسة الخصوصية | رُكن الأنظمة القانونية";
   const description = "سياسة الخصوصية في رُكن الأنظمة القانونية توضح بيانات الاستخدام والتواصل وAnalytics والروابط الخارجية وكيفية حماية المعلومات عند بدء طلب قانوني.";
-  const body = `<main><div class="container breadcrumb" aria-label="مسار الصفحة"><a href="/">الرئيسية</a><span aria-hidden="true">/</span><span>سياسة الخصوصية</span></div><section class="hero service-detail-hero"><div class="container hero-grid"><div class="hero-copy"><span class="eyebrow">آخر تحديث: 21 أغسطس 2026</span><h1>سياسة الخصوصية<br><span>رُكن الأنظمة القانونية</span></h1><p>توضح هذه السياسة أنواع البيانات التي قد تُجمع عند استخدام الموقع أو التواصل، والغرض منها، والخطوات المناسبة لحماية معلوماتك.</p></div><aside class="service-hero-aside"><span class="service-badge">تنبيه مهم</span><div class="service-symbol" aria-hidden="true">!</div><h2>لا ترسل في البداية</h2><ul class="service-hero-points"><li>كلمات المرور</li><li>البيانات البنكية</li><li>أصول المستندات</li><li>المعلومات شديدة الحساسية</li></ul></aside></div></section><section class="section"><div class="container policy-content"><h2>بيانات الاستخدام</h2><p>يستخدم الموقع Google Analytics لقياس الزيارات والصفحات ومصادر الوصول والتفاعل. قد تعتمد هذه الخدمة على ملفات تعريف الارتباط أو معرّفات تقنية وفق إعدادات Google والمتصفح.</p><h2>بيانات التواصل</h2><p>عند الاتصال أو إرسال بريد أو فتح واتساب، تُرسل المعلومات التي تختار تقديمها إلى قناة التواصل المحددة. استخدم رسالة أولية مختصرة، ولا ترسل معلومات لا يحتاجها التقييم الأولي.</p><h2>الغرض من المعالجة</h2><p>تُستخدم المعلومات لفهم الطلب والرد عليه وتحسين الموقع وقياس جودة صفحات الخدمات. لا يبيع الموقع بيانات التواصل للغير.</p><h2>الخدمات والروابط الخارجية</h2><p>واتساب والبريد وGoogle Analytics خدمات مستقلة لها سياساتها الخاصة. عند الانتقال إليها يخضع استخدامك لإعداداتك وسياسة الجهة المقدمة للخدمة.</p><h2>الاحتفاظ والحماية</h2><p>يُحتفظ بالمعلومات بالقدر اللازم للرد وإدارة الطلب والالتزامات النظامية، مع اتخاذ تدابير معقولة لحمايتها. لا توجد وسيلة إلكترونية تضمن أمانًا مطلقًا.</p><h2>الاستفسار أو طلب التصحيح</h2><p>يمكن التواصل عبر <a href="mailto:${email}">${email}</a> أو <a href="tel:${phone}" dir="ltr">${displayPhone}</a> للاستفسار عن بيانات التواصل أو طلب تصحيحها أو حذفها عندما يكون ذلك ممكنًا نظامًا.</p><div class="related-services"><a href="about.html">عن الموقع ومنهج المحتوى</a><a href="saudi-regions-guide.html">دليل مناطق السعودية</a><a href="/">العودة للرئيسية</a></div></div></section></main>`;
+  const body = `<main><div class="container breadcrumb" aria-label="مسار الصفحة"><a href="/">الرئيسية</a><span aria-hidden="true">/</span><span>سياسة الخصوصية</span></div><section class="hero service-detail-hero"><div class="container hero-grid"><div class="hero-copy"><span class="eyebrow">آخر تحديث: 30 أغسطس 2026</span><h1>سياسة الخصوصية<br><span>رُكن الأنظمة القانونية</span></h1><p>توضح هذه السياسة أنواع البيانات التي قد تُجمع عند استخدام الموقع أو التواصل، والغرض منها، والخطوات المناسبة لحماية معلوماتك.</p></div><aside class="service-hero-aside"><span class="service-badge">تنبيه مهم</span><div class="service-symbol" aria-hidden="true">!</div><h2>لا ترسل في البداية</h2><ul class="service-hero-points"><li>كلمات المرور</li><li>البيانات البنكية</li><li>أصول المستندات</li><li>المعلومات شديدة الحساسية</li></ul></aside></div></section><section class="section"><div class="container policy-content"><h2>بيانات الاستخدام</h2><p>يستخدم الموقع Google Analytics لقياس الزيارات والصفحات ومصادر الوصول والتفاعل. قد تعتمد هذه الخدمة على ملفات تعريف الارتباط أو معرّفات تقنية وفق إعدادات Google والمتصفح.</p><h2>بيانات التواصل</h2><p>عند الاتصال أو إرسال بريد أو فتح واتساب، تُرسل المعلومات التي تختار تقديمها إلى قناة التواصل المحددة. استخدم رسالة أولية مختصرة، ولا ترسل معلومات لا يحتاجها التقييم الأولي.</p><h2>الغرض من المعالجة</h2><p>تُستخدم المعلومات لفهم الطلب والرد عليه وتحسين الموقع وقياس جودة صفحات الخدمات. لا يبيع الموقع بيانات التواصل للغير.</p><h2>الخدمات والروابط الخارجية</h2><p>واتساب والبريد وGoogle Analytics خدمات مستقلة لها سياساتها الخاصة. عند الانتقال إليها يخضع استخدامك لإعداداتك وسياسة الجهة المقدمة للخدمة.</p><h2>الاحتفاظ والحماية</h2><p>يُحتفظ بالمعلومات بالقدر اللازم للرد وإدارة الطلب والالتزامات النظامية، مع اتخاذ تدابير معقولة لحمايتها. لا توجد وسيلة إلكترونية تضمن أمانًا مطلقًا.</p><h2>الاستفسار أو طلب التصحيح</h2><p>يمكن التواصل عبر <a href="mailto:${email}">${email}</a> أو <a href="tel:${phone}" dir="ltr">${displayPhone}</a> للاستفسار عن بيانات التواصل أو طلب تصحيحها أو حذفها عندما يكون ذلك ممكنًا نظامًا.</p><div class="related-services"><a href="about.html">عن الموقع ومنهج المحتوى</a><a href="saudi-regions-guide.html">دليل مناطق السعودية</a><a href="/">العودة للرئيسية</a></div></div></section></main>`;
   writeFileSync(resolve(root, file), shell({ file, title, description, robots: "noindex,follow,max-image-preview:large,max-snippet:-1,max-video-preview:-1", body }), "utf8");
 }
 
@@ -203,7 +212,8 @@ function notFoundPage() {
 }
 
 function pageTitle(html, fallback) {
-  return html.match(/<title>([\s\S]*?)<\/title>/i)?.[1]?.replace(/\s*\|\s*رُ?كن الأنظمة(?: القانونية)?\s*$/i, "").trim() || fallback;
+  const title = decodeHtml(html.match(/<title>([\s\S]*?)<\/title>/i)?.[1] || "");
+  return title.replace(/\s*\|\s*رُ?كن الأنظمة(?: القانونية)?\s*$/i, "").trim() || fallback;
 }
 
 function isNoindex(html) {
@@ -252,17 +262,17 @@ function sitewideTrustBlock(language) {
 
 function contentAccountabilityBlock(language) {
   if (language === "en") {
-    return `<!-- content-accountability:start --><aside class="content-accountability" data-content-accountability aria-label="Content information"><div class="container content-accountability-inner"><div><strong>Published and maintained by Legal Systems Corner</strong><span>General information to help organize an initial request; it does not replace a professional review of the facts and documents.</span></div><div class="content-accountability-meta"><time datetime="${releaseDate}">Content updated 29 August 2026</time><a href="about.html">How we prepare content</a></div></div></aside><!-- content-accountability:end -->`;
+    return `<!-- content-accountability:start --><aside class="content-accountability" data-content-accountability aria-label="Content information"><div class="container content-accountability-inner"><div><strong>Published and maintained by Legal Systems Corner</strong><span>General information to help organize an initial request; it does not replace a professional review of the facts and documents.</span></div><div class="content-accountability-meta"><time datetime="${releaseDate}">Content updated 30 August 2026</time><a href="about.html">How we prepare content</a></div></div></aside><!-- content-accountability:end -->`;
   }
-  return `<!-- content-accountability:start --><aside class="content-accountability" data-content-accountability aria-label="معلومات المحتوى"><div class="container content-accountability-inner"><div><strong>النشر والتحديث: رُكن الأنظمة القانونية</strong><span>محتوى عام لتنظيم الطلب الأولي، ولا يغني عن تقييم الوقائع والمستندات من مختص.</span></div><div class="content-accountability-meta"><time datetime="${releaseDate}">تحديث المحتوى: 29 أغسطس 2026</time><a href="about.html">منهج إعداد المحتوى</a></div></div></aside><!-- content-accountability:end -->`;
+  return `<!-- content-accountability:start --><aside class="content-accountability" data-content-accountability aria-label="معلومات المحتوى"><div class="container content-accountability-inner"><div><strong>النشر والتحديث: رُكن الأنظمة القانونية</strong><span>محتوى عام لتنظيم الطلب الأولي، ولا يغني عن تقييم الوقائع والمستندات من مختص.</span></div><div class="content-accountability-meta"><time datetime="${releaseDate}">تحديث المحتوى: 30 أغسطس 2026</time><a href="about.html">منهج إعداد المحتوى</a></div></div></aside><!-- content-accountability:end -->`;
 }
 
-function conversionPanelBlock(language) {
+function conversionPanelBlock(language, title) {
+  const contactUrl = pageContactUrl(title, language);
   if (language === "en") {
-    const message = encodeURIComponent("Hello, I would like to request a legal service. Matter type, city, and current stage: ");
-    return `<!-- conversion-panel:start --><section class="conversion-panel" data-conversion-panel aria-labelledby="sitewide-contact-title"><div class="container conversion-panel-card"><div class="conversion-panel-copy"><span class="eyebrow">Direct contact — no account required</span><h2 id="sitewide-contact-title">Start with three short details</h2><p>Send the matter type, city, and current stage. Do not send passwords, banking data, or sensitive documents in the first message.</p><ul class="conversion-facts" aria-label="Contact information"><li>Electronic initial intake</li><li>WhatsApp or phone</li><li>No guaranteed legal outcome</li></ul></div><div class="conversion-panel-actions"><a class="primary-btn conversion-whatsapp" href="https://wa.me/966506142113?text=${message}" target="_blank" rel="noopener">Contact on WhatsApp</a><a class="secondary-btn conversion-call" href="tel:${phone}">Call ${displayPhone}</a><a class="conversion-method" href="about.html">How requests are handled</a></div></div></section><!-- conversion-panel:end -->`;
+    return `<!-- conversion-panel:start --><section class="conversion-panel" data-conversion-panel aria-labelledby="sitewide-contact-title"><div class="container conversion-panel-card"><div class="conversion-panel-copy"><span class="eyebrow">Direct contact — no account required</span><h2 id="sitewide-contact-title">Start with three short details</h2><p>Send the matter type, city, and current stage. The page topic is included automatically so your request starts in the right context.</p><ul class="conversion-facts" aria-label="Contact information"><li>Electronic initial intake</li><li>WhatsApp or phone</li><li>No guaranteed legal outcome</li></ul></div><div class="conversion-panel-actions"><a class="primary-btn conversion-whatsapp" href="${contactUrl}" target="_blank" rel="noopener">Contact on WhatsApp</a><a class="secondary-btn conversion-call" href="tel:${phone}">Call ${displayPhone}</a><a class="conversion-method" href="about.html">How requests are handled</a></div></div></section><!-- conversion-panel:end -->`;
   }
-  return `<!-- conversion-panel:start --><section class="conversion-panel" data-conversion-panel aria-labelledby="sitewide-contact-title"><div class="container conversion-panel-card"><div class="conversion-panel-copy"><span class="eyebrow">تواصل مباشر بلا تسجيل</span><h2 id="sitewide-contact-title">ابدأ بملخص من ثلاث معلومات</h2><p>أرسل نوع المسألة، المدينة، والمرحلة الحالية. لا ترسل كلمات مرور أو بيانات بنكية أو مستندات حساسة في الرسالة الأولى.</p><ul class="conversion-facts" aria-label="معلومات التواصل"><li>استقبال أولي إلكتروني</li><li>واتساب أو اتصال مباشر</li><li>لا توجد نتيجة قانونية مضمونة</li></ul></div><div class="conversion-panel-actions"><a class="primary-btn conversion-whatsapp" href="${whatsappUrl}" target="_blank" rel="noopener">ابدأ عبر واتساب</a><a class="secondary-btn conversion-call" href="tel:${phone}" dir="ltr">اتصل ${displayPhone}</a><a class="conversion-method" href="about.html">كيف نتعامل مع الطلب؟</a></div></div></section><!-- conversion-panel:end -->`;
+  return `<!-- conversion-panel:start --><section class="conversion-panel" data-conversion-panel aria-labelledby="sitewide-contact-title"><div class="container conversion-panel-card"><div class="conversion-panel-copy"><span class="eyebrow">تواصل مباشر بلا تسجيل</span><h2 id="sitewide-contact-title">ابدأ بملخص من ثلاث معلومات</h2><p>أرسل نوع المسألة، المدينة، والمرحلة الحالية. سيُضاف موضوع الصفحة تلقائيًا لبدء الطلب في سياقه الصحيح.</p><ul class="conversion-facts" aria-label="معلومات التواصل"><li>استقبال أولي إلكتروني</li><li>واتساب أو اتصال مباشر</li><li>لا توجد نتيجة قانونية مضمونة</li></ul></div><div class="conversion-panel-actions"><a class="primary-btn conversion-whatsapp" href="${contactUrl}" target="_blank" rel="noopener">ابدأ عبر واتساب</a><a class="secondary-btn conversion-call" href="tel:${phone}" dir="ltr">اتصل ${displayPhone}</a><a class="conversion-method" href="about.html">كيف نتعامل مع الطلب؟</a></div></div></section><!-- conversion-panel:end -->`;
 }
 
 function breadcrumbSchema(file, html, canonical, language) {
@@ -313,10 +323,12 @@ function legalIntentCards(locationKey) {
       ["تنظيم نزاع تجاري", "eastern-jubail-supplier-dispute.html", "افصل التوريد والجودة والتأخير والدفعات في ملف واضح."]
     ],
     tabuk: [
-      ["استشارة قانونية قبل اتخاذ الإجراء", "legal-consultation-tabuk.html", "لفهم الصفة والمرحلة والخيارات قبل رفع الدعوى أو الرد عليها."],
-      ["توكيل محامي ومتابعة القضية", "appoint-lawyer-tabuk.html", "لتحديد نطاق الوكالة والتمثيل والمتابعة والمواعيد المهمة."],
-      ["كتابة اعتراض أو مذكرة قانونية", "objection-memorandum-tabuk.html", "لترتيب الوقائع والطلبات والأسانيد والمرفقات بصورة واضحة."],
-      ["مراجعة عقد أو مطالبة مالية", "contracts-lawyer-tabuk.html", "لفحص الالتزامات والدفعات والإخلال والنتيجة المطلوبة."]
+      ["أفضل محامي في تبوك: معايير الاختيار", "lawyer-tabuk.html", "قارن التخصص والترخيص ونطاق العمل قبل اختيار المحامي المناسب لنوع القضية."],
+      ["محامي قضايا مخدرات في تبوك", "drug-cases-lawyer-tabuk.html", "ابدأ من الصفة ومرحلة الضبط أو التحقيق أو المحاكمة وأقرب موعد."],
+      ["محامي عقود في تبوك", "contracts-lawyer-tabuk.html", "لفحص الالتزامات والدفعات والإنهاء والضمانات قبل التوقيع أو عند النزاع."],
+      ["محامي تنفيذ في تبوك", "execution-lawyer-tabuk.html", "لتحديد السند وصفة طالب التنفيذ أو المنفذ ضده والإجراء الأخير."],
+      ["استشارة قانونية في تبوك", "legal-consultation-tabuk.html", "لفهم الصفة والمرحلة والخيارات قبل رفع الدعوى أو الرد عليها."],
+      ["توكيل محامي ومتابعة القضية", "appoint-lawyer-tabuk.html", "لتحديد نطاق الوكالة والتمثيل والمتابعة والمواعيد المهمة."]
     ],
     dammam: [
       ["استشارة قانونية قبل اتخاذ الإجراء", "legal-consultation-dammam.html", "لفهم الموقف والمستند والجهة والمدة قبل بدء الإجراء."],
@@ -360,6 +372,74 @@ function notaryIntentCards(locationKey) {
   ];
 }
 
+function cornerstoneFiles(locationKey, notary) {
+  if (notary) {
+    const city = ["dammam", "riyadh", "tabuk"].includes(locationKey) ? locationKey : null;
+    return [
+      "notary-services-saudi.html",
+      city ? `request-notary-${city}.html` : "power-of-attorney-notarization-saudi.html",
+      city ? `verify-notary-license-${city}.html` : "real-estate-transfer-notarization-saudi.html",
+      city ? `power-of-attorney-notary-${city}.html` : "marriage-contract-notarization-saudi.html",
+      city ? `real-estate-transfer-notary-${city}.html` : "company-contract-notarization-saudi.html"
+    ];
+  }
+
+  const pages = {
+    tabuk: [
+      "lawyer-tabuk.html",
+      "tabuk-region-lawyers.html",
+      "legal-consultation-tabuk.html",
+      "appoint-lawyer-tabuk.html",
+      "contracts-lawyer-tabuk.html",
+      "execution-lawyer-tabuk.html",
+      "criminal-lawyer-tabuk.html",
+      "drug-cases-lawyer-tabuk.html"
+    ],
+    riyadh: [
+      "lawyer-riyadh.html",
+      "legal-services-riyadh.html",
+      "contracts-lawyer-riyadh.html",
+      "execution-lawyer-riyadh.html",
+      "criminal-lawyer-riyadh.html",
+      "family-lawyer-riyadh.html"
+    ],
+    jeddah: [
+      "lawyer-jeddah.html",
+      "legal-services-jeddah.html",
+      "contracts-lawyer-jeddah.html",
+      "execution-lawyer-jeddah.html",
+      "criminal-lawyer-jeddah.html",
+      "family-lawyer-jeddah.html"
+    ],
+    dammam: [
+      "lawyer-dammam.html",
+      "legal-services-dammam.html",
+      "contracts-lawyer-dammam.html",
+      "execution-lawyer-dammam.html",
+      "criminal-lawyer-dammam.html",
+      "family-lawyer-dammam.html"
+    ],
+    eastern: [
+      "eastern-province-legal-services.html",
+      "lawyer-dammam.html",
+      "eastern-dammam-contract-risk-review.html",
+      "eastern-khobar-enforcement-application.html",
+      "eastern-jubail-supplier-dispute.html"
+    ],
+    national: [
+      "index.html",
+      "saudi-regions-guide.html",
+      "lawyer-tabuk.html",
+      "lawyer-riyadh.html",
+      "lawyer-jeddah.html",
+      "lawyer-dammam.html",
+      "articles.html",
+      "site-directory.html"
+    ]
+  };
+  return pages[locationKey] || pages.national;
+}
+
 function clientIntentBlock(file, html, catalog) {
   if (isNoindex(html) || /<html[^>]*\slang="en/i.test(html)) return "";
   const location = locationProfile(file);
@@ -378,7 +458,13 @@ function clientIntentBlock(file, html, catalog) {
   const clusterPages = catalog.filter((page) => page.cluster === cluster).sort((a, b) => a.file.localeCompare(b.file));
   const currentIndex = clusterPages.findIndex((page) => page.file === file);
   const related = [];
-  for (let offset = 1; offset < clusterPages.length && related.length < 6; offset += 1) {
+  const pageByFile = new Map(catalog.map((page) => [page.file, page]));
+  for (const cornerstoneFile of cornerstoneFiles(location.key, notary)) {
+    const candidate = pageByFile.get(cornerstoneFile);
+    if (candidate && candidate.file !== file && !related.some((item) => item.file === candidate.file)) related.push(candidate);
+    if (related.length >= 8) break;
+  }
+  for (let offset = 1; offset < clusterPages.length && related.length < 8; offset += 1) {
     const candidate = clusterPages[(currentIndex + offset) % clusterPages.length];
     if (candidate && !related.some((item) => item.file === candidate.file)) related.push(candidate);
   }
@@ -387,7 +473,7 @@ function clientIntentBlock(file, html, catalog) {
   const intro = notary
     ? `ابدأ من نوع المعاملة، ثم تحقق من الموثق المرخص والمتطلبات الرسمية. هذه المسارات تساعدك على الانتقال من ${escapeHtml(currentTitle)} إلى الإجراء الأقرب لطلبك.`
     : `حدّد هدفك أولًا: استشارة لفهم الموقف، توكيل لمتابعة قضية، إعداد اعتراض أو مذكرة، أو مراجعة عقد ومطالبة. اختر المسار الأقرب إلى ${escapeHtml(currentTitle)}.`;
-  const relatedHeading = notary ? `صفحات توثيق مرتبطة في ${location.label}` : `خدمات قانونية مرتبطة في ${location.label}`;
+  const relatedHeading = notary ? `صفحات التوثيق الأساسية في ${location.label}` : `الصفحات القانونية الأساسية في ${location.label}`;
   return `<!-- client-intent:start --><section class="section client-intent-section" data-client-intent><div class="container"><div class="section-head"><span class="eyebrow">اختر حسب هدفك</span><h2>${heading}</h2><p>${intro}</p></div><div class="intent-grid">${cards}</div>${relatedLinks ? `<div class="topic-links" data-topic-links><strong>${relatedHeading}</strong><div class="related-services">${relatedLinks}</div></div>` : ""}</div></section><!-- client-intent:end -->`;
 }
 
@@ -492,7 +578,7 @@ function enhanceHtml(file, catalog = []) {
     html = html.replace(/(<body\b[^>]*>)/i, `$1\n  ${accessibilityNavigation}`);
   }
 
-  const floatingContact = floatingContactLink(language);
+  const floatingContact = floatingContactLink(language, title);
   if (/<a\b[^>]*class="[^"]*\bwhatsapp-float\b[^"]*"[^>]*>[\s\S]*?<\/a>/i.test(html)) {
     html = html.replace(/<a\b[^>]*class="[^"]*\bwhatsapp-float\b[^"]*"[^>]*>[\s\S]*?<\/a>/i, floatingContact);
   } else {
@@ -529,7 +615,7 @@ function enhanceHtml(file, catalog = []) {
   }
 
   if (!isNoindex(html)) {
-    const conversionPanel = conversionPanelBlock(language);
+    const conversionPanel = conversionPanelBlock(language, title);
     if (/<!-- conversion-panel:start -->[\s\S]*?<!-- conversion-panel:end -->/i.test(html)) {
       html = html.replace(/<!-- conversion-panel:start -->[\s\S]*?<!-- conversion-panel:end -->/i, conversionPanel);
     } else {
@@ -568,7 +654,7 @@ function updateSitemap() {
   pages.sort((a, b) => (a.file === "index.html" ? -1 : b.file === "index.html" ? 1 : a.file.localeCompare(b.file)));
   const entries = pages.map(({ file, html }) => {
     const canonical = canonicalFor(file, html);
-    const lastModified = /data-national-wave="[4-7]"/i.test(html) || ["saudi-regions-guide.html", "site-directory.html"].includes(file) ? "2026-08-29" : releaseDate;
+    const lastModified = releaseDate;
     const alternates = file === "index.html" || file === "en.html" ? `\n    <xhtml:link rel="alternate" hreflang="ar" href="${baseUrl}/" />\n    <xhtml:link rel="alternate" hreflang="en" href="${baseUrl}/en.html" />\n    <xhtml:link rel="alternate" hreflang="x-default" href="${baseUrl}/" />` : "";
     return `  <url>\n    <loc>${canonical}</loc>\n    <lastmod>${lastModified}</lastmod>${alternates}\n  </url>`;
   });

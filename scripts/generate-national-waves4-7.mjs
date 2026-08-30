@@ -13,6 +13,13 @@ const email = "ap0554138485@icloud.com";
 const stylesheet = "styles-20260821b.css?v=20260825b";
 const scriptFile = "script-20260824b.js?v=20260827b";
 
+const batchReviewNotes = {
+  4: "في هذه المرحلة ثبّت خط الأساس قبل أي مقارنة: النسخة المرجعية، تاريخ القطع، صاحب الصلاحية، حدود النطاق، والمستند الذي أنشأ الالتزام. اكتب ما يدخل في المراجعة وما استُبعد وسبب الاستبعاد، ثم امنع إدخال نسخة أحدث دون تسجيل أثرها على النتيجة السابقة.",
+  5: "تعامل مع التغيير أو التسوية كسلسلة فروق قابلة للقياس. افصل الطلب الأصلي عن العرض المعدل، وحدد المقابل والتنازل والشرط والمدة والاعتماد لكل نسخة. لا تدمج الأرقام أو الصيغ قبل إنشاء جدول يبين ما بقي ثابتًا وما تغير ومن وافق عليه.",
+  6: "ركز هنا على سلسلة السلطة والاعتماد: من أعد المدخل، ومن راجعه، ومن يملك القرار، ومن نفذه، وما الدليل الذي أغلق المهمة. إذا اجتمعت عدة صفات في شخص واحد فدوّنها منفصلة، واختبر وجود تعارض أو حد مالي أو مدة تفويض قبل الاعتماد.",
+  7: "حوّل القرار في هذه المرحلة إلى سجل تنفيذ حي: مهمة محددة، مالك، تبعية، موعد، مخرج، اختبار قبول، ودليل إغلاق. سجّل العوائق والتغيير اللاحق في صف مستقل، ولا تعتبر النسبة أو لون الحالة إنجازًا ما لم يوجد أثر يمكن لمراجع آخر فحصه."
+};
+
 function escapeHtml(value) {
   return String(value).replaceAll("&", "&amp;").replaceAll("<", "&lt;").replaceAll(">", "&gt;").replaceAll('"', "&quot;");
 }
@@ -55,7 +62,7 @@ function render(page) {
   const angleOne = reviewAngles[(page.domainIndex * 3 + page.taskIndex * 7) % reviewAngles.length];
   const angleTwo = reviewAngles[(page.domainIndex * 11 + page.taskIndex * 5 + 3) % reviewAngles.length];
   const angleThree = reviewAngles[(page.domainIndex * 7 + page.taskIndex * 13 + 9) % reviewAngles.length];
-  const evidence = [...domain.docs, ...task.evidence];
+  const evidence = [...domain.docs, ...task.evidence, batchReviewNotes[page.batch]];
   const inBatch = pages.filter((item) => item.batch === page.batch);
   const related = rotate(inBatch, page.index + 17, 12).filter((item) => item.slug !== page.slug).slice(0, 8);
   const faqs = [
