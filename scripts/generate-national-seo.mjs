@@ -1,4 +1,4 @@
-import { readFileSync, readdirSync, writeFileSync } from "node:fs";
+import { readFileSync, readdirSync, writeFileSync as nativeWriteFileSync } from "node:fs";
 import { resolve } from "node:path";
 
 const root = resolve(import.meta.dirname, "..");
@@ -16,6 +16,18 @@ const logoFile = "logo-128-20260824.png";
 const whatsappMessage = "السلام عليكم، أرغب في طلب خدمة قانونية. نوع المسألة، المدينة، والمرحلة الحالية: ";
 const whatsappUrl = `https://wa.me/966506142113?text=${encodeURIComponent(whatsappMessage)}`;
 const relatedLinkLimit = 10;
+
+function writeFileSync(path, data, encoding) {
+  for (let attempt = 0; attempt < 8; attempt += 1) {
+    try {
+      nativeWriteFileSync(path, data, encoding);
+      return;
+    } catch (error) {
+      if (attempt === 7 || !["UNKNOWN", "EBUSY", "EPERM"].includes(error.code)) throw error;
+      Atomics.wait(new Int32Array(new SharedArrayBuffer(4)), 0, 0, 75 * (attempt + 1));
+    }
+  }
+}
 
 function pageContactUrl(title, language = "ar") {
   const topic = String(title || "")

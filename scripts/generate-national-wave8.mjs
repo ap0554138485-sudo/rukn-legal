@@ -72,7 +72,9 @@ export const pages = categories.flatMap((category, categoryIndex) => category.to
   };
 }));
 
-function render(page) {
+export function renderNationalPage(page, options = {}) {
+  const pageContentDate = options.contentDate ?? contentDate;
+  const allPages = options.allPages ?? pages;
   const { category, location } = page;
   const url = `${baseUrl}/${page.slug}`;
   const documentTitle = `${page.title} في ${location.name} | رُكن الأنظمة`;
@@ -80,7 +82,7 @@ function render(page) {
   const message = `السلام عليكم، لدي طلب متعلق بـ${page.title}. المدينة: ${location.name}. المرحلة والموعد الأقرب: `;
   const steps = rotate(category.workflow, page.index % category.workflow.length, 5);
   const evidence = [page.coreDocument, page.proof, ...rotate(category.documents, page.index % category.documents.length, 4)];
-  const related = rotate(pages, page.index + 23, 10).filter((item) => item.slug !== page.slug).slice(0, 8);
+  const related = rotate(allPages, page.index + 23, 10).filter((item) => item.slug !== page.slug).slice(0, 8);
   const faq = [
     [`ما أول مستند في ملف ${page.title}؟`, `ابدأ بـ${page.coreDocument}، ثم ضع بجواره مصدره وتاريخه وصاحب النسخة. لا تبدأ من ملخص مكتوب لاحقًا إذا كانت الوثيقة الأصلية متاحة.`],
     ["ما السؤال الذي يحدد اتجاه المراجعة؟", `${page.pivot} اكتب الإجابة المثبتة، وما يعارضها، وما بقي معلقًا، ثم اربط كل جزء بمرجع مستقل.`],
@@ -89,7 +91,7 @@ function render(page) {
   ];
   const graph = [
     { "@type": "WebPage", "@id": `${url}#webpage`, url, name: documentTitle, description, inLanguage: "ar-SA", isPartOf: { "@id": `${baseUrl}/#website` }, breadcrumb: { "@id": `${url}#breadcrumb` } },
-    { "@type": "Article", "@id": `${url}#article`, headline: documentTitle.split("|")[0].trim(), description, datePublished: contentDate, dateModified: contentDate, inLanguage: "ar-SA", author: { "@id": `${baseUrl}/#organization` }, publisher: { "@id": `${baseUrl}/#organization` }, mainEntityOfPage: { "@id": `${url}#webpage` }, about: [page.title, category.label, location.name, location.region] },
+    { "@type": "Article", "@id": `${url}#article`, headline: documentTitle.split("|")[0].trim(), description, datePublished: pageContentDate, dateModified: pageContentDate, inLanguage: "ar-SA", author: { "@id": `${baseUrl}/#organization` }, publisher: { "@id": `${baseUrl}/#organization` }, mainEntityOfPage: { "@id": `${url}#webpage` }, about: [page.title, category.label, location.name, location.region] },
     { "@type": "Service", "@id": `${url}#service`, name: `تنظيم ملف ${page.title}`, serviceType: category.label, url, provider: { "@id": `${baseUrl}/#organization` }, areaServed: [{ "@type": location.kind, name: location.name }, { "@type": "AdministrativeArea", name: location.region }] },
     { "@type": "BreadcrumbList", "@id": `${url}#breadcrumb`, itemListElement: [{ "@type": "ListItem", position: 1, name: "الرئيسية", item: `${baseUrl}/` }, { "@type": "ListItem", position: 2, name: "مناطق السعودية", item: `${baseUrl}/saudi-regions-guide.html` }, { "@type": "ListItem", position: 3, name: page.title, item: url }] },
     { "@type": "FAQPage", mainEntity: faq.map(([name, answer]) => ({ "@type": "Question", name, acceptedAnswer: { "@type": "Answer", text: answer } })) }
@@ -113,7 +115,7 @@ function render(page) {
 export function generateNationalWave8() {
   if (pages.length !== 100) throw new Error(`Expected 100 pages, found ${pages.length}.`);
   if (new Set(pages.map((page) => page.slug)).size !== 100) throw new Error("Duplicate batch-eight slug.");
-  for (const page of pages) writeFileSync(resolve(root, page.slug), render(page), "utf8");
+  for (const page of pages) writeFileSync(resolve(root, page.slug), renderNationalPage(page), "utf8");
   const rolloutPath = resolve(root, "national-seo-rollout.json");
   const rollout = JSON.parse(readFileSync(rolloutPath, "utf8"));
   if (!rollout.completedBatches.includes(7)) throw new Error("Batch 7 is not recorded as complete.");
