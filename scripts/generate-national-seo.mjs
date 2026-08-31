@@ -3,7 +3,7 @@ import { resolve } from "node:path";
 
 const root = resolve(import.meta.dirname, "..");
 const baseUrl = "https://rukn-legal-vwptio.cranl.net";
-const releaseDate = "2026-08-30";
+const releaseDate = "2026-08-31";
 const phone = "+966506142113";
 const displayPhone = "+966 50 614 2113";
 const email = "ap0554138485@icloud.com";
@@ -15,6 +15,7 @@ const scriptFile = `script-${assetVersion}.js?v=${scriptVersion}`;
 const logoFile = "logo-128-20260824.png";
 const whatsappMessage = "السلام عليكم، أرغب في طلب خدمة قانونية. نوع المسألة، المدينة، والمرحلة الحالية: ";
 const whatsappUrl = `https://wa.me/966506142113?text=${encodeURIComponent(whatsappMessage)}`;
+const relatedLinkLimit = 10;
 
 function pageContactUrl(title, language = "ar") {
   const topic = String(title || "")
@@ -462,9 +463,9 @@ function clientIntentBlock(file, html, catalog) {
   for (const cornerstoneFile of cornerstoneFiles(location.key, notary)) {
     const candidate = pageByFile.get(cornerstoneFile);
     if (candidate && candidate.file !== file && !related.some((item) => item.file === candidate.file)) related.push(candidate);
-    if (related.length >= 8) break;
+    if (related.length >= relatedLinkLimit) break;
   }
-  for (let offset = 1; offset < clusterPages.length && related.length < 8; offset += 1) {
+  for (let offset = 1; offset < clusterPages.length && related.length < relatedLinkLimit; offset += 1) {
     const candidate = clusterPages[(currentIndex + offset) % clusterPages.length];
     if (candidate && !related.some((item) => item.file === candidate.file)) related.push(candidate);
   }

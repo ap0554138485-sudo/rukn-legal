@@ -3,7 +3,7 @@ import { basename, resolve } from "node:path";
 
 const root = resolve(import.meta.dirname, "..");
 const origin = "https://rukn-legal-vwptio.cranl.net";
-const releaseDate = "2026-08-30";
+const releaseDate = "2026-08-31";
 const files = readdirSync(root)
   .filter((file) => file.endsWith(".html") && !file.startsWith("google"))
   .sort();
