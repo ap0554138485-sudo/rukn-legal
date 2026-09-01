@@ -70,7 +70,7 @@ try {
   assert(post.status === 405, `POST returned ${post.status}`);
   assert(post.headers.get("allow") === "GET, HEAD", "405 response is missing the Allow header");
 
-  for (const publicPath of ["/sitemap.xml", "/robots.txt", "/styles-20260821b.css", "/script-20260824b.js", "/logo-128-20260824.png"]) {
+  for (const publicPath of ["/sitemap.xml", "/sitemap-core.xml", "/sitemap-national-w9.xml", "/robots.txt", "/styles-20260821b.css", "/script-20260824b.js", "/logo-128-20260824.png"]) {
     const response = await fetch(`${origin}${publicPath}`);
     assert(response.status === 200, `${publicPath} returned ${response.status}`);
   }
@@ -79,6 +79,10 @@ try {
   assert(versionedAsset.headers.get("cache-control")?.includes("immutable"), "versioned assets are not cached immutably");
   const sitemap = await fetch(`${origin}/sitemap.xml`);
   assert(sitemap.headers.get("cache-control")?.includes("max-age=0"), "sitemap may remain stale in crawler caches");
+  const sitemapIndex = await sitemap.text();
+  assert(sitemapIndex.includes("<sitemapindex"), "sitemap.xml is not a sitemap index");
+  assert(sitemapIndex.includes("/sitemap-core.xml"), "sitemap index is missing the core sitemap");
+  assert(sitemapIndex.includes("/sitemap-national-w9.xml"), "sitemap index is missing national batch 9");
 
   for (const privatePath of ["/package.json", "/server.js", "/DEPLOYMENT.md", "/.git/config", "/scripts/generate-notary-pages.mjs"]) {
     const response = await fetch(`${origin}${privatePath}`);

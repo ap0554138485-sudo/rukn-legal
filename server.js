@@ -43,7 +43,7 @@ function cacheControl(filePath, ext) {
   if (/^(?:styles|script|logo)-[a-z0-9]+\.(?:css|js|png|jpe?g|svg)$/i.test(fileName)) {
     return 'public, max-age=31536000, immutable';
   }
-  if (fileName === 'sitemap.xml' || fileName === 'robots.txt') {
+  if (/^sitemap(?:-[a-z0-9-]+)?\.xml$/i.test(fileName) || fileName === 'robots.txt') {
     return 'public, max-age=0, must-revalidate';
   }
   return longCache.has(ext)
@@ -109,6 +109,7 @@ function isPublicFile(relativePath) {
   if (/^styles(?:-[a-z0-9]+)?\.css$/i.test(relativePath)) return true;
   if (/^script(?:-[a-z0-9]+)?\.js$/i.test(relativePath)) return true;
   if (/^logo(?:-[a-z0-9]+)*\.(?:png|jpe?g|svg)$/i.test(relativePath)) return true;
+  if (/^sitemap(?:-[a-z0-9-]+)?\.xml$/i.test(relativePath)) return true;
   return publicFiles.has(relativePath.toLowerCase());
 }
 

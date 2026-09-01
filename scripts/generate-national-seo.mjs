@@ -661,17 +661,36 @@ function canonicalFor(file, html) {
   return html.match(/<link\s+rel="canonical"\s+href="([^"]+)"/i)?.[1] || (file === "index.html" ? `${baseUrl}/` : `${baseUrl}/${file}`);
 }
 
-function updateSitemap() {
+function sitemapUrlEntry({ file, html }) {
+  const canonical = canonicalFor(file, html);
+  const alternates = file === "index.html" || file === "en.html" ? `\n    <xhtml:link rel="alternate" hreflang="ar" href="${baseUrl}/" />\n    <xhtml:link rel="alternate" hreflang="en" href="${baseUrl}/en.html" />\n    <xhtml:link rel="alternate" hreflang="x-default" href="${baseUrl}/" />` : "";
+  return `  <url>\n    <loc>${canonical}</loc>\n    <lastmod>${releaseDate}</lastmod>${alternates}\n  </url>`;
+}
+
+function updateSitemaps() {
   const excluded = new Set(["googlebffd6cc2130f2272.html"]);
   const pages = readdirSync(root).filter((file) => file.endsWith(".html") && !excluded.has(file)).map((file) => ({ file, html: readFileSync(resolve(root, file), "utf8") })).filter(({ html }) => !isNoindex(html));
   pages.sort((a, b) => (a.file === "index.html" ? -1 : b.file === "index.html" ? 1 : a.file.localeCompare(b.file)));
-  const entries = pages.map(({ file, html }) => {
-    const canonical = canonicalFor(file, html);
-    const lastModified = releaseDate;
-    const alternates = file === "index.html" || file === "en.html" ? `\n    <xhtml:link rel="alternate" hreflang="ar" href="${baseUrl}/" />\n    <xhtml:link rel="alternate" hreflang="en" href="${baseUrl}/en.html" />\n    <xhtml:link rel="alternate" hreflang="x-default" href="${baseUrl}/" />` : "";
-    return `  <url>\n    <loc>${canonical}</loc>\n    <lastmod>${lastModified}</lastmod>${alternates}\n  </url>`;
+  const groups = new Map([["sitemap-core.xml", []]]);
+  for (const page of pages) {
+    const wave = page.file.match(/^saudi-guide-w(\d+)-/i)?.[1];
+    const sitemapFile = wave ? `sitemap-national-w${wave}.xml` : "sitemap-core.xml";
+    if (!groups.has(sitemapFile)) groups.set(sitemapFile, []);
+    groups.get(sitemapFile).push(page);
+  }
+
+  const sitemapFiles = [...groups.keys()].sort((a, b) => {
+    if (a === "sitemap-core.xml") return -1;
+    if (b === "sitemap-core.xml") return 1;
+    return Number(a.match(/w(\d+)/)?.[1] || 0) - Number(b.match(/w(\d+)/)?.[1] || 0);
   });
-  writeFileSync(resolve(root, "sitemap.xml"), `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:xhtml="http://www.w3.org/1999/xhtml">\n${entries.join("\n")}\n</urlset>\n`, "utf8");
+  for (const sitemapFile of sitemapFiles) {
+    const entries = groups.get(sitemapFile).map(sitemapUrlEntry);
+    writeFileSync(resolve(root, sitemapFile), `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:xhtml="http://www.w3.org/1999/xhtml">\n${entries.join("\n")}\n</urlset>\n`, "utf8");
+  }
+
+  const indexEntries = sitemapFiles.map((sitemapFile) => `  <sitemap>\n    <loc>${baseUrl}/${sitemapFile}</loc>\n    <lastmod>${releaseDate}</lastmod>\n  </sitemap>`);
+  writeFileSync(resolve(root, "sitemap.xml"), `<?xml version="1.0" encoding="UTF-8"?>\n<sitemapindex xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${indexEntries.join("\n")}\n</sitemapindex>\n`, "utf8");
 }
 
 function syncVersionedAssets() {
@@ -704,7 +723,7 @@ function generate() {
     ? { ...page, html: finalDirectoryHtml, title: pageTitle(finalDirectoryHtml, page.file), cluster: clusterFor(page.file, finalDirectoryHtml) }
     : page);
   enhanceHtml("site-directory.html", finalCatalog);
-  updateSitemap();
+  updateSitemaps();
   writeFileSync(resolve(root, "robots.txt"), `User-agent: *\nAllow: /\n\nSitemap: ${baseUrl}/sitemap.xml\n`, "utf8");
   console.log(`Generated national SEO pages and enhanced ${htmlFiles.length} public HTML files.`);
 }

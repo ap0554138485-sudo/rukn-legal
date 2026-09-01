@@ -42,8 +42,30 @@ for (const file of files) {
 }
 
 const sitemap = readFileSync(resolve(root, "sitemap.xml"), "utf8");
-const sitemapCount = [...sitemap.matchAll(/<loc>/g)].length;
-const sitemapLocations = [...sitemap.matchAll(/<loc>([^<]+)<\/loc>/g)].map((match) => match[1]);
+if (!/<sitemapindex\b/i.test(sitemap)) errors.push("sitemap.xml: expected a sitemap index");
+const sitemapIndexLocations = [...sitemap.matchAll(/<loc>([^<]+)<\/loc>/g)].map((match) => match[1]);
+const sitemapFiles = [];
+const sitemapLocations = [];
+for (const location of sitemapIndexLocations) {
+  let url;
+  try {
+    url = new URL(location);
+  } catch {
+    errors.push(`sitemap.xml: invalid child sitemap URL ${location}`);
+    continue;
+  }
+  const sitemapFile = decodeURIComponent(url.pathname.replace(/^\/+/, ""));
+  if (url.origin !== "https://rukn-legal-vwptio.cranl.net" || !/^sitemap-(?:core|national-w\d+)\.xml$/i.test(sitemapFile) || !existsSync(resolve(root, sitemapFile))) {
+    errors.push(`sitemap.xml: missing child sitemap ${location}`);
+    continue;
+  }
+  sitemapFiles.push(sitemapFile);
+  const child = readFileSync(resolve(root, sitemapFile), "utf8");
+  if (!/<urlset\b/i.test(child)) errors.push(`${sitemapFile}: expected a URL set`);
+  sitemapLocations.push(...[...child.matchAll(/<loc>([^<]+)<\/loc>/g)].map((match) => match[1]));
+}
+const sitemapCount = sitemapLocations.length;
+if (new Set(sitemapLocations).size !== sitemapLocations.length) errors.push("sitemap files: duplicate page URLs");
 let indexableCount = 0;
 for (const file of files) {
   const html = readFileSync(resolve(root, file), "utf8");
@@ -56,6 +78,7 @@ for (const file of files) {
 
 console.log(`Public pages: ${files.length}`);
 console.log(`Indexable pages: ${indexableCount}`);
+console.log(`Sitemap files: ${sitemapFiles.length}`);
 console.log(`Sitemap URLs: ${sitemapCount}`);
 console.log(`Errors: ${errors.length}`);
 if (errors.length) {

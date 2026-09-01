@@ -11,7 +11,7 @@ const warnings = [];
 const documents = new Map();
 const visible = new Map();
 const seen = { title: new Map(), description: new Map(), h1: new Map(), body: new Map() };
-const sitemap = readFileSync(resolve(root, "sitemap.xml"), "utf8");
+const sitemap = readFileSync(resolve(root, "sitemap-national-w1.xml"), "utf8");
 
 function fail(message) { failures.push(message); }
 function capture(html, pattern) { return html.match(pattern)?.[1]?.replace(/<[^>]+>/g, " ").replace(/\s+/g, " ").trim() || ""; }
@@ -55,9 +55,12 @@ for (const page of pages) {
   const title = capture(html, /<title>([\s\S]*?)<\/title>/i);
   const description = capture(html, /<meta\s+name="description"\s+content="([^"]+)"/i);
   const h1 = capture(html, /<h1\b[^>]*>([\s\S]*?)<\/h1>/i);
-  const main = capture(html, /<main\b[^>]*>([\s\S]*?)<\/main>/i);
-  const plain = text(main);
-  visible.set(page.slug, plain);
+  const mainHtml = html.match(/<main\b[^>]*>([\s\S]*?)<\/main>/i)?.[1] || "";
+  const plain = text(mainHtml);
+  const comparableMain = mainHtml
+    .replace(/<!-- client-intent:start -->[\s\S]*?<!-- client-intent:end -->/gi, " ")
+    .replace(/<!-- conversion-panel:start -->[\s\S]*?<!-- conversion-panel:end -->/gi, " ");
+  visible.set(page.slug, text(comparableMain));
   const bodyHash = createHash("sha256").update(plain).digest("hex");
   for (const [field, value] of Object.entries({ title, description, h1, body: bodyHash })) {
     if (!value) fail(`${page.slug}: missing ${field}.`);
@@ -105,6 +108,7 @@ for (const page of pages) {
 }
 
 let maximumSimilarity = { score: 0, left: "", right: "" };
+const highSimilarityPairs = [];
 const shingleCache = new Map(pages.map((page) => [page.slug, shingles(visible.get(page.slug) || "")]));
 for (let leftIndex = 0; leftIndex < pages.length; leftIndex += 1) {
   for (let rightIndex = leftIndex + 1; rightIndex < pages.length; rightIndex += 1) {
@@ -112,9 +116,14 @@ for (let leftIndex = 0; leftIndex < pages.length; leftIndex += 1) {
     const right = pages[rightIndex];
     const score = jaccard(shingleCache.get(left.slug), shingleCache.get(right.slug));
     if (score > maximumSimilarity.score) maximumSimilarity = { score, left: left.slug, right: right.slug };
+    if (score > 0.50) highSimilarityPairs.push({ score, left: left.slug, right: right.slug });
   }
 }
-if (maximumSimilarity.score > 0.50) fail(`Similarity is too high: ${(maximumSimilarity.score * 100).toFixed(1)}% between ${maximumSimilarity.left} and ${maximumSimilarity.right}.`);
+if (highSimilarityPairs.length) {
+  highSimilarityPairs.sort((left, right) => right.score - left.score);
+  const details = highSimilarityPairs.slice(0, 20).map((pair) => `${(pair.score * 100).toFixed(1)}% ${pair.left} / ${pair.right}`).join("; ");
+  fail(`${highSimilarityPairs.length} pair(s) exceed 50% similarity: ${details}.`);
+}
 
 if (warnings.length) {
   console.warn(`Non-blocking warnings (${warnings.length}):`);

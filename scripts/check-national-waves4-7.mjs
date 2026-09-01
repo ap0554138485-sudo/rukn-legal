@@ -12,7 +12,7 @@ const baseUrl = "https://rukn-legal-vwptio.cranl.net";
 const batch = Number(process.argv[2]);
 const pages = futurePages.filter((page) => page.batch === batch);
 const earlier = [...waveOnePages, ...waveTwoPages, ...waveThreePages, ...futurePages.filter((page) => page.batch < batch)];
-const sitemap = readFileSync(resolve(root, "sitemap.xml"), "utf8");
+const sitemap = readFileSync(resolve(root, `sitemap-national-w${batch}.xml`), "utf8");
 const failures = [];
 const warnings = [];
 const visible = new Map();

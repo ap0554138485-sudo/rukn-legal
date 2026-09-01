@@ -208,9 +208,24 @@ for (const field of ["title", "description", "canonical"]) {
 }
 
 const sitemapXml = readFileSync(resolve(root, "sitemap.xml"), "utf8");
-const sitemapLocations = matches(sitemapXml, /<loc>([^<]+)<\/loc>/gi);
+if (!/<sitemapindex\b/i.test(sitemapXml)) errors.push("sitemap.xml: expected a sitemap index");
+const sitemapIndexLocations = matches(sitemapXml, /<loc>([^<]+)<\/loc>/gi);
+const sitemapFiles = [];
+const sitemapLocations = [];
+for (const location of sitemapIndexLocations) {
+  const target = localTarget(location);
+  if (!target || !/^sitemap-(?:core|national-w\d+)\.xml$/i.test(target) || !existsSync(resolve(root, target))) {
+    errors.push(`sitemap.xml: invalid or missing child sitemap (${location})`);
+    continue;
+  }
+  sitemapFiles.push(target);
+  const childXml = readFileSync(resolve(root, target), "utf8");
+  if (!/<urlset\b/i.test(childXml)) errors.push(`${target}: expected a URL set`);
+  sitemapLocations.push(...matches(childXml, /<loc>([^<]+)<\/loc>/gi));
+}
+if (!sitemapFiles.includes("sitemap-core.xml")) errors.push("sitemap.xml: missing sitemap-core.xml");
 const sitemapSet = new Set(sitemapLocations);
-if (sitemapLocations.length !== sitemapSet.size) errors.push("sitemap.xml: duplicate URL entries");
+if (sitemapLocations.length !== sitemapSet.size) errors.push("sitemap files: duplicate URL entries");
 
 for (const page of pages.values()) {
   const expected = page.file === "index.html" ? `${origin}/` : `${origin}/${page.file}`;
@@ -227,7 +242,7 @@ for (const page of pages.values()) {
 
 for (const location of sitemapLocations) {
   const target = localTarget(location);
-  if (!target || !fileSet.has(target)) errors.push(`sitemap.xml: URL has no public HTML file (${location})`);
+  if (!target || !fileSet.has(target)) errors.push(`sitemap files: URL has no public HTML file (${location})`);
 }
 
 const robotsTxt = readFileSync(resolve(root, "robots.txt"), "utf8");
@@ -251,6 +266,7 @@ const weakest = indexable
 console.log(`Public content pages: ${pages.size}`);
 console.log(`Indexable pages: ${indexable.length}`);
 console.log(`Noindex pages: ${noindex.length}${noindex.length ? ` (${noindex.map((page) => basename(page.file)).join(", ")})` : ""}`);
+console.log(`Sitemap files: ${sitemapFiles.length}`);
 console.log(`Sitemap URLs: ${sitemapLocations.length}`);
 console.log("Weakest internal-link coverage:");
 for (const page of weakest) console.log(`  ${page.file}: ${page.links} source page(s), ${page.words} words`);

@@ -12,7 +12,7 @@ import { pages } from "./generate-national-wave9.mjs";
 const root = resolve(dirname(fileURLToPath(import.meta.url)), "..");
 const baseUrl = "https://rukn-legal-vwptio.cranl.net";
 const earlier = [...waveOnePages, ...waveTwoPages, ...waveThreePages, ...wavesFourToSevenPages, ...waveEightPages];
-const sitemap = readFileSync(resolve(root, "sitemap.xml"), "utf8");
+const sitemap = readFileSync(resolve(root, "sitemap-national-w9.xml"), "utf8");
 const failures = [];
 const warnings = [];
 const visible = new Map();
