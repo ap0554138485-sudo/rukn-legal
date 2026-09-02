@@ -3,7 +3,7 @@ import { basename, resolve } from "node:path";
 
 const root = resolve(import.meta.dirname, "..");
 const origin = "https://rukn-legal-vwptio.cranl.net";
-const releaseDate = "2026-08-31";
+const releaseDate = "2026-09-02";
 const files = readdirSync(root)
   .filter((file) => file.endsWith(".html") && !file.startsWith("google"))
   .sort();
@@ -119,7 +119,7 @@ for (const file of files) {
   if (!new RegExp(`<time\\s+datetime="${releaseDate}"`, "i").test(html)) errors.push(`${file}: missing current content update date`);
   const htmlTag = html.match(/<html\b([^>]*)>/i)?.[1] || "";
   const isEnglish = /\blang="en(?:-[^"]+)?"/i.test(htmlTag);
-  const visibleUpdateText = isEnglish ? "Content updated 31 August 2026" : "تحديث المحتوى: 31 أغسطس 2026";
+  const visibleUpdateText = isEnglish ? "Content updated 2 September 2026" : "تحديث المحتوى: 2 سبتمبر 2026";
   if (!html.includes(visibleUpdateText)) errors.push(`${file}: visible content update date is stale`);
   if (isEnglish && !/\bdir="ltr"/i.test(htmlTag)) errors.push(`${file}: English page must use left-to-right direction`);
   if (!isEnglish && (!/\blang="ar(?:-[^"]+)?"/i.test(htmlTag) || !/\bdir="rtl"/i.test(htmlTag))) {
