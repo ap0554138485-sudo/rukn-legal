@@ -88,6 +88,12 @@ for (const file of files) {
     if (!html.includes("najiz.sa/applications/lawyers/LawyersInquire")) {
       errors.push(`${file}: missing official lawyer-license verification link`);
     }
+    if (!normalizedHtml.includes(normalize("رقم التواصل لطلب محامي في تبوك"))) {
+      errors.push(`${file}: missing direct-contact search intent for Tabuk`);
+    }
+    if (!html.includes('href="tel:+966506142113"')) {
+      errors.push(`${file}: missing direct telephone action for Tabuk searchers`);
+    }
   }
 }
 
