@@ -160,6 +160,7 @@ function pageLinks(page) {
   if (page.national) {
     return [
       ...nationalGuides.map((guide) => [guide.file, guide.keyword]),
+      ["real-estate-transfer-notary-yanbu.html", "إفراغ عقاري في ينبع"],
       ...cities.map((city) => [`notary-${city.key}.html`, `موثق في ${city.name}`])
     ];
   }
