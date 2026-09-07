@@ -308,7 +308,7 @@ function render(page) {
   const graph = [
     { "@type": "WebPage", "@id": `${url}#webpage`, url, name: documentTitle, description, inLanguage: "ar-SA", isPartOf: { "@id": `${baseUrl}/#website` }, breadcrumb: { "@id": `${url}#breadcrumb` } },
     { "@type": "Article", "@id": `${url}#article`, headline: documentTitle.split("|")[0].trim(), description, datePublished: contentDate, dateModified: contentDate, inLanguage: "ar-SA", author: { "@id": `${baseUrl}/#organization` }, publisher: { "@id": `${baseUrl}/#organization` }, mainEntityOfPage: { "@id": `${url}#webpage` }, about: [page.title, category.label, location.name, location.region] },
-    { "@type": "Service", "@id": `${url}#service`, name: `تنظيم طلب ${page.title}`, serviceType: category.label, url, provider: { "@id": `${baseUrl}/#organization` }, areaServed: [{ "@type": location.kind, name: location.name }, { "@type": "AdministrativeArea", name: location.region }] },
+    { "@type": "Service", "@id": `${url}#service`, name: `تنظيم طلب ${page.title}`, serviceType: category.label, url, provider: { "@id": `${baseUrl}/#organization` }, areaServed: [{ "@type": location.kind === "مدينة" ? "City" : "AdministrativeArea", name: location.name }, { "@type": "AdministrativeArea", name: location.region }] },
     { "@type": "BreadcrumbList", "@id": `${url}#breadcrumb`, itemListElement: [{ "@type": "ListItem", position: 1, name: "الرئيسية", item: `${baseUrl}/` }, { "@type": "ListItem", position: 2, name: "مناطق السعودية", item: `${baseUrl}/saudi-regions-guide.html` }, { "@type": "ListItem", position: 3, name: page.title, item: url }] },
     { "@type": "FAQPage", mainEntity: faqs.map(([name, text]) => ({ "@type": "Question", name, acceptedAnswer: { "@type": "Answer", text } })) }
   ];

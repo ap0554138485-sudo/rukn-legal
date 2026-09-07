@@ -3,7 +3,7 @@ import { basename, resolve } from "node:path";
 
 const root = resolve(import.meta.dirname, "..");
 const origin = "https://rukn-legal-vwptio.cranl.net";
-const releaseDate = "2026-09-02";
+const releaseDate = "2026-09-07";
 const files = readdirSync(root)
   .filter((file) => file.endsWith(".html") && !file.startsWith("google"))
   .sort();
@@ -110,6 +110,9 @@ for (const file of files) {
   }
   const structuredNodes = parsedJsonLd.flatMap(schemaNodes);
   if (!structuredNodes.some((node) => node["@type"] === "WebPage")) errors.push(`${file}: missing WebPage structured data`);
+  const primaryWebPageNodes = structuredNodes.filter((node) => node["@type"] === "WebPage" && node["@id"] === `${expectedCanonical}#webpage`);
+  if (primaryWebPageNodes.length > 1) errors.push(`${file}: duplicate primary WebPage structured data`);
+  if (structuredNodes.some((node) => ["مدينة", "محافظة"].includes(node["@type"]))) errors.push(`${file}: structured data uses a translated schema type`);
   if (file === "index.html") {
     const organization = structuredNodes.find((node) => node["@type"] === "Organization" && node["@id"] === `${origin}/#organization`);
     const logoUrl = typeof organization?.logo === "string" ? organization.logo : organization?.logo?.url || organization?.logo?.contentUrl;
@@ -119,7 +122,7 @@ for (const file of files) {
   if (!new RegExp(`<time\\s+datetime="${releaseDate}"`, "i").test(html)) errors.push(`${file}: missing current content update date`);
   const htmlTag = html.match(/<html\b([^>]*)>/i)?.[1] || "";
   const isEnglish = /\blang="en(?:-[^"]+)?"/i.test(htmlTag);
-  const visibleUpdateText = isEnglish ? "Content updated 2 September 2026" : "تحديث المحتوى: 2 سبتمبر 2026";
+  const visibleUpdateText = isEnglish ? "Content updated 7 September 2026" : "تحديث المحتوى: 7 سبتمبر 2026";
   if (!html.includes(visibleUpdateText)) errors.push(`${file}: visible content update date is stale`);
   if (isEnglish && !/\bdir="ltr"/i.test(htmlTag)) errors.push(`${file}: English page must use left-to-right direction`);
   if (!isEnglish && (!/\blang="ar(?:-[^"]+)?"/i.test(htmlTag) || !/\bdir="rtl"/i.test(htmlTag))) {
@@ -135,7 +138,7 @@ for (const file of files) {
   if (!isEnglish && !/class="[^"]*\bfooter-region-directory\b/i.test(html)) errors.push(`${file}: missing Saudi region footer navigation`);
   if (!/<meta\s+name="color-scheme"\s+content="light"/i.test(html)) errors.push(`${file}: missing color-scheme metadata`);
   if (!/<meta\s+name="format-detection"\s+content="telephone=no"/i.test(html)) errors.push(`${file}: missing telephone format metadata`);
-  if (!/styles-20260830a\.css\?v=20260830c/i.test(html)) errors.push(`${file}: stale stylesheet version`);
+  if (!/styles-20260830a\.css\?v=20260907a/i.test(html)) errors.push(`${file}: stale stylesheet version`);
   if (!/script-20260830a\.js\?v=20260830c/i.test(html)) errors.push(`${file}: stale script version`);
 
   const ids = matches(html, /\bid="([^"]+)"/gi);
@@ -164,6 +167,12 @@ for (const file of files) {
   if (!/class="[^"]*\bwhatsapp-float--labelled\b/i.test(html)) errors.push(`${file}: floating WhatsApp action needs a visible label`);
   if (!isNoindex && isArabic && !/data-client-intent/i.test(html)) errors.push(`${file}: missing client-intent navigation`);
   if (!isNoindex && isArabic && !/data-topic-links/i.test(html)) errors.push(`${file}: missing contextual topic links`);
+  const sourceExclusions = new Set(["index.html", "about.html", "privacy.html", "editorial-policy.html", "official-sources.html", "site-directory.html"]);
+  if (!isNoindex && isArabic && !sourceExclusions.has(file) && !/data-official-sources/i.test(html)) errors.push(`${file}: missing official-source guidance`);
+  const regionHubFiles = new Set(["legal-services-riyadh.html", "makkah-region-legal-services.html", "eastern-province-legal-services.html", "tabuk-region-lawyers.html", "medina-region-legal-services.html", "qassim-region-legal-services.html", "asir-region-legal-services.html", "hail-region-legal-services.html", "northern-borders-region-legal-services.html", "jazan-region-legal-services.html", "najran-region-legal-services.html", "al-baha-region-legal-services.html", "al-jouf-region-legal-services.html"]);
+  if (regionHubFiles.has(file) && !/data-regional-discovery/i.test(html)) errors.push(`${file}: missing regional discovery links`);
+  const trustBlockCount = (html.match(/<!-- sitewide-trust:start -->/gi) || []).length;
+  if (trustBlockCount !== 1) errors.push(`${file}: expected one sitewide trust block, found ${trustBlockCount}`);
   const hasVisibleBreadcrumb = /class="[^"]*\bbreadcrumb\b/i.test(html);
   if (!isNoindex && hasVisibleBreadcrumb && !structuredNodes.some((node) => node["@type"] === "BreadcrumbList")) {
     errors.push(`${file}: visible breadcrumb is missing BreadcrumbList structured data`);

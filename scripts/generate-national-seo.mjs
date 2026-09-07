@@ -1,15 +1,16 @@
 import { readFileSync, readdirSync, writeFileSync as nativeWriteFileSync } from "node:fs";
 import { resolve } from "node:path";
+import { locations as nationalLocations } from "./generate-national-wave1.mjs";
 
 const root = resolve(import.meta.dirname, "..");
 const baseUrl = "https://rukn-legal-vwptio.cranl.net";
-const releaseDate = "2026-09-02";
+const releaseDate = "2026-09-07";
 const phone = "+966506142113";
 const displayPhone = "+966 50 614 2113";
 const email = "ap0554138485@icloud.com";
 const assetVersion = "20260830a";
 const scriptVersion = "20260830c";
-const stylesheetVersion = "20260830c";
+const stylesheetVersion = "20260907a";
 const stylesheetFile = `styles-${assetVersion}.css?v=${stylesheetVersion}`;
 const scriptFile = `script-${assetVersion}.js?v=${scriptVersion}`;
 const logoFile = "logo-128-20260824.png";
@@ -17,10 +18,44 @@ const whatsappMessage = "السلام عليكم، أرغب في طلب خدمة
 const whatsappUrl = `https://wa.me/966506142113?text=${encodeURIComponent(whatsappMessage)}`;
 const relatedLinkLimit = 10;
 
+const regionHubs = new Map([
+  ["منطقة الرياض", { key: "riyadh-region", label: "منطقة الرياض", file: "legal-services-riyadh.html" }],
+  ["منطقة مكة المكرمة", { key: "makkah-region", label: "منطقة مكة المكرمة", file: "makkah-region-legal-services.html" }],
+  ["المنطقة الشرقية", { key: "eastern", label: "المنطقة الشرقية", file: "eastern-province-legal-services.html" }],
+  ["منطقة تبوك", { key: "tabuk", label: "منطقة تبوك", file: "tabuk-region-lawyers.html" }],
+  ["منطقة المدينة المنورة", { key: "medina-region", label: "منطقة المدينة المنورة", file: "medina-region-legal-services.html" }],
+  ["منطقة القصيم", { key: "qassim-region", label: "منطقة القصيم", file: "qassim-region-legal-services.html" }],
+  ["منطقة عسير", { key: "asir-region", label: "منطقة عسير", file: "asir-region-legal-services.html" }],
+  ["منطقة حائل", { key: "hail-region", label: "منطقة حائل", file: "hail-region-legal-services.html" }],
+  ["منطقة الحدود الشمالية", { key: "northern-borders-region", label: "منطقة الحدود الشمالية", file: "northern-borders-region-legal-services.html" }],
+  ["منطقة جازان", { key: "jazan-region", label: "منطقة جازان", file: "jazan-region-legal-services.html" }],
+  ["منطقة نجران", { key: "najran-region", label: "منطقة نجران", file: "najran-region-legal-services.html" }],
+  ["منطقة الباحة", { key: "al-baha-region", label: "منطقة الباحة", file: "al-baha-region-legal-services.html" }],
+  ["منطقة الجوف", { key: "al-jouf-region", label: "منطقة الجوف", file: "al-jouf-region-legal-services.html" }]
+]);
+
+const locationRegions = new Map(nationalLocations.map((location) => [location.key, location.region]));
+
+const officialSources = {
+  laws: ["هيئة الخبراء — الأنظمة السعودية", "https://www.boe.gov.sa/ar/Pages/default.aspx"],
+  najiz: ["منصة ناجز — الخدمات العدلية", "https://najiz.sa/applications/landing"],
+  labor: ["وزارة الموارد البشرية والتنمية الاجتماعية", "https://www.hrsd.gov.sa/"],
+  commerce: ["وزارة التجارة", "https://mc.gov.sa/ar/Pages/default.aspx"],
+  business: ["المركز السعودي للأعمال", "https://business.sa/"],
+  intellectualProperty: ["الهيئة السعودية للملكية الفكرية — العلامات التجارية", "https://www.saip.gov.sa/ar/services/trademarks"],
+  tax: ["هيئة الزكاة والضريبة والجمارك", "https://zatca.gov.sa/ar/Pages/default.aspx"],
+  municipality: ["منصة بلدي", "https://balady.gov.sa/"],
+  arbitration: ["المركز السعودي للتحكيم التجاري", "https://sadr.org/"],
+  data: ["الهيئة السعودية للبيانات والذكاء الاصطناعي", "https://sdaia.gov.sa/" ]
+};
+
 function writeFileSync(path, data, encoding) {
+  const normalizedData = typeof data === "string"
+    ? data.replace(/\r\n?/g, "\n").replace(/[ \t]+\n/g, "\n")
+    : data;
   for (let attempt = 0; attempt < 8; attempt += 1) {
     try {
-      nativeWriteFileSync(path, data, encoding);
+      nativeWriteFileSync(path, normalizedData, encoding);
       return;
     } catch (error) {
       if (attempt === 7 || !["UNKNOWN", "EBUSY", "EPERM"].includes(error.code)) throw error;
@@ -94,6 +129,96 @@ function jsonLd(value) {
   return `<script type="application/ld+json">${JSON.stringify({ "@context": "https://schema.org", "@graph": value })}</script>`;
 }
 
+function schemaTypeIncludes(node, type) {
+  const value = node?.["@type"];
+  return value === type || (Array.isArray(value) && value.includes(type));
+}
+
+function normalizeStructuredData(html, canonical, file) {
+  const region = regionProfileFor(file, html);
+  return html.replace(/<script\s+type="application\/ld\+json"(?![^>]*data-sitewide-schema)([^>]*)>([\s\S]*?)<\/script>/gi, (block, attributes, payload) => {
+    try {
+      const value = JSON.parse(payload);
+      const visit = (node) => {
+        if (!node || typeof node !== "object") return;
+        if (Array.isArray(node)) return node.forEach(visit);
+        if (node["@type"] === "مدينة") node["@type"] = "City";
+        if (node["@type"] === "محافظة") node["@type"] = "AdministrativeArea";
+        if (schemaTypeIncludes(node, "WebPage") && (!node.url || node.url === canonical)) {
+          node.author = { "@id": `${baseUrl}/#organization` };
+          node.publisher = { "@id": `${baseUrl}/#organization` };
+          node.dateModified = releaseDate;
+        }
+        if (schemaTypeIncludes(node, "Article") && (!node.mainEntityOfPage?.["@id"] || node.mainEntityOfPage["@id"] === `${canonical}#webpage`)) {
+          node.author = { "@id": `${baseUrl}/#organization` };
+          node.publisher = { "@id": `${baseUrl}/#organization` };
+          node.dateModified = releaseDate;
+        }
+        if (region && /^saudi-guide-w\d+-/i.test(file) && schemaTypeIncludes(node, "BreadcrumbList") && Array.isArray(node.itemListElement)) {
+          const regionUrl = `${baseUrl}/${region.file}`;
+          if (!node.itemListElement.some((item) => item?.item === regionUrl)) {
+            const current = node.itemListElement.at(-1);
+            const parents = node.itemListElement.slice(0, -1);
+            node.itemListElement = [
+              ...parents,
+              { "@type": "ListItem", position: parents.length + 1, name: region.label, item: regionUrl },
+              { ...current, position: parents.length + 2 }
+            ];
+          }
+        }
+        Object.values(node).forEach(visit);
+      };
+      visit(value);
+      return `<script type="application/ld+json"${attributes}>${JSON.stringify(value).replaceAll("<", "\\u003c")}</script>`;
+    } catch {
+      return block;
+    }
+  });
+}
+
+function regionProfileFor(file, html = "") {
+  for (const profile of regionHubs.values()) {
+    if (file === profile.file) return profile;
+  }
+  if (/^eastern-/i.test(file)) return regionHubs.get("المنطقة الشرقية");
+  const location = nationalLocations.find((item) => file.endsWith(`-${item.key}.html`));
+  if (location) return regionHubs.get(location.region) || null;
+  for (const [regionName, profile] of regionHubs) {
+    if (html.includes(`"name":"${regionName}"`) || html.includes(`• ${regionName}`)) return profile;
+  }
+  return null;
+}
+
+function sourceKeysFor(file, html) {
+  const title = pageTitle(html, file);
+  const topic = html.match(/data-guide-topic="([^"]+)"/i)?.[1] || "";
+  const subject = `${file} ${title} ${topic}`.toLowerCase();
+  const keys = ["laws"];
+  const add = (...items) => items.forEach((item) => { if (!keys.includes(item)) keys.push(item); });
+  if (/labor|work|employee|employment|wage|termination|عمال|موظف|أجور|عمل/.test(subject)) add("labor", "najiz");
+  if (/trademark|copyright|patent|intellectual|علامة|ملكية فكرية/.test(subject)) add("intellectualProperty", "commerce");
+  if (/company|commercial|commerce|partner|franchise|corporate|supply|شركة|تجار|شريك|امتياز|توريد/.test(subject)) add("commerce", "business");
+  if (/arbitration|تحكيم/.test(subject)) add("arbitration", "laws");
+  if (/zakat|tax|vat|customs|ضريب|زكاة|جمارك/.test(subject)) add("tax", "laws");
+  if (/municipal|balady|بلدي|مخالفة بلدية/.test(subject)) add("municipality", "laws");
+  if (/data|privacy|cyber|leak|بيانات|خصوصية|تسرب/.test(subject)) add("data", "laws");
+  if (/court|claim|lawsuit|appeal|objection|judgment|execution|criminal|family|divorce|custody|inherit|notary|محكم|دعوى|قض|تنفيذ|اعتراض|استئناف|جنائي|طلاق|حضانة|تركة|توثيق/.test(subject)) add("najiz");
+  if (keys.length === 1) add("najiz");
+  return keys.slice(0, 3);
+}
+
+function officialSourcesBlock(file, html, language) {
+  const excluded = new Set(["index.html", "en.html", "404.html", "privacy.html", "about.html", "editorial-policy.html", "official-sources.html", "site-directory.html"]);
+  if (language === "en" || isNoindex(html) || excluded.has(file)) return "";
+  const currentTitle = pageTitle(html, file).split("|")[0].trim();
+  const links = sourceKeysFor(file, html)
+    .map((key) => officialSources[key])
+    .filter(Boolean)
+    .map(([label, href]) => `<a href="${href}" target="_blank" rel="noopener external">${escapeHtml(label)}</a>`)
+    .join("");
+  return `<!-- official-sources:start --><section class="section official-sources-panel" data-official-sources><div class="container source-review-card"><div><span class="eyebrow">تحقق قبل اتخاذ الإجراء</span><h2>مصادر رسمية مرتبطة بـ${escapeHtml(currentTitle)}</h2><p>راجع النص أو الخدمة في مصدرها الرسمي، وتحقق من النسخة النافذة والمهلة قبل الاعتماد عليها. الروابط التالية للمراجعة العامة ولا تعني أن إجراءً واحدًا يناسب كل ملف.</p></div><div class="official-source-links">${links}<a href="official-sources.html">دليل جميع المصادر الرسمية</a><a href="editorial-policy.html">سياسة التحرير والتحديث</a></div></div></section><!-- official-sources:end -->`;
+}
+
 function gaTag() {
   return `<!-- site-analytics:start --><script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments)}gtag('js',new Date());gtag('config','G-KKGEYHSD29');(()=>{let loaded=false;const load=()=>{if(loaded)return;loaded=true;const script=document.createElement('script');script.async=true;script.src='https://www.googletagmanager.com/gtag/js?id=G-KKGEYHSD29';document.head.appendChild(script)};['pointerdown','keydown','touchstart','scroll'].forEach(name=>window.addEventListener(name,load,{once:true,passive:true}));window.addEventListener('load',()=>window.setTimeout(load,6000),{once:true})})();</script><!-- site-analytics:end -->`;
 }
@@ -122,7 +247,7 @@ function floatingContactLink(language, title) {
 }
 
 function footer(message = "خدمات واستشارات قانونية للأفراد والمنشآت في مختلف مناطق المملكة.") {
-  return `<footer class="footer" aria-label="معلومات الموقع"><div class="container footer-grid"><div><strong>رُكن الأنظمة القانونية</strong><p>${message}</p></div><div><b>أدلة مهمة</b><a href="notary-services-saudi.html">خدمات الموثق والتوثيق</a><a href="saudi-regions-guide.html">مناطق السعودية</a><a href="site-directory.html">دليل جميع الصفحات</a><a href="articles.html">المقالات والإرشادات</a></div><div><b>تواصل</b><a href="tel:${phone}" dir="ltr">${displayPhone}</a><a href="mailto:${email}">${email}</a></div></div><div class="container copyright">© 2026 رُكن الأنظمة القانونية. جميع الحقوق محفوظة.</div></footer>`;
+  return `<footer class="footer" aria-label="معلومات الموقع"><div class="container footer-grid"><div><strong>رُكن الأنظمة القانونية</strong><p>${message}</p></div><div><b>أدلة مهمة</b><a href="notary-services-saudi.html">خدمات الموثق والتوثيق</a><a href="saudi-regions-guide.html">مناطق السعودية</a><a href="official-sources.html">المصادر الرسمية</a><a href="editorial-policy.html">سياسة التحرير</a><a href="articles.html">المقالات والإرشادات</a></div><div><b>تواصل</b><a href="tel:${phone}" dir="ltr">${displayPhone}</a><a href="mailto:${email}">${email}</a></div></div><div class="container copyright">© 2026 رُكن الأنظمة القانونية. جميع الحقوق محفوظة.</div></footer>`;
 }
 
 function shell({ file, title, description, robots = "index,follow,max-image-preview:large,max-snippet:-1,max-video-preview:-1", body, schema = [] }) {
@@ -208,6 +333,36 @@ function aboutPage() {
   writeFileSync(resolve(root, file), shell({ file, title, description, body, schema }), "utf8");
 }
 
+function editorialPolicyPage() {
+  const file = "editorial-policy.html";
+  const title = "سياسة تحرير المحتوى القانوني | رُكن الأنظمة";
+  const description = "سياسة تحرير المحتوى القانوني في رُكن الأنظمة: هدف المحتوى، طريقة الإعداد والتحديث، استخدام القوالب والأتمتة، مراجعة المصادر الرسمية، وتصحيح الأخطاء.";
+  const body = `<main><div class="container breadcrumb" aria-label="مسار الصفحة"><a href="/">الرئيسية</a><span aria-hidden="true">/</span><a href="about.html">عن الموقع</a><span aria-hidden="true">/</span><span>سياسة التحرير</span></div><section class="hero service-detail-hero"><div class="container hero-grid"><div class="hero-copy"><span class="eyebrow">منهج معلن وقابل للمراجعة</span><h1>سياسة تحرير المحتوى القانوني<br><span>من يكتب؟ كيف؟ ولماذا؟</span></h1><p>تنشر رُكن الأنظمة القانونية محتوى عامًا يساعد القارئ على فهم نوع المسألة وترتيب الوقائع والمستندات والأسئلة قبل طلب تقييم مهني. لا يُقدَّم المحتوى بوصفه فتوى أو رأيًا قانونيًا خاصًا بواقعة بعينها.</p></div><aside class="service-hero-aside"><span class="service-badge">آخر مراجعة</span><div class="service-symbol" aria-hidden="true">✓</div><h2>7 سبتمبر 2026</h2><ul class="service-hero-points"><li>مصادر رسمية</li><li>تاريخ تحديث حقيقي</li><li>تصحيح معلن</li></ul></aside></div></section><section class="section"><div class="container policy-content"><h2>المسؤول عن النشر</h2><p>تتولى رُكن الأنظمة القانونية إدارة الموقع ونشر محتواه، وتظهر وسيلة التواصل في كل صفحة. لا ننسب مراجعة قانونية إلى محامٍ أو خبير بالاسم ما لم تُنجز تلك المراجعة ويُذكر صاحبها وصفته بوضوح.</p><h2>كيف يُعد المحتوى؟</h2><p>تُبنى الصفحة من سؤال عملي أو مرحلة أو مستند يحتاجه الزائر. قد تُستخدم قوالب وأدوات برمجية لتنظيم البنية والروابط والبيانات الوصفية وفحوص التشابه، لكن لا يجوز أن تكون المدينة وحدها هي القيمة المختلفة بين صفحتين. يجب أن تتناول كل صفحة مشكلة أو قرارًا أو وثيقة أو مرحلة مستقلة.</p><h2>المصادر والتحقق</h2><p>عند ذكر نظام أو خدمة أو جهة أو مهلة قابلة للتغير، يكون المرجع الأول هو المصدر الحكومي أو الجهة الرسمية المختصة. وعلى القارئ التحقق من النص النافذ وحالة الخدمة وقت اتخاذ الإجراء؛ فالصفحة قد تشرح طريقة تنظيم الملف ولا تنقل جميع الاستثناءات النظامية.</p><h2>التحديث والتواريخ</h2><p>لا نغيّر تاريخ التحديث لمجرد إظهار الصفحة حديثة. يُحدّث التاريخ عند تغيير المحتوى أو المراجع أو البنية التي تساعد المستخدم ومحركات البحث على فهم الصفحة. تُراجع الروابط الرسمية والصفحات المحورية دوريًا.</p><h2>التصحيح والاستجابة</h2><p>إذا وجدت خطأً واقعيًا أو رابطًا رسميًا متوقفًا، أرسل عنوان الصفحة ووصف الملاحظة إلى <a href="mailto:${email}">${email}</a>. نراجع الملاحظة ونصحح المحتوى أو نضيف توضيحًا عند الحاجة.</p><h2>حدود التغطية الجغرافية</h2><p>ذكر مدينة أو منطقة يصف صلة الطلب بالموقع ولا يعني وجود فرع فعلي. الاستقبال الأولي إلكتروني من مناطق المملكة، ويجب التحقق من مقدم الخدمة والترخيص ونطاق العمل قبل التعاقد.</p><div class="related-services"><a href="official-sources.html">دليل المصادر الرسمية</a><a href="about.html">عن الموقع ومنهج الخدمة</a><a href="privacy.html">سياسة الخصوصية</a><a href="saudi-regions-guide.html">دليل مناطق السعودية</a></div></div></section></main>`;
+  const schema = [{ "@type": "WebPage", "@id": `${baseUrl}/${file}#policy`, name: title.split("|")[0].trim(), description, url: `${baseUrl}/${file}`, dateModified: releaseDate, publisher: { "@id": `${baseUrl}/#organization` } }, { "@type": "BreadcrumbList", itemListElement: [{ "@type": "ListItem", position: 1, name: "الرئيسية", item: `${baseUrl}/` }, { "@type": "ListItem", position: 2, name: "عن الموقع", item: `${baseUrl}/about.html` }, { "@type": "ListItem", position: 3, name: "سياسة التحرير", item: `${baseUrl}/${file}` }] }];
+  writeFileSync(resolve(root, file), shell({ file, title, description, body, schema }), "utf8");
+}
+
+function officialSourcesPage() {
+  const file = "official-sources.html";
+  const title = "المصادر القانونية والرسمية | رُكن الأنظمة";
+  const description = "المصادر القانونية والرسمية للتحقق من الأنظمة والخدمات العدلية والعمالية والتجارية والضريبية والملكية الفكرية والبلدية في السعودية.";
+  const sourceCards = [
+    [officialSources.laws, "للبحث في الأنظمة واللوائح السعودية ومتابعة النصوص الرسمية."],
+    [officialSources.najiz, "للخدمات العدلية الإلكترونية ومسارات القضاء والتنفيذ والتوثيق."],
+    [officialSources.labor, "للأنظمة والخدمات والأدلة المرتبطة بعلاقات العمل والتسوية الودية."],
+    [officialSources.commerce, "للأنظمة والخدمات والأدلة المرتبطة بالتجارة والمنشآت."],
+    [officialSources.business, "لبدء ومعرفة إجراءات الأعمال والخدمات الحكومية المجمعة للمنشآت."],
+    [officialSources.intellectualProperty, "للخدمات والأدلة المرتبطة بالعلامات وحقوق الملكية الفكرية."],
+    [officialSources.tax, "للزكاة والضرائب والجمارك والأدلة والخدمات المرتبطة بها."],
+    [officialSources.municipality, "للخدمات والتراخيص والمخالفات البلدية."],
+    [officialSources.arbitration, "لخدمات وقواعد التحكيم المؤسسي التجاري."],
+    [officialSources.data, "للمراجع الرسمية المرتبطة بالبيانات والحوكمة الرقمية."]
+  ].map(([[label, href], copy], index) => `<article class="source-card" data-number="${String(index + 1).padStart(2, "0")}"><h2><a href="${href}" target="_blank" rel="noopener external">${escapeHtml(label)}</a></h2><p>${escapeHtml(copy)}</p><span>رابط خارجي رسمي أو مؤسسي</span></article>`).join("");
+  const body = `<main><div class="container breadcrumb" aria-label="مسار الصفحة"><a href="/">الرئيسية</a><span aria-hidden="true">/</span><span>المصادر الرسمية</span></div><section class="hero service-detail-hero"><div class="container hero-grid"><div class="hero-copy"><span class="eyebrow">ابدأ من الجهة المختصة</span><h1>المصادر القانونية والرسمية<br><span>في المملكة العربية السعودية</span></h1><p>استخدم هذا الدليل للتحقق من النصوص والخدمات في مصدرها. لا تعتمد على ملخص منشور عندما تحتاج نسخة نافذة أو مهلة أو متطلبًا يتغير بحسب نوع الطلب.</p><div class="hero-actions"><a class="btn primary" href="#sources">عرض المصادر</a><a class="btn secondary" href="editorial-policy.html">سياسة التحرير</a></div></div><aside class="service-hero-aside"><span class="service-badge">طريقة الاستخدام</span><div class="service-symbol" aria-hidden="true">↗</div><h2>تحقق من ثلاثة أمور</h2><ul class="service-hero-points"><li>اسم الجهة المختصة</li><li>النسخة أو الخدمة الحالية</li><li>تاريخ النفاذ أو المهلة</li></ul></aside></div></section><section class="section" id="sources"><div class="container"><div class="section-head"><span class="eyebrow">روابط تحقق مباشرة</span><h2>جهات ومصادر بحسب نوع المسألة</h2><p>كل رابط يفتح موقع الجهة في نافذة جديدة. قد تتغير مسارات الخدمات؛ استخدم بحث الجهة إذا تغير الرابط الداخلي.</p></div><div class="source-grid">${sourceCards}</div></div></section><section class="section alt"><div class="container policy-content"><h2>كيف تستخدم المصدر؟</h2><ol><li>طابق اسم النظام أو الخدمة مع نوع طلبك وصفة الأطراف.</li><li>تحقق من تاريخ النص والقرارات أو التحديثات اللاحقة.</li><li>احفظ رابط الصفحة أو رقم الوثيقة وتاريخ الاطلاع ضمن ملفك.</li><li>لا تستنتج المهلة أو الاختصاص من عنوان مختصر؛ راجع النص والوقائع.</li></ol><div class="related-services"><a href="editorial-policy.html">سياسة تحرير المحتوى</a><a href="articles.html">المقالات والإرشادات</a><a href="saudi-regions-guide.html">دليل مناطق السعودية</a></div></div></section></main>`;
+  const schema = [{ "@type": "CollectionPage", "@id": `${baseUrl}/${file}#sources`, name: title.split("|")[0].trim(), description, url: `${baseUrl}/${file}`, dateModified: releaseDate, publisher: { "@id": `${baseUrl}/#organization` } }, { "@type": "BreadcrumbList", itemListElement: [{ "@type": "ListItem", position: 1, name: "الرئيسية", item: `${baseUrl}/` }, { "@type": "ListItem", position: 2, name: "المصادر الرسمية", item: `${baseUrl}/${file}` }] }];
+  writeFileSync(resolve(root, file), shell({ file, title, description, body, schema }), "utf8");
+}
+
 function privacyPage() {
   const file = "privacy.html";
   const title = "سياسة الخصوصية | رُكن الأنظمة القانونية";
@@ -267,17 +422,17 @@ function directoryPage() {
 
 function sitewideTrustBlock(language) {
   if (language === "en") {
-    return `<!-- sitewide-trust:start --><div class="container footer-trust-links" aria-label="Trust and policy links"><a href="/" hreflang="ar" lang="ar">العربية</a><a href="notary-services-saudi.html">Notary guides</a><a href="about.html">About and content method</a><a href="saudi-regions-guide.html">Saudi coverage</a><a href="site-directory.html">All pages</a><a href="privacy.html">Privacy</a></div><!-- sitewide-trust:end -->`;
+    return `<!-- sitewide-trust:start --><div class="container footer-trust-links" aria-label="Trust and policy links"><a href="/" hreflang="ar" lang="ar">العربية</a><a href="notary-services-saudi.html">Notary guides</a><a href="about.html">About</a><a href="editorial-policy.html">Editorial policy</a><a href="official-sources.html">Official sources</a><a href="saudi-regions-guide.html">Saudi coverage</a><a href="privacy.html">Privacy</a></div><!-- sitewide-trust:end -->`;
   }
   const regionLinks = regions.map(([name, , href]) => `<a href="${href}">${name.replace(/^منطقة\s+/, "")}</a>`).join("");
-  return `<!-- sitewide-trust:start --><div class="container footer-trust-links" aria-label="روابط الثقة والسياسات"><a href="en.html" hreflang="en" lang="en">English</a><a href="notary-services-saudi.html">دليل خدمات الموثق</a><a href="about.html">عن الموقع ومنهج المحتوى</a><a href="saudi-regions-guide.html">دليل مناطق السعودية</a><a href="site-directory.html">دليل جميع الصفحات</a><a href="privacy.html">سياسة الخصوصية</a></div><nav class="container footer-region-directory" aria-label="مناطق السعودية"><strong>انتقل مباشرة إلى منطقتك</strong><div>${regionLinks}</div></nav><!-- sitewide-trust:end -->`;
+  return `<!-- sitewide-trust:start --><div class="container footer-trust-links" aria-label="روابط الثقة والسياسات"><a href="en.html" hreflang="en" lang="en">English</a><a href="notary-services-saudi.html">دليل خدمات الموثق</a><a href="about.html">عن الموقع</a><a href="editorial-policy.html">سياسة التحرير</a><a href="official-sources.html">المصادر الرسمية</a><a href="saudi-regions-guide.html">مناطق السعودية</a><a href="privacy.html">سياسة الخصوصية</a></div><nav class="container footer-region-directory" aria-label="مناطق السعودية"><strong>انتقل مباشرة إلى منطقتك</strong><div>${regionLinks}</div></nav><!-- sitewide-trust:end -->`;
 }
 
 function contentAccountabilityBlock(language) {
   if (language === "en") {
-    return `<!-- content-accountability:start --><aside class="content-accountability" data-content-accountability aria-label="Content information"><div class="container content-accountability-inner"><div><strong>Published and maintained by Legal Systems Corner</strong><span>General information to help organize an initial request; it does not replace a professional review of the facts and documents.</span></div><div class="content-accountability-meta"><time datetime="${releaseDate}">Content updated 2 September 2026</time><a href="about.html">How we prepare content</a></div></div></aside><!-- content-accountability:end -->`;
+    return `<!-- content-accountability:start --><aside class="content-accountability" data-content-accountability aria-label="Content information"><div class="container content-accountability-inner"><div><strong>Published and maintained by Legal Systems Corner</strong><span>General information to help organize an initial request; it does not replace a professional review of the facts and documents.</span></div><div class="content-accountability-meta"><time datetime="${releaseDate}">Content updated 7 September 2026</time><a href="editorial-policy.html">Editorial policy</a><a href="official-sources.html">Official sources</a></div></div></aside><!-- content-accountability:end -->`;
   }
-  return `<!-- content-accountability:start --><aside class="content-accountability" data-content-accountability aria-label="معلومات المحتوى"><div class="container content-accountability-inner"><div><strong>النشر والتحديث: رُكن الأنظمة القانونية</strong><span>محتوى عام لتنظيم الطلب الأولي، ولا يغني عن تقييم الوقائع والمستندات من مختص.</span></div><div class="content-accountability-meta"><time datetime="${releaseDate}">تحديث المحتوى: 2 سبتمبر 2026</time><a href="about.html">منهج إعداد المحتوى</a></div></div></aside><!-- content-accountability:end -->`;
+  return `<!-- content-accountability:start --><aside class="content-accountability" data-content-accountability aria-label="معلومات المحتوى"><div class="container content-accountability-inner"><div><strong>النشر والتحديث: رُكن الأنظمة القانونية</strong><span>محتوى عام لتنظيم الطلب الأولي، ولا يغني عن تقييم الوقائع والمستندات من مختص.</span></div><div class="content-accountability-meta"><time datetime="${releaseDate}">تحديث المحتوى: 7 سبتمبر 2026</time><a href="editorial-policy.html">سياسة التحرير</a><a href="official-sources.html">المصادر الرسمية</a></div></div></aside><!-- content-accountability:end -->`;
 }
 
 function conversionPanelBlock(language, title) {
@@ -310,11 +465,15 @@ function breadcrumbSchema(file, html, canonical, language) {
 }
 
 function locationProfile(file) {
+  const hub = [...regionHubs.values()].find((profile) => profile.file === file);
+  if (hub) return { key: hub.key, label: hub.label, hubFile: hub.file };
   if (/^eastern-/i.test(file)) return { key: "eastern", label: "المنطقة الشرقية" };
   if (/riyadh/i.test(file)) return { key: "riyadh", label: "الرياض" };
   if (/dammam/i.test(file)) return { key: "dammam", label: "الدمام" };
   if (/jeddah/i.test(file)) return { key: "jeddah", label: "جدة" };
   if (/tabuk|duba|umluj|tayma|haql|al-wajh|al-bad/i.test(file)) return { key: "tabuk", label: "منطقة تبوك" };
+  const regional = regionProfileFor(file);
+  if (regional) return { key: regional.key, label: regional.label, hubFile: regional.file };
   return { key: "national", label: "السعودية" };
 }
 
@@ -368,7 +527,17 @@ function legalIntentCards(locationKey) {
       ["تصفح جميع الخدمات المنشورة", "site-directory.html", "استخدم الدليل للوصول إلى صفحة التخصص أو المدينة المناسبة."]
     ]
   };
-  return cards[locationKey] || cards.national;
+  if (cards[locationKey]) return cards[locationKey];
+  const region = [...regionHubs.values()].find((profile) => profile.key === locationKey);
+  if (region) {
+    return [
+      [`دليل ${region.label}`, region.file, "ابدأ من الدليل الإقليمي ثم اختر المشكلة والمرحلة الأقرب إلى طلبك."],
+      ["اقرأ الأدلة القانونية العملية", "articles.html", "افهم المستندات والأسئلة والخطوات الأولية قبل التواصل."],
+      ["تحقق من الجهة أو النظام الرسمي", "official-sources.html", "ارجع إلى المصدر الرسمي للنص أو الخدمة أو المتطلب الحالي."],
+      ["ابدأ بطلب استشارة قانونية", "/#contact", "أرسل نوع المسألة والمدينة والمرحلة والمستند الأساسي."]
+    ];
+  }
+  return cards.national;
 }
 
 function notaryIntentCards(locationKey) {
@@ -450,7 +619,37 @@ function cornerstoneFiles(locationKey, notary) {
       "site-directory.html"
     ]
   };
-  return pages[locationKey] || pages.national;
+  if (pages[locationKey]) return pages[locationKey];
+  const region = [...regionHubs.values()].find((profile) => profile.key === locationKey);
+  return region ? [region.file, "saudi-regions-guide.html", "articles.html", "official-sources.html", "editorial-policy.html"] : pages.national;
+}
+
+function regionDiscoveryBlock(file, catalog) {
+  const region = [...regionHubs.values()].find((profile) => profile.file === file);
+  if (!region) return "";
+  const candidates = catalog
+    .filter((page) => /^saudi-guide-w\d+-/i.test(page.file) && regionProfileFor(page.file, page.html)?.file === file)
+    .sort((left, right) => {
+      const leftWave = Number(left.file.match(/^saudi-guide-w(\d+)-/i)?.[1] || 0);
+      const rightWave = Number(right.file.match(/^saudi-guide-w(\d+)-/i)?.[1] || 0);
+      return leftWave - rightWave || left.title.localeCompare(right.title, "ar");
+    });
+  if (!candidates.length) return "";
+  const limit = Math.min(24, candidates.length);
+  const selected = Array.from({ length: limit }, (_, index) => candidates[Math.floor(index * candidates.length / limit)]);
+  const links = selected.map((page) => `<a href="${page.file}">${escapeHtml(page.title.split("|")[0].trim())}</a>`).join("");
+  return `<!-- regional-discovery:start --><section class="section regional-discovery" data-regional-discovery><div class="container"><div class="section-head"><span class="eyebrow">مسارات ذات أولوية للفهرسة</span><h2>أدلة قانونية عملية في ${escapeHtml(region.label)}</h2><p>روابط منتقاة من مراحل وموضوعات مختلفة لتسهيل وصول الزائر ومحركات البحث إلى الأدلة الأعمق، دون إنشاء صفحة لمجرد تكرار اسم المدينة.</p></div><div class="related-services directory-links">${links}</div></div></section><!-- regional-discovery:end -->`;
+}
+
+function addRegionToVisibleBreadcrumb(file, html) {
+  if (!/^saudi-guide-w\d+-/i.test(file)) return html;
+  const region = regionProfileFor(file, html);
+  if (!region) return html;
+  return html.replace(/(<div[^>]*class="[^"]*\bbreadcrumb\b[^"]*"[^>]*>)([\s\S]*?)(<\/div>)/i, (block, open, content, close) => {
+    if (content.includes(`href="${region.file}"`)) return block;
+    const next = content.replace(/(<a\s+href="saudi-regions-guide\.html"[^>]*>[\s\S]*?<\/a>)/i, `$1<span aria-hidden="true">/</span><a href="${region.file}">${escapeHtml(region.label)}</a>`);
+    return `${open}${next}${close}`;
+  });
 }
 
 function clientIntentBlock(file, html, catalog) {
@@ -540,6 +739,9 @@ function enhanceHtml(file, catalog = []) {
   const description = decodeHtml(html.match(/<meta\s+name="description"\s+content="([^"]+)"/i)?.[1]?.trim() || "");
   const canonical = html.match(/<link\s+rel="canonical"\s+href="([^"]+)"/i)?.[1]?.trim();
 
+  if (canonical) html = normalizeStructuredData(html, canonical, file);
+  html = addRegionToVisibleBreadcrumb(file, html);
+
   const analytics = gaTag();
   if (/<!-- site-analytics:start -->[\s\S]*?<!-- site-analytics:end -->/i.test(html)) {
     html = html.replace(/<!-- site-analytics:start -->[\s\S]*?<!-- site-analytics:end -->/i, analytics);
@@ -575,6 +777,7 @@ function enhanceHtml(file, catalog = []) {
   } else {
     html = html.replace(/(<link\s+rel="stylesheet"\s+href="styles(?:-[a-z0-9]+)?\.css[^"]*"\s*\/?>)/i, `$1\n  ${contrast}`);
   }
+  html = html.replace(/(<!-- accessibility-contrast:end -->)\s*<style>:root\{--muted:#536360\}[\s\S]*?<\/style>/i, "$1");
 
   html = html.replace(/<main\b([^>]*)>/i, (match, attributes) => {
     let nextAttributes = attributes;
@@ -611,11 +814,40 @@ function enhanceHtml(file, catalog = []) {
       ? { "@context": "https://schema.org", "@graph": [pageSchema, breadcrumb] }
       : { "@context": "https://schema.org", ...pageSchema };
     const schema = `<script type="application/ld+json" data-sitewide-schema>${JSON.stringify(schemaPayload)}</script>`;
-    if (/<script\s+type="application\/ld\+json"\s+data-sitewide-schema>[\s\S]*?<\/script>/i.test(html)) {
+    const htmlWithoutSitewideSchema = html.replace(/<script\s+type="application\/ld\+json"\s+data-sitewide-schema>[\s\S]*?<\/script>/gi, "");
+    if (/"@type"\s*:\s*"WebPage"/i.test(htmlWithoutSitewideSchema)) {
+      html = htmlWithoutSitewideSchema;
+    } else if (/<script\s+type="application\/ld\+json"\s+data-sitewide-schema>[\s\S]*?<\/script>/i.test(html)) {
       html = html.replace(/<script\s+type="application\/ld\+json"\s+data-sitewide-schema>[\s\S]*?<\/script>/i, schema);
     } else {
       html = html.replace(/<\/head>/i, `  ${schema}\n</head>`);
     }
+  }
+
+  const regionalDiscovery = regionDiscoveryBlock(file, catalog);
+  if (regionalDiscovery) {
+    if (/<!-- regional-discovery:start -->[\s\S]*?<!-- regional-discovery:end -->/i.test(html)) {
+      html = html.replace(/<!-- regional-discovery:start -->[\s\S]*?<!-- regional-discovery:end -->/i, regionalDiscovery);
+    } else if (/<!-- client-intent:start -->/i.test(html)) {
+      html = html.replace(/<!-- client-intent:start -->/i, `${regionalDiscovery}\n<!-- client-intent:start -->`);
+    } else {
+      html = html.replace(/<\/main>/i, `${regionalDiscovery}\n</main>`);
+    }
+  } else {
+    html = html.replace(/\s*<!-- regional-discovery:start -->[\s\S]*?<!-- regional-discovery:end -->/i, "");
+  }
+
+  const sources = officialSourcesBlock(file, html, language);
+  if (sources) {
+    if (/<!-- official-sources:start -->[\s\S]*?<!-- official-sources:end -->/i.test(html)) {
+      html = html.replace(/<!-- official-sources:start -->[\s\S]*?<!-- official-sources:end -->/i, sources);
+    } else if (/<!-- client-intent:start -->/i.test(html)) {
+      html = html.replace(/<!-- client-intent:start -->/i, `${sources}\n<!-- client-intent:start -->`);
+    } else {
+      html = html.replace(/<\/main>/i, `${sources}\n</main>`);
+    }
+  } else {
+    html = html.replace(/\s*<!-- official-sources:start -->[\s\S]*?<!-- official-sources:end -->/i, "");
   }
 
   const clientIntent = clientIntentBlock(file, html, catalog);
@@ -653,6 +885,9 @@ function enhanceHtml(file, catalog = []) {
   } else {
     html = html.replace(/<\/body>/i, `${trust}\n</body>`);
   }
+  html = html
+    .replace(/(?:<div\b[^>]*class="[^"]*\bfooter-trust-links\b[^"]*"[^>]*>[\s\S]*?<\/div>\s*)+(?=<!-- sitewide-trust:start -->)/gi, "")
+    .replace(/(?:<nav\b[^>]*class="[^"]*\bfooter-region-directory\b[^"]*"[^>]*>[\s\S]*?<\/nav>\s*)+(?=<!-- sitewide-trust:start -->)/gi, "");
 
   if (html !== original) writeFileSync(path, html, "utf8");
 }
@@ -698,10 +933,28 @@ function syncVersionedAssets() {
   writeFileSync(resolve(root, `styles-${assetVersion}.css`), readFileSync(resolve(root, "styles-20260821b.css"), "utf8"), "utf8");
 }
 
+function normalizeGeneratedOutput() {
+  const generatedFiles = readdirSync(root).filter((file) =>
+    file.endsWith(".html")
+    || file.endsWith(".xml")
+    || file === "robots.txt"
+    || file === `script-${assetVersion}.js`
+    || file === `styles-${assetVersion}.css`
+  );
+  for (const file of generatedFiles) {
+    const path = resolve(root, file);
+    const original = readFileSync(path, "utf8");
+    const normalized = original.replace(/\r\n?/g, "\n").replace(/[ \t]+\n/g, "\n");
+    if (normalized !== original) writeFileSync(path, normalized, "utf8");
+  }
+}
+
 function generate() {
   syncVersionedAssets();
   nationalGuide();
   aboutPage();
+  editorialPolicyPage();
+  officialSourcesPage();
   privacyPage();
   notFoundPage();
   directoryPage();
@@ -725,6 +978,7 @@ function generate() {
   enhanceHtml("site-directory.html", finalCatalog);
   updateSitemaps();
   writeFileSync(resolve(root, "robots.txt"), `User-agent: *\nAllow: /\n\nSitemap: ${baseUrl}/sitemap.xml\n`, "utf8");
+  normalizeGeneratedOutput();
   console.log(`Generated national SEO pages and enhanced ${htmlFiles.length} public HTML files.`);
 }
 

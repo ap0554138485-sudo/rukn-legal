@@ -35,6 +35,7 @@ The second-wave Riyadh service pages are generated from `scripts/generate-riyadh
 
 ## National SEO rollout
 
+- `scripts/generate-national-seo.mjs` also generates `editorial-policy.html` and `official-sources.html`, and injects the reviewed official-source and regional-discovery blocks. Update the generator rather than hand-editing those generated sections.
 - The ten-day national rollout publishes at most 100 reviewed pages per batch.
 - Batches one through three are generated from `scripts/generate-national-wave1.mjs`, `scripts/generate-national-wave2.mjs`, and `scripts/generate-national-wave3.mjs`.
 - Batches four through seven are generated from `scripts/generate-national-waves4-7.mjs` with source data in `scripts/national-waves4-7-data.mjs`. Batch eight is generated from `scripts/generate-national-wave8.mjs` with source data in `scripts/national-wave8-data.mjs`. Batch nine is generated from `scripts/generate-national-wave9.mjs` with source data in `scripts/national-wave9-data.mjs`. Batches ten through fourteen are generated from `scripts/generate-national-waves10-14.mjs` with source data in `scripts/national-waves10-14-data.mjs`; never hand-edit generated `saudi-guide-w1-*.html` through `saudi-guide-w14-*.html` files.
