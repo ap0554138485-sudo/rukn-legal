@@ -8,17 +8,21 @@ import { pages as wavesFourToSevenPages } from "./generate-national-waves4-7.mjs
 import { pages as waveEightPages } from "./generate-national-wave8.mjs";
 import { pages as waveNinePages } from "./generate-national-wave9.mjs";
 import { pages as expansionPages } from "./generate-national-waves10-14.mjs";
+import { pages as advancedExpansionPages } from "./generate-national-waves15-17.mjs";
 
 const root = resolve(import.meta.dirname, "..");
 const baseUrl = "https://rukn-legal-vwptio.cranl.net";
 const batch = Number(process.argv[2]);
-if (!Number.isInteger(batch) || batch < 10 || batch > 14) throw new Error("Choose a batch from 10 through 14.");
+if (!Number.isInteger(batch) || batch < 10 || batch > 17) throw new Error("Choose a batch from 10 through 17.");
 
-const pages = expansionPages.filter((page) => page.batch === batch);
+const allExpansionPages = [...expansionPages, ...advancedExpansionPages];
+const pages = allExpansionPages.filter((page) => page.batch === batch);
 const originalPages = [...waveOnePages, ...waveTwoPages, ...waveThreePages, ...wavesFourToSevenPages, ...waveEightPages, ...waveNinePages];
-const earlierExpansion = expansionPages.filter((page) => page.batch < batch);
+const earlierExpansion = allExpansionPages.filter((page) => page.batch < batch);
 const priorPages = [...originalPages, ...earlierExpansion];
 const sitemap = readFileSync(resolve(root, `sitemap-national-w${batch}.xml`), "utf8");
+const expectedPageCount = batch === 17 ? 50 : 100;
+const expectedStageCount = batch === 17 ? 2 : 4;
 const failures = [];
 const warnings = [];
 const visible = new Map();
@@ -55,12 +59,12 @@ function schemaNodes(value) {
   return [value, ...Object.values(value).flatMap(schemaNodes)];
 }
 
-if (pages.length !== 100) fail(`Expected exactly 100 pages, found ${pages.length}.`);
-if (new Set(pages.map((page) => page.slug)).size !== 100) fail(`Batch ${batch} slugs are not unique.`);
-if (new Set(pages.map((page) => page.key)).size !== 100) fail(`Batch ${batch} keys are not unique.`);
-if (new Set(pages.map((page) => page.title)).size !== 100) fail(`Batch ${batch} titles are not unique.`);
+if (pages.length !== expectedPageCount) fail(`Expected exactly ${expectedPageCount} pages, found ${pages.length}.`);
+if (new Set(pages.map((page) => page.slug)).size !== expectedPageCount) fail(`Batch ${batch} slugs are not unique.`);
+if (new Set(pages.map((page) => page.key)).size !== expectedPageCount) fail(`Batch ${batch} keys are not unique.`);
+if (new Set(pages.map((page) => page.title)).size !== expectedPageCount) fail(`Batch ${batch} titles are not unique.`);
 if (new Set(pages.map((page) => page.matter.key)).size !== 25) fail(`Batch ${batch} must include all 25 legal matters.`);
-if (new Set(pages.map((page) => page.stage.key)).size !== 4) fail(`Batch ${batch} must include four distinct legal stages.`);
+if (new Set(pages.map((page) => page.stage.key)).size !== expectedStageCount) fail(`Batch ${batch} must include ${expectedStageCount} distinct legal stages.`);
 if (new Set(pages.map((page) => page.location.region)).size !== 13) fail(`Batch ${batch} must cover all 13 regions.`);
 
 const priorKeys = new Set(priorPages.map((page) => page.key));

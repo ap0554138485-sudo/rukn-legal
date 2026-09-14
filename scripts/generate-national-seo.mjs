@@ -4,7 +4,9 @@ import { locations as nationalLocations } from "./generate-national-wave1.mjs";
 
 const root = resolve(import.meta.dirname, "..");
 const baseUrl = "https://rukn-legal-vwptio.cranl.net";
-const releaseDate = "2026-09-07";
+const releaseDate = "2026-09-10";
+const releaseDateArabic = "10 سبتمبر 2026";
+const releaseDateEnglish = "10 September 2026";
 const phone = "+966506142113";
 const displayPhone = "+966 50 614 2113";
 const email = "ap0554138485@icloud.com";
@@ -458,9 +460,9 @@ function sitewideTrustBlock(language) {
 
 function contentAccountabilityBlock(language) {
   if (language === "en") {
-    return `<!-- content-accountability:start --><aside class="content-accountability" data-content-accountability aria-label="Content information"><div class="container content-accountability-inner"><div><strong>Published and maintained by Legal Systems Corner</strong><span>General information to help organize an initial request; it does not replace a professional review of the facts and documents.</span></div><div class="content-accountability-meta"><time datetime="${releaseDate}">Content updated 7 September 2026</time><a href="editorial-policy.html">Editorial policy</a><a href="official-sources.html">Official sources</a></div></div></aside><!-- content-accountability:end -->`;
+    return `<!-- content-accountability:start --><aside class="content-accountability" data-content-accountability aria-label="Content information"><div class="container content-accountability-inner"><div><strong>Published and maintained by Legal Systems Corner</strong><span>General information to help organize an initial request; it does not replace a professional review of the facts and documents.</span></div><div class="content-accountability-meta"><time datetime="${releaseDate}">Content updated ${releaseDateEnglish}</time><a href="editorial-policy.html">Editorial policy</a><a href="official-sources.html">Official sources</a></div></div></aside><!-- content-accountability:end -->`;
   }
-  return `<!-- content-accountability:start --><aside class="content-accountability" data-content-accountability aria-label="معلومات المحتوى"><div class="container content-accountability-inner"><div><strong>النشر والتحديث: رُكن الأنظمة القانونية</strong><span>محتوى عام لتنظيم الطلب الأولي، ولا يغني عن تقييم الوقائع والمستندات من مختص.</span></div><div class="content-accountability-meta"><time datetime="${releaseDate}">تحديث المحتوى: 7 سبتمبر 2026</time><a href="editorial-policy.html">سياسة التحرير</a><a href="official-sources.html">المصادر الرسمية</a></div></div></aside><!-- content-accountability:end -->`;
+  return `<!-- content-accountability:start --><aside class="content-accountability" data-content-accountability aria-label="معلومات المحتوى"><div class="container content-accountability-inner"><div><strong>النشر والتحديث: رُكن الأنظمة القانونية</strong><span>محتوى عام لتنظيم الطلب الأولي، ولا يغني عن تقييم الوقائع والمستندات من مختص.</span></div><div class="content-accountability-meta"><time datetime="${releaseDate}">تحديث المحتوى: ${releaseDateArabic}</time><a href="editorial-policy.html">سياسة التحرير</a><a href="official-sources.html">المصادر الرسمية</a></div></div></aside><!-- content-accountability:end -->`;
 }
 
 function conversionPanelBlock(language, title) {
@@ -509,9 +511,95 @@ function isNotaryPage(file, html) {
   return /notary|notarization/i.test(file) || /<meta\s+name="page-family"\s+content="notary-/i.test(html);
 }
 
+const topicProfiles = [
+  ["criminal", "القضايا الجنائية", /criminal|drug|fraud|traffic-accident|private-right|investigation|بلاغ|جنائ|مخدر|احتيال|حادث مروري|حق خاص|تحقيق/],
+  ["family", "الأحوال الشخصية والمواريث", /family|divorce|custody|alimony|inheritance|heirs|estate-inventory|visitation|طلاق|فسخ|حضانة|نفقة|زيارة|مواريث|تركة|ورثة/],
+  ["employment", "العمل والحقوق الوظيفية", /labor|employment|employee|workplace|wage|termination|unpaid-benefits|عمال|موظف|وظيف|أجور|مستحقات عمالية|إنهاء علاقة عمل/],
+  ["arbitration", "التحكيم وتسوية المنازعات", /arbitration|settlement|تحكيم|تسوية/],
+  ["data-cyber", "البيانات والأمن السيبراني", /data|privacy|cyber|breach|electronic-evidence|بيانات|خصوصية|سيبران|دليل رقمي|تسرب/],
+  ["intellectual-property", "الملكية الفكرية والعلامات", /trademark|copyright|patent|intellectual-property|franchise|علامة|ملكية فكرية|براءة|حقوق مؤلف|امتياز/],
+  ["tax-regulatory", "الزكاة والضريبة والامتثال", /zakat|tax|vat|customs|municipal|regulatory|inspection|زكاة|ضريب|جمارك|بلدي|رقاب|امتثال/],
+  ["real-estate", "العقار والمقاولات", /real-estate|property|mortgage|construction|rental|lease|handover|defect|إفراغ|عقار|رهن|مقاول|إيجار|تسليم|عيب إنشائي/],
+  ["contracts", "العقود والاتفاقيات", /contract|agreement|drafting|breach|noncompete|عقد|اتفاق|صياغة|إخلال|عدم منافسة/],
+  ["enforcement", "التنفيذ والمطالبات المالية", /execution|enforcement|debt|money-judgment|financial-claim|invoice-claim|claim-quantification|تنفيذ|سند|دين|مطالبات مالية|حكم مالي|فاتورة/],
+  ["commercial", "الشركات والمنازعات التجارية", /commercial|company|corporate|partner|supplier|business|shareholder|governance|تجار|شركة|شريك|مورد|حوكمة|منشأة/],
+  ["administrative", "القضايا الإدارية", /administrative|grievance|government-contract|إدار|تظلم|قرار حكومي|عقد حكومي/],
+  ["notary", "التوثيق والوكالات", /notary|notarization|power-of-attorney|declaration|توثيق|موثق|وكالة|إقرار/]
+];
+
+function topicProfileFor(file, html) {
+  const title = pageTitle(html, file);
+  const guideTopic = html.match(/data-guide-topic="([^"]+)"/i)?.[1] || "";
+  const subject = `${file} ${title} ${guideTopic}`.toLowerCase();
+  for (const [key, label, pattern] of topicProfiles) {
+    if (pattern.test(subject)) return { key, label };
+  }
+  return { key: "general", label: "الخدمات والاستشارات القانونية" };
+}
+
 function clusterFor(file, html) {
   const location = locationProfile(file);
-  return `${isNotaryPage(file, html) ? "notary" : "legal"}-${location.key}`;
+  const topic = topicProfileFor(file, html);
+  return `${isNotaryPage(file, html) ? "notary" : "legal"}-${location.key}-${topic.key}`;
+}
+
+const searchDemandPages = new Map([
+  ["lawyer-tabuk.html", {
+    heading: "تبحث عن محامين في تبوك؟ ابدأ من التخصص",
+    copy: "لا توجد قائمة واحدة تصلح لكل القضايا. لاختيار أفضل محامي في تبوك لملفك، طابق نوع القضية مع تخصص المحامي، وتحقق من الترخيص، وحدد نطاق العمل والأتعاب وآلية المتابعة قبل التوكيل.",
+    links: [["drug-cases-lawyer-tabuk.html", "محامي قضايا مخدرات"], ["contracts-lawyer-tabuk.html", "محامي عقود"], ["execution-lawyer-tabuk.html", "محامي تنفيذ"], ["tabuk-region-lawyers.html", "مدن ومحافظات تبوك"]]
+  }],
+  ["tabuk-region-lawyers.html", {
+    heading: "محامون في منطقة تبوك: من الموقع إلى التخصص",
+    copy: "ابدأ بتحديد مدينة تبوك أو المحافظة، ثم اختر التخصص القانوني والمرحلة الحالية. ذكر الموقع يساعد على تنظيم الطلب، لكنه لا يغني عن التحقق من ترخيص المحامي وخبرته الفعلية في نوع القضية.",
+    links: [["lawyer-tabuk.html", "مدينة تبوك"], ["lawyer-duba.html", "ضباء"], ["lawyer-al-wajh.html", "الوجه"], ["lawyer-tayma.html", "تيماء"], ["lawyer-haql.html", "حقل"]]
+  }],
+  ["drug-cases-lawyer-tabuk.html", {
+    heading: "محامي مخدرات في تبوك: ابدأ من مرحلة القضية",
+    copy: "حدّد هل الملف في الضبط أو التحقيق أو النيابة أو المحاكمة أو الاعتراض، ثم جهّز رقم القضية وأقرب موعد وصفة صاحب الطلب. لا ترسل تفاصيل حساسة أو أصول مستندات في الرسالة الأولى.",
+    links: [["criminal-lawyer-tabuk.html", "الدليل الجنائي"], ["appeals-lawyer-tabuk.html", "الاعتراض والاستئناف"], ["lawyer-tabuk.html", "معايير اختيار المحامي"]]
+  }],
+  ["contracts-lawyer-tabuk.html", {
+    heading: "محامي عقود في تبوك: صياغة أم مراجعة أم نزاع؟",
+    copy: "حدّد المطلوب قبل التواصل: إنشاء عقد جديد، مراجعة مسودة قبل التوقيع، تعديل بند، أو معالجة إخلال قائم. أرسل نوع العقد والأطراف والمرحلة والبند محل القلق دون مشاركة بيانات سرية أولًا.",
+    links: [["contract-drafting-tabuk.html", "صياغة عقد"], ["corporate-contract-lawyer-tabuk.html", "عقود الشركات"], ["commercial-lawyer-tabuk.html", "نزاع تجاري"]]
+  }],
+  ["execution-lawyer-tabuk.html", {
+    heading: "محامي تنفيذ في تبوك: ابدأ بالسند والصفة وآخر إجراء",
+    copy: "اذكر هل أنت طالب تنفيذ أم منفذًا ضده، ونوع السند أو الحكم، ورقم الطلب عند وجوده، وآخر إجراء ظاهر. هذا يميز بين بدء التنفيذ ومنازعة التنفيذ والمطالبة التي تحتاج حكمًا أولًا.",
+    links: [["debt-collection-tabuk.html", "مطالبة مالية"], ["judgment-appeal-tabuk.html", "اعتراض على حكم"], ["legal-consultation-tabuk.html", "استشارة أولية"]]
+  }],
+  ["legal-consultation-tabuk.html", {
+    heading: "استشارة قانونية في تبوك: جهّز السؤال والمرحلة والمستند",
+    copy: "للحصول على توجيه أولي أدق، اكتب سؤالك في سطر واحد، ثم صفتك والجهة والمرحلة وأقرب موعد واسم المستند الأساسي. لا تفترض أن التواصل الأولي المجاني يعني استشارة قانونية كاملة بلا أتعاب.",
+    links: [["lawyer-tabuk.html", "اختيار محامي"], ["appoint-lawyer-tabuk.html", "توكيل ومتابعة"], ["official-sources.html", "المصادر الرسمية"]]
+  }],
+  ["lawyer-tayma.html", {
+    heading: "محامي في تيماء: اختر التخصص قبل طلب التواصل",
+    copy: "اذكر نوع المسألة والمرحلة الحالية والجهة وأقرب موعد، ثم تحقق من ترخيص المحامي ونطاق عمله. الاستقبال الأولي إلكتروني ولا يعني وجود فرع فعلي في تيماء.",
+    links: [["lawyer-tabuk.html", "دليل اختيار المحامي"], ["tabuk-region-lawyers.html", "دليل المنطقة"], ["legal-consultation-tabuk.html", "استشارة قانونية"]]
+  }],
+  ["lawyer-haql.html", {
+    heading: "محامي في حقل: ابدأ بنوع القضية ومرحلتها",
+    copy: "حدّد إن كان الطلب أسريًا أو عماليًا أو تجاريًا أو جنائيًا أو متعلقًا بعقد أو تنفيذ، ثم أضف المرحلة والموعد. الاستقبال الأولي إلكتروني ولا يعني وجود مكتب محلي في حقل.",
+    links: [["lawyer-tabuk.html", "دليل اختيار المحامي"], ["tabuk-region-lawyers.html", "دليل المنطقة"], ["contracts-lawyer-tabuk.html", "العقود"]]
+  }],
+  ["lawyer-al-wajh.html", {
+    heading: "محامي في الوجه: طابق القضية مع التخصص المناسب",
+    copy: "ابدأ بملخص الوقائع والصفة والمرحلة والمستند الأساسي، ثم تحقق من الترخيص ونطاق التمثيل والأتعاب. الاستقبال الأولي إلكتروني ولا يعني وجود فرع فعلي في الوجه.",
+    links: [["lawyer-tabuk.html", "دليل اختيار المحامي"], ["tabuk-region-lawyers.html", "دليل المنطقة"], ["execution-lawyer-tabuk.html", "التنفيذ"]]
+  }]
+]);
+
+function searchDemandBlock(file, catalog) {
+  const demand = searchDemandPages.get(file);
+  if (!demand) return "";
+  const catalogFiles = new Set(catalog.map((page) => page.file));
+  const links = demand.links
+    .filter(([href]) => catalogFiles.has(href))
+    .map(([href, label]) => `<a href="${href}">${escapeHtml(label)}</a>`)
+    .join("");
+  return `<!-- search-demand:start --><section class="section alt search-demand-section" data-search-demand><div class="container prep-layout"><div class="prep-intro"><span class="eyebrow">إجابة مباشرة</span><h2>${escapeHtml(demand.heading)}</h2><p>${escapeHtml(demand.copy)}</p></div><div class="locality-panel"><h3>انتقل إلى المسار الأقرب</h3><div class="related-services">${links}</div><p class="coverage-disclaimer">المعلومات عامة، والاختيار النهائي يعتمد على الوقائع والمستندات والتحقق من مقدم الخدمة.</p></div></div></section><!-- search-demand:end -->`;
 }
 
 function legalIntentCards(locationKey) {
@@ -697,17 +785,27 @@ function clientIntentBlock(file, html, catalog) {
     .map(([label, href, copy]) => `<article class="intent-card"><h3><a href="${href}">${label}</a></h3><p>${copy}</p></article>`)
     .join("");
 
+  const topic = topicProfileFor(file, html);
   const cluster = clusterFor(file, html);
   const clusterPages = catalog.filter((page) => page.cluster === cluster).sort((a, b) => a.file.localeCompare(b.file));
   const currentIndex = clusterPages.findIndex((page) => page.file === file);
   const related = [];
   const pageByFile = new Map(catalog.map((page) => [page.file, page]));
-  for (const cornerstoneFile of cornerstoneFiles(location.key, notary)) {
+  for (const cornerstoneFile of cornerstoneFiles(location.key, notary).slice(0, 4)) {
     const candidate = pageByFile.get(cornerstoneFile);
     if (candidate && candidate.file !== file && !related.some((item) => item.file === candidate.file)) related.push(candidate);
     if (related.length >= relatedLinkLimit) break;
   }
-  for (let offset = 1; offset < clusterPages.length && related.length < relatedLinkLimit; offset += 1) {
+  const preferredOffsetCount = Math.min(6, Math.max(0, clusterPages.length - 1));
+  const preferredOffsets = [];
+  for (let index = 1; index <= preferredOffsetCount; index += 1) {
+    const offset = Math.max(1, Math.round(index * clusterPages.length / (preferredOffsetCount + 1)));
+    if (!preferredOffsets.includes(offset)) preferredOffsets.push(offset);
+  }
+  const remainingOffsets = Array.from({ length: Math.max(0, clusterPages.length - 1) }, (_, index) => index + 1)
+    .filter((offset) => !preferredOffsets.includes(offset));
+  for (const offset of [...preferredOffsets, ...remainingOffsets]) {
+    if (related.length >= relatedLinkLimit) break;
     const candidate = clusterPages[(currentIndex + offset) % clusterPages.length];
     if (candidate && !related.some((item) => item.file === candidate.file)) related.push(candidate);
   }
@@ -716,7 +814,9 @@ function clientIntentBlock(file, html, catalog) {
   const intro = notary
     ? `ابدأ من نوع المعاملة، ثم تحقق من الموثق المرخص والمتطلبات الرسمية. هذه المسارات تساعدك على الانتقال من ${escapeHtml(currentTitle)} إلى الإجراء الأقرب لطلبك.`
     : `حدّد هدفك أولًا: استشارة لفهم الموقف، توكيل لمتابعة قضية، إعداد اعتراض أو مذكرة، أو مراجعة عقد ومطالبة. اختر المسار الأقرب إلى ${escapeHtml(currentTitle)}.`;
-  const relatedHeading = notary ? `صفحات التوثيق الأساسية في ${location.label}` : `الصفحات القانونية الأساسية في ${location.label}`;
+  const relatedHeading = notary
+    ? `صفحات ${topic.label} المرتبطة في ${location.label}`
+    : `صفحات ${topic.label} المرتبطة في ${location.label}`;
   return `<!-- client-intent:start --><section class="section client-intent-section" data-client-intent><div class="container"><div class="section-head"><span class="eyebrow">اختر حسب هدفك</span><h2>${heading}</h2><p>${intro}</p></div><div class="intent-grid">${cards}</div>${relatedLinks ? `<div class="topic-links" data-topic-links><strong>${relatedHeading}</strong><div class="related-services">${relatedLinks}</div></div>` : ""}</div></section><!-- client-intent:end -->`;
 }
 
@@ -809,6 +909,19 @@ function enhanceHtml(file, catalog = []) {
     html = html.replace(/(<link\s+rel="stylesheet"\s+href="styles(?:-[a-z0-9]+)?\.css[^"]*"\s*\/?>)/i, `$1\n  ${contrast}`);
   }
   html = html.replace(/(<!-- accessibility-contrast:end -->)\s*<style>:root\{--muted:#536360\}[\s\S]*?<\/style>/i, "$1");
+
+  const searchDemand = searchDemandBlock(file, catalog);
+  if (searchDemand) {
+    if (/<!-- search-demand:start -->[\s\S]*?<!-- search-demand:end -->/i.test(html)) {
+      html = html.replace(/<!-- search-demand:start -->[\s\S]*?<!-- search-demand:end -->/i, searchDemand);
+    } else if (/<section\b[^>]*class="[^"]*\bhero\b[^"]*"[^>]*>[\s\S]*?<\/section>/i.test(html)) {
+      html = html.replace(/(<section\b[^>]*class="[^"]*\bhero\b[^"]*"[^>]*>[\s\S]*?<\/section>)/i, `$1\n${searchDemand}`);
+    } else {
+      html = html.replace(/<\/main>/i, `${searchDemand}\n</main>`);
+    }
+  } else {
+    html = html.replace(/\s*<!-- search-demand:start -->[\s\S]*?<!-- search-demand:end -->/i, "");
+  }
 
   html = html.replace(/<main\b([^>]*)>/i, (match, attributes) => {
     let nextAttributes = attributes;

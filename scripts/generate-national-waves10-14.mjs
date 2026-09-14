@@ -4,6 +4,7 @@ import { fileURLToPath } from "node:url";
 import { locations } from "./generate-national-wave1.mjs";
 import { renderNationalPage } from "./generate-national-wave8.mjs";
 import { families, stages } from "./national-waves10-14-data.mjs";
+import { stageLexicon as wavesFifteenToSeventeenStageLexicon } from "./national-waves15-17-data.mjs";
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), "..");
 const contentDate = "2026-09-02";
@@ -71,6 +72,7 @@ const reviewModes = [
 ];
 
 const stageLexicon = {
+  ...wavesFifteenToSeventeenStageLexicon,
   standing: ["هوية صاحب الحق", "سند الوكالة", "حدود التمثيل", "تطابق الأسماء", "صفة الطرف الآخر", "تاريخ نشوء الصفة", "تعارض المصالح", "قرار قبول الصفة"],
   timeline: ["حدث البداية", "وقت الإنشاء", "وقت الإرسال", "إثبات الوصول", "الفجوة الزمنية", "تعارض التاريخ", "الحدث القاطع", "آخر موعد مثبت"],
   "claim-scope": ["الطلب الرئيسي", "الطلب الاحتياطي", "حدود المبلغ", "الفترة المطالب بها", "الواقعة المؤسسة", "الدفع المقابل", "المسألة المستبعدة", "منطوق النتيجة"],
@@ -143,8 +145,8 @@ function stageDeepDive(page) {
   return `<section class="section alt stage-deep-dive" id="stage-deep-dive"><div class="container"><div class="section-head"><span class="eyebrow">معيار مختلف للمرحلة والمشكلة</span><h2>أربع وعشرون بوابة لـ${escapeHtml(page.title)}</h2><p>تجمع كل بوابة عنصرًا خاصًا بالمرحلة مع عنصر خاص بالمشكلة، لذلك لا تعتمد قيمة الصفحة على اسم المدينة أو قالب عام.</p></div><div class="locality-panels">${terms.map((term, index) => `<article class="locality-panel" data-number="${String(index + 1).padStart(2, "0")}"><h3>${escapeHtml(`${term.stageTerm} — ${term.matterTerm}`)}</h3><p>${escapeHtml(patterns[index % patterns.length](term))}</p></article>`).join("")}</div></div></section>`;
 }
 
-function progressionLinks(page) {
-  const progression = pages.filter((candidate) => candidate.matter.key === page.matter.key);
+function progressionLinks(page, allPages = pages) {
+  const progression = allPages.filter((candidate) => candidate.matter.key === page.matter.key);
   const position = progression.findIndex((candidate) => candidate.slug === page.slug);
   const links = Array.from({ length: 6 }, (_, offset) => progression[(position + offset + 1) % progression.length]);
   return `<section class="section stage-progression" id="stage-progression"><div class="container"><div class="section-head"><span class="eyebrow">المشكلة نفسها في مراحل أخرى</span><h2>انتقل إلى المرحلة التالية من ${escapeHtml(page.matter.title)}</h2><p>اختر المرحلة التي تطابق وضع الملف الآن؛ اختلاف المدينة لا يغني عن مطابقة الإجراء والمستند والنتيجة المطلوبة.</p></div><div class="related-services">${links.map((item) => `<a href="${item.slug}">${escapeHtml(item.title)} — ${escapeHtml(item.location.name)}</a>`).join("")}</div></div></section>`;
@@ -171,13 +173,17 @@ function stageWorkbook(page) {
   return `<section class="section expansion-workbook" id="stage-workbook"><div class="container"><div class="section-head"><span class="eyebrow">دفتر مرحلة قانونية مستقل</span><h2>اثنتا عشرة مراجعة خاصة بـ${escapeHtml(page.title)}</h2><p>هذا الدفتر يربط المشكلة القانونية بمرحلة محددة ووثيقة وقرار، لذلك لا تعتمد قيمة الصفحة على اسم ${escapeHtml(location.name)} وحده.</p></div><div class="locality-panels">${ordered.map(([title, body], index) => `<article class="locality-panel" data-number="${String(index + 1).padStart(2, "0")}"><h3>${escapeHtml(title)}</h3><p>${escapeHtml(body)}</p></article>`).join("")}</div></div></section>`;
 }
 
-export function renderExpansionPage(page) {
-  let html = renderNationalPage(page, { allPages: pages, contentDate });
+export function renderExpansionPage(page, options = {}) {
+  const allPages = options.allPages || pages;
+  const renderedContentDate = options.contentDate || contentDate;
+  const renderedDisplayDate = options.displayDate || displayDate;
+  const rolloutTotal = options.rolloutTotal || 17;
+  let html = renderNationalPage(page, { allPages, contentDate: renderedContentDate });
   html = html
     .replace('data-national-wave="8"', `data-national-wave="${page.batch}"`)
     .replaceAll("الدفعة الوطنية الثامنة", `الدفعة الوطنية ${page.batch}`)
-    .replaceAll("الدفعة 8 من 10", `الدفعة ${page.batch} من 14`)
-    .replaceAll("29 أغسطس 2026", displayDate)
+    .replaceAll("الدفعة 8 من 10", `الدفعة ${page.batch} من ${rolloutTotal}`)
+    .replaceAll("29 أغسطس 2026", renderedDisplayDate)
     .replaceAll("موضوعات مختلفة من الدفعة الثامنة", "موضوعات مختلفة من التوسع الوطني")
     .replace('href="#file-map">خريطة الملف</a>', 'href="#stage-deep-dive">بوابات المرحلة</a>')
     .replace('href="#evidence">سجل الأدلة</a>', 'href="#stage-deep-dive">قائمة المراجعة</a>');
@@ -188,7 +194,7 @@ export function renderExpansionPage(page) {
     /<div class="service-jump-wrap">[\s\S]*?<\/nav><\/div>/i,
     '<div class="service-jump-wrap"><nav class="container service-jump" aria-label="روابط داخل الصفحة"><a href="#stage-deep-dive">بوابات المرحلة</a><a href="#faq">الأسئلة</a></nav></div>'
   );
-  return html.replace('<section class="section alt" id="faq">', `${stageDeepDive(page)}${progressionLinks(page)}<section class="section alt" id="faq">`);
+  return html.replace('<section class="section alt" id="faq">', `${stageDeepDive(page)}${progressionLinks(page, allPages)}<section class="section alt" id="faq">`);
 }
 
 export function generateNationalExpansion(batch) {
