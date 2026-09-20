@@ -20,6 +20,21 @@ const whatsappMessage = "السلام عليكم، أرغب في طلب خدمة
 const whatsappUrl = `https://wa.me/966506142113?text=${encodeURIComponent(whatsappMessage)}`;
 const relatedLinkLimit = 10;
 
+const searchAppearanceOverrides = new Map([
+  ["lawyer-tabuk.html", {
+    title: "محامي تبوك | رقم التواصل وكيف تختار أفضل محامي في تبوك",
+    description: "دليل محامي تبوك لمن يبحث عن رقم التواصل أو أفضل محامي في تبوك: قارن التخصص والترخيص والأتعاب قبل توكيل المحامي المناسب لمرحلة قضيتك.",
+    dateModified: "2026-09-19",
+    dateModifiedArabic: "19 سبتمبر 2026"
+  }],
+  ["tabuk-region-lawyers.html", {
+    title: "محامي في منطقة تبوك | دليل المدن والمحافظات",
+    description: "ابحث عن محامي في منطقة تبوك حسب المدينة: تبوك، ضباء، الوجه، أملج، تيماء، حقل والبدع. اختر موقعك ثم انتقل إلى التخصص القانوني المناسب.",
+    dateModified: "2026-09-19",
+    dateModifiedArabic: "19 سبتمبر 2026"
+  }]
+]);
+
 const regionHubs = new Map([
   ["منطقة الرياض", { key: "riyadh-region", label: "منطقة الرياض", file: "legal-services-riyadh.html" }],
   ["منطقة مكة المكرمة", { key: "makkah-region", label: "منطقة مكة المكرمة", file: "makkah-region-legal-services.html" }],
@@ -129,6 +144,28 @@ function textContent(value) {
 
 function jsonLd(value) {
   return `<script type="application/ld+json">${JSON.stringify({ "@context": "https://schema.org", "@graph": value })}</script>`;
+}
+
+function modifiedDateFor(file) {
+  return searchAppearanceOverrides.get(file)?.dateModified || releaseDate;
+}
+
+function modifiedDateLabelFor(file, language) {
+  const override = searchAppearanceOverrides.get(file);
+  if (language === "en") return override?.dateModifiedEnglish || releaseDateEnglish;
+  return override?.dateModifiedArabic || releaseDateArabic;
+}
+
+function applySearchAppearanceMetadata(file, html) {
+  const override = searchAppearanceOverrides.get(file);
+  if (!override) return html;
+  return html
+    .replace(/<title>[\s\S]*?<\/title>/i, `<title>${escapeHtml(override.title)}</title>`)
+    .replace(/<meta\s+name="description"\s+content="[^"]+"\s*\/?\s*>/i, `<meta name="description" content="${escapeHtml(override.description)}">`)
+    .replace(/<meta\s+property="og:title"\s+content="[^"]+"\s*\/?\s*>/i, `<meta property="og:title" content="${escapeHtml(override.title)}">`)
+    .replace(/<meta\s+property="og:description"\s+content="[^"]+"\s*\/?\s*>/i, `<meta property="og:description" content="${escapeHtml(override.description)}">`)
+    .replace(/<meta\s+name="twitter:title"\s+content="[^"]+"\s*\/?\s*>/i, `<meta name="twitter:title" content="${escapeHtml(override.title)}">`)
+    .replace(/<meta\s+name="twitter:description"\s+content="[^"]+"\s*\/?\s*>/i, `<meta name="twitter:description" content="${escapeHtml(override.description)}">`);
 }
 
 function schemaTypeIncludes(node, type) {
@@ -458,11 +495,13 @@ function sitewideTrustBlock(language) {
   return `<!-- sitewide-trust:start --><div class="container footer-trust-links" aria-label="روابط الثقة والسياسات"><a href="en.html" hreflang="en" lang="en">English</a><a href="notary-services-saudi.html">دليل خدمات الموثق</a><a href="about.html">عن الموقع</a><a href="editorial-policy.html">سياسة التحرير</a><a href="official-sources.html">المصادر الرسمية</a><a href="saudi-regions-guide.html">مناطق السعودية</a><a href="privacy.html">سياسة الخصوصية</a></div><nav class="container footer-region-directory" aria-label="مناطق السعودية"><strong>انتقل مباشرة إلى منطقتك</strong><div>${regionLinks}</div></nav><!-- sitewide-trust:end -->`;
 }
 
-function contentAccountabilityBlock(language) {
+function contentAccountabilityBlock(language, file) {
+  const modifiedDate = modifiedDateFor(file);
+  const modifiedDateLabel = modifiedDateLabelFor(file, language);
   if (language === "en") {
-    return `<!-- content-accountability:start --><aside class="content-accountability" data-content-accountability aria-label="Content information"><div class="container content-accountability-inner"><div><strong>Published and maintained by Legal Systems Corner</strong><span>General information to help organize an initial request; it does not replace a professional review of the facts and documents.</span></div><div class="content-accountability-meta"><time datetime="${releaseDate}">Content updated ${releaseDateEnglish}</time><a href="editorial-policy.html">Editorial policy</a><a href="official-sources.html">Official sources</a></div></div></aside><!-- content-accountability:end -->`;
+    return `<!-- content-accountability:start --><aside class="content-accountability" data-content-accountability aria-label="Content information"><div class="container content-accountability-inner"><div><strong>Published and maintained by Legal Systems Corner</strong><span>General information to help organize an initial request; it does not replace a professional review of the facts and documents.</span></div><div class="content-accountability-meta"><time datetime="${modifiedDate}">Content updated ${modifiedDateLabel}</time><a href="editorial-policy.html">Editorial policy</a><a href="official-sources.html">Official sources</a></div></div></aside><!-- content-accountability:end -->`;
   }
-  return `<!-- content-accountability:start --><aside class="content-accountability" data-content-accountability aria-label="معلومات المحتوى"><div class="container content-accountability-inner"><div><strong>النشر والتحديث: رُكن الأنظمة القانونية</strong><span>محتوى عام لتنظيم الطلب الأولي، ولا يغني عن تقييم الوقائع والمستندات من مختص.</span></div><div class="content-accountability-meta"><time datetime="${releaseDate}">تحديث المحتوى: ${releaseDateArabic}</time><a href="editorial-policy.html">سياسة التحرير</a><a href="official-sources.html">المصادر الرسمية</a></div></div></aside><!-- content-accountability:end -->`;
+  return `<!-- content-accountability:start --><aside class="content-accountability" data-content-accountability aria-label="معلومات المحتوى"><div class="container content-accountability-inner"><div><strong>النشر والتحديث: رُكن الأنظمة القانونية</strong><span>محتوى عام لتنظيم الطلب الأولي، ولا يغني عن تقييم الوقائع والمستندات من مختص.</span></div><div class="content-accountability-meta"><time datetime="${modifiedDate}">تحديث المحتوى: ${modifiedDateLabel}</time><a href="editorial-policy.html">سياسة التحرير</a><a href="official-sources.html">المصادر الرسمية</a></div></div></aside><!-- content-accountability:end -->`;
 }
 
 function conversionPanelBlock(language, title) {
@@ -545,13 +584,13 @@ function clusterFor(file, html) {
 
 const searchDemandPages = new Map([
   ["lawyer-tabuk.html", {
-    heading: "تبحث عن محامين في تبوك؟ ابدأ من التخصص",
-    copy: "لا توجد قائمة واحدة تصلح لكل القضايا. لاختيار أفضل محامي في تبوك لملفك، طابق نوع القضية مع تخصص المحامي، وتحقق من الترخيص، وحدد نطاق العمل والأتعاب وآلية المتابعة قبل التوكيل.",
+    heading: "محامي تبوك: رقم التواصل واختيار التخصص المناسب",
+    copy: "إذا كنت تبحث عن محامي أو محامين في تبوك، فابدأ بتحديد نوع القضية ومرحلتها، ثم تحقق من الترخيص والخبرة ونطاق العمل والأتعاب. ستجد في الصفحة رقم التواصل المباشر ومسارات التخصص قبل قرار التوكيل.",
     links: [["drug-cases-lawyer-tabuk.html", "محامي قضايا مخدرات"], ["contracts-lawyer-tabuk.html", "محامي عقود"], ["execution-lawyer-tabuk.html", "محامي تنفيذ"], ["tabuk-region-lawyers.html", "مدن ومحافظات تبوك"]]
   }],
   ["tabuk-region-lawyers.html", {
-    heading: "محامون في منطقة تبوك: من الموقع إلى التخصص",
-    copy: "ابدأ بتحديد مدينة تبوك أو المحافظة، ثم اختر التخصص القانوني والمرحلة الحالية. ذكر الموقع يساعد على تنظيم الطلب، لكنه لا يغني عن التحقق من ترخيص المحامي وخبرته الفعلية في نوع القضية.",
+    heading: "دليل محامين منطقة تبوك حسب المدينة والمحافظة",
+    copy: "اختر مدينة تبوك أو ضباء أو الوجه أو أملج أو تيماء أو حقل أو البدع، ثم انتقل إلى التخصص والمرحلة المناسبة. الدليل ينظم الوصول حسب الموقع ولا يعني وجود فرع فعلي في كل مدينة.",
     links: [["lawyer-tabuk.html", "مدينة تبوك"], ["lawyer-duba.html", "ضباء"], ["lawyer-al-wajh.html", "الوجه"], ["lawyer-tayma.html", "تيماء"], ["lawyer-haql.html", "حقل"]]
   }],
   ["drug-cases-lawyer-tabuk.html", {
@@ -865,6 +904,7 @@ function enhanceHtml(file, catalog = []) {
   const path = resolve(root, file);
   let html = readFileSync(path, "utf8");
   const original = html;
+  html = applySearchAppearanceMetadata(file, html);
   const language = html.match(/<html[^>]*\slang="([^"]+)"/i)?.[1]?.toLowerCase().startsWith("en") ? "en" : "ar";
   const title = decodeHtml(html.match(/<title>([\s\S]*?)<\/title>/i)?.[1]?.trim() || "");
   const description = decodeHtml(html.match(/<meta\s+name="description"\s+content="([^"]+)"/i)?.[1]?.trim() || "");
@@ -951,7 +991,7 @@ function enhanceHtml(file, catalog = []) {
     } else {
       html = html.replace(/(<meta\s+name="description"\s+content="[^"]+"\s*\/?\s*>)/i, `$1\n  <meta name="author" content="رُكن الأنظمة القانونية">`);
     }
-    const pageSchema = { "@type": "WebPage", "@id": `${canonical}#webpage`, url: canonical, name: title, description, inLanguage: language === "en" ? "en" : "ar-SA", isPartOf: { "@id": `${baseUrl}/#website` }, author: { "@id": `${baseUrl}/#organization` }, publisher: { "@id": `${baseUrl}/#organization` }, dateModified: releaseDate };
+    const pageSchema = { "@type": "WebPage", "@id": `${canonical}#webpage`, url: canonical, name: title, description, inLanguage: language === "en" ? "en" : "ar-SA", isPartOf: { "@id": `${baseUrl}/#website` }, author: { "@id": `${baseUrl}/#organization` }, publisher: { "@id": `${baseUrl}/#organization` }, dateModified: modifiedDateFor(file) };
     const breadcrumb = breadcrumbSchema(file, html, canonical, language);
     if (breadcrumb) pageSchema.breadcrumb = { "@id": breadcrumb["@id"] };
     const schemaPayload = breadcrumb
@@ -1014,7 +1054,7 @@ function enhanceHtml(file, catalog = []) {
     html = html.replace(/\s*<!-- conversion-panel:start -->[\s\S]*?<!-- conversion-panel:end -->/i, "");
   }
 
-  const accountability = contentAccountabilityBlock(language);
+  const accountability = contentAccountabilityBlock(language, file);
   if (/<!-- content-accountability:start -->[\s\S]*?<!-- content-accountability:end -->\s*(?=<footer\b)/i.test(html)) {
     html = html.replace(/<!-- content-accountability:start -->[\s\S]*?<!-- content-accountability:end -->\s*(?=<footer\b)/i, `${accountability}\n  `);
   } else if (/<\/main>\s*(?=<footer\b)/i.test(html)) {
@@ -1043,7 +1083,14 @@ function canonicalFor(file, html) {
 function sitemapUrlEntry({ file, html }) {
   const canonical = canonicalFor(file, html);
   const alternates = file === "index.html" || file === "en.html" ? `\n    <xhtml:link rel="alternate" hreflang="ar" href="${baseUrl}/" />\n    <xhtml:link rel="alternate" hreflang="en" href="${baseUrl}/en.html" />\n    <xhtml:link rel="alternate" hreflang="x-default" href="${baseUrl}/" />` : "";
-  return `  <url>\n    <loc>${canonical}</loc>\n    <lastmod>${releaseDate}</lastmod>${alternates}\n  </url>`;
+  return `  <url>\n    <loc>${canonical}</loc>\n    <lastmod>${modifiedDateFor(file)}</lastmod>${alternates}\n  </url>`;
+}
+
+function sitemapModifiedDate(pages) {
+  return pages.reduce((latest, page) => {
+    const modifiedDate = modifiedDateFor(page.file);
+    return modifiedDate > latest ? modifiedDate : latest;
+  }, releaseDate);
 }
 
 function updateSitemaps() {
@@ -1068,7 +1115,7 @@ function updateSitemaps() {
     writeFileSync(resolve(root, sitemapFile), `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:xhtml="http://www.w3.org/1999/xhtml">\n${entries.join("\n")}\n</urlset>\n`, "utf8");
   }
 
-  const indexEntries = sitemapFiles.map((sitemapFile) => `  <sitemap>\n    <loc>${baseUrl}/${sitemapFile}</loc>\n    <lastmod>${releaseDate}</lastmod>\n  </sitemap>`);
+  const indexEntries = sitemapFiles.map((sitemapFile) => `  <sitemap>\n    <loc>${baseUrl}/${sitemapFile}</loc>\n    <lastmod>${sitemapModifiedDate(groups.get(sitemapFile))}</lastmod>\n  </sitemap>`);
   writeFileSync(resolve(root, "sitemap.xml"), `<?xml version="1.0" encoding="UTF-8"?>\n<sitemapindex xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${indexEntries.join("\n")}\n</sitemapindex>\n`, "utf8");
 }
 

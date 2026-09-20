@@ -3,7 +3,10 @@ import { basename, resolve } from "node:path";
 
 const root = resolve(import.meta.dirname, "..");
 const origin = "https://rukn-legal-vwptio.cranl.net";
-const releaseDate = "2026-09-10";
+const minimumUpdateDate = "2026-09-10";
+const auditDate = new Date().toISOString().slice(0, 10);
+const arabicMonths = ["يناير", "فبراير", "مارس", "أبريل", "مايو", "يونيو", "يوليو", "أغسطس", "سبتمبر", "أكتوبر", "نوفمبر", "ديسمبر"];
+const englishMonths = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
 const files = readdirSync(root)
   .filter((file) => file.endsWith(".html") && !file.startsWith("google"))
   .sort();
@@ -25,6 +28,15 @@ function textContent(html) {
     .replace(/&(?:nbsp|amp|quot|apos|#\d+|#x[\da-f]+);/gi, " ")
     .replace(/\s+/g, " ")
     .trim();
+}
+
+function expectedVisibleUpdateText(date, isEnglish) {
+  const [year, month, day] = date.split("-");
+  const monthIndex = Number(month) - 1;
+  if (!year || !day || monthIndex < 0 || monthIndex > 11) return "";
+  return isEnglish
+    ? `Content updated ${Number(day)} ${englishMonths[monthIndex]} ${year}`
+    : `تحديث المحتوى: ${Number(day)} ${arabicMonths[monthIndex]} ${year}`;
 }
 
 function schemaNodes(value) {
@@ -119,11 +131,19 @@ for (const file of files) {
     if (logoUrl !== `${origin}/logo-128-20260824.png`) errors.push(`${file}: Organization logo is missing or incorrect`);
   }
   if (!/data-content-accountability/i.test(html)) errors.push(`${file}: missing visible content accountability block`);
-  if (!new RegExp(`<time\\s+datetime="${releaseDate}"`, "i").test(html)) errors.push(`${file}: missing current content update date`);
   const htmlTag = html.match(/<html\b([^>]*)>/i)?.[1] || "";
   const isEnglish = /\blang="en(?:-[^"]+)?"/i.test(htmlTag);
-  const visibleUpdateText = isEnglish ? "Content updated 10 September 2026" : "تحديث المحتوى: 10 سبتمبر 2026";
-  if (!html.includes(visibleUpdateText)) errors.push(`${file}: visible content update date is stale`);
+  const accountabilityBlock = html.match(/<!-- content-accountability:start -->([\s\S]*?)<!-- content-accountability:end -->/i)?.[1] || "";
+  const updateTime = accountabilityBlock.match(/<time\s+datetime="(\d{4}-\d{2}-\d{2})">([^<]+)<\/time>/i);
+  if (!updateTime) {
+    errors.push(`${file}: missing valid content update date`);
+  } else {
+    const [, updateDate, updateLabel] = updateTime;
+    if (updateDate < minimumUpdateDate) errors.push(`${file}: content update date is older than ${minimumUpdateDate}`);
+    if (updateDate > auditDate) errors.push(`${file}: content update date is in the future`);
+    const expectedUpdateLabel = expectedVisibleUpdateText(updateDate, isEnglish);
+    if (!expectedUpdateLabel || updateLabel.trim() !== expectedUpdateLabel) errors.push(`${file}: visible content update date does not match datetime`);
+  }
   if (isEnglish && !/\bdir="ltr"/i.test(htmlTag)) errors.push(`${file}: English page must use left-to-right direction`);
   if (!isEnglish && (!/\blang="ar(?:-[^"]+)?"/i.test(htmlTag) || !/\bdir="rtl"/i.test(htmlTag))) {
     errors.push(`${file}: Arabic page must declare Arabic and right-to-left direction`);
