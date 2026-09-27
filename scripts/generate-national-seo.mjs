@@ -38,6 +38,42 @@ const searchAppearanceOverrides = new Map([
     description: "ابحث عن محامي في منطقة تبوك حسب المدينة: تبوك، ضباء، الوجه، أملج، تيماء، حقل والبدع. اختر موقعك ثم انتقل إلى التخصص القانوني المناسب.",
     dateModified: "2026-09-19",
     dateModifiedArabic: "19 سبتمبر 2026"
+  }],
+  ["family-lawyer-tabuk.html", {
+    title: "محامي أحوال شخصية في تبوك | الطلاق والحضانة والنفقة",
+    description: "محامي أحوال شخصية في تبوك لقضايا الطلاق والفسخ والحضانة والنفقة والزيارة والتركات، مع تحديد نوع الطلب والمرحلة والمستندات قبل التوكيل.",
+    dateModified: "2026-09-27",
+    dateModifiedArabic: "27 سبتمبر 2026"
+  }],
+  ["divorce-lawyer-tabuk.html", {
+    title: "محامي طلاق في تبوك | الفسخ والحقوق بعد الانفصال",
+    description: "محامي طلاق في تبوك لتنظيم طلب الطلاق أو الفسخ والحقوق المالية والاتفاقات والأحكام السابقة، مع فصل الحضانة والنفقة عند الحاجة.",
+    dateModified: "2026-09-27",
+    dateModifiedArabic: "27 سبتمبر 2026"
+  }],
+  ["drug-cases-lawyer-tabuk.html", {
+    title: "محامي مخدرات في تبوك | الضبط والتحقيق والمحاكمة",
+    description: "محامي مخدرات في تبوك لمراجعة مرحلة الضبط أو التحقيق أو النيابة أو المحاكمة أو الاعتراض، وتحديد الصفة والأدلة والمواعيد قبل بدء الطلب.",
+    dateModified: "2026-09-27",
+    dateModifiedArabic: "27 سبتمبر 2026"
+  }],
+  ["criminal-lawyer-tabuk.html", {
+    title: "محامي جنائي في تبوك | التحقيق والقضايا الجزائية والاعتراض",
+    description: "محامي جنائي في تبوك لمراحل الاستدلال والتحقيق والنيابة والمحاكمة والاعتراض، مع مسار مستقل لقضايا المخدرات والاحتيال والحق الخاص.",
+    dateModified: "2026-09-27",
+    dateModifiedArabic: "27 سبتمبر 2026"
+  }],
+  ["contracts-lawyer-tabuk.html", {
+    title: "محامي عقود في تبوك | صياغة ومراجعة العقود قبل التوقيع",
+    description: "محامي عقود في تبوك لصياغة عقد جديد أو مراجعة مسودة وتعديل البنود ومعالجة الإخلال، للأفراد والمنشآت قبل التوقيع أو عند النزاع.",
+    dateModified: "2026-09-27",
+    dateModifiedArabic: "27 سبتمبر 2026"
+  }],
+  ["real-estate-transfer-notary-yanbu.html", {
+    title: "إفراغ عقاري في ينبع | متى يفتح الإفراغ وخطوات الطلب",
+    description: "إفراغ عقاري في ينبع: اعرف متى تبدأ المعاملة، وما بيانات الصك والأطراف والوكالة والقيود المطلوبة، وكيف تتحقق من الخدمة والموثق عبر المصدر الرسمي.",
+    dateModified: "2026-09-27",
+    dateModifiedArabic: "27 سبتمبر 2026"
   }]
 ]);
 
@@ -606,7 +642,22 @@ const searchDemandPages = new Map([
   ["drug-cases-lawyer-tabuk.html", {
     heading: "محامي مخدرات في تبوك: ابدأ من مرحلة القضية",
     copy: "حدّد هل الملف في الضبط أو التحقيق أو النيابة أو المحاكمة أو الاعتراض، ثم جهّز رقم القضية وأقرب موعد وصفة صاحب الطلب. لا ترسل تفاصيل حساسة أو أصول مستندات في الرسالة الأولى.",
-    links: [["criminal-lawyer-tabuk.html", "الدليل الجنائي"], ["appeals-lawyer-tabuk.html", "الاعتراض والاستئناف"], ["lawyer-tabuk.html", "معايير اختيار المحامي"]]
+    links: [["criminal-lawyer-tabuk.html", "الدليل الجنائي"], ["judgment-appeal-tabuk.html", "الاعتراض على الحكم"], ["lawyer-tabuk.html", "معايير اختيار المحامي"]]
+  }],
+  ["criminal-lawyer-tabuk.html", {
+    heading: "محامي جنائي في تبوك: حدّد نوع القضية والمرحلة أولًا",
+    copy: "ابدأ بذكر الصفة والجهة الحالية وأقرب موعد: استدلال أو تحقيق أو نيابة أو محاكمة أو اعتراض. لقضايا المخدرات أو الاحتيال أو الحق الخاص انتقل إلى الصفحة المتخصصة بدل استخدام وصف عام.",
+    links: [["drug-cases-lawyer-tabuk.html", "محامي مخدرات في تبوك"], ["fraud-lawyer-tabuk.html", "قضايا الاحتيال"], ["judgment-appeal-tabuk.html", "الاعتراض على الحكم"]]
+  }],
+  ["family-lawyer-tabuk.html", {
+    heading: "محامي أحوال شخصية في تبوك: ما نوع الطلب الأسري؟",
+    copy: "فرّق بين الطلاق أو الفسخ، والحضانة أو الزيارة، والنفقة، والتركات قبل التواصل. اذكر وجود دعوى أو حكم سابق وأقرب موعد، ثم انتقل إلى الصفحة المتخصصة إذا كان الطلب محددًا.",
+    links: [["divorce-lawyer-tabuk.html", "محامي طلاق في تبوك"], ["custody-alimony-lawyer-tabuk.html", "الحضانة والنفقة"], ["inheritance-lawyer-tabuk.html", "المواريث والتركات"]]
+  }],
+  ["divorce-lawyer-tabuk.html", {
+    heading: "محامي طلاق في تبوك: طلاق أم فسخ وما الحقوق المرتبطة؟",
+    copy: "حدّد نوع العلاقة والطلب، وهل توجد دعوى أو وثيقة أو اتفاق أو حكم سابق. افصل إنهاء العلاقة عن الحضانة والنفقة والزيارة والحقوق المالية حتى يتضح نطاق كل مسألة.",
+    links: [["family-lawyer-tabuk.html", "دليل الأحوال الشخصية"], ["custody-alimony-lawyer-tabuk.html", "الحضانة والنفقة"], ["legal-consultation-tabuk.html", "استشارة قانونية أولية"]]
   }],
   ["contracts-lawyer-tabuk.html", {
     heading: "محامي عقود في تبوك: صياغة أم مراجعة أم نزاع؟",
@@ -622,6 +673,11 @@ const searchDemandPages = new Map([
     heading: "استشارة قانونية في تبوك: جهّز السؤال والمرحلة والمستند",
     copy: "للحصول على توجيه أولي أدق، اكتب سؤالك في سطر واحد، ثم صفتك والجهة والمرحلة وأقرب موعد واسم المستند الأساسي. لا تفترض أن التواصل الأولي المجاني يعني استشارة قانونية كاملة بلا أتعاب.",
     links: [["lawyer-tabuk.html", "اختيار محامي"], ["appoint-lawyer-tabuk.html", "توكيل ومتابعة"], ["official-sources.html", "المصادر الرسمية"]]
+  }],
+  ["real-estate-transfer-notary-yanbu.html", {
+    heading: "متى يفتح الإفراغ العقاري في ينبع؟",
+    copy: "لا يوجد موعد عام ثابت لكل معاملة؛ يبدأ الإجراء عند إتاحة الخدمة الرسمية واستكمال بيانات الصك والأطراف والصفة والوكالة والقيود إن وجدت. تحقّق من القناة الرسمية والموثق المرخص قبل حجز الموعد أو دفع أي مبلغ.",
+    links: [["notary-services-saudi.html", "دليل خدمات الموثق"], ["official-sources.html", "المصادر الرسمية"], ["medina-region-legal-services.html", "دليل منطقة المدينة المنورة"]]
   }],
   ["lawyer-tayma.html", {
     heading: "محامي في تيماء: اختر التخصص قبل طلب التواصل",
@@ -661,11 +717,18 @@ function legalIntentCards(locationKey) {
     ],
     tabuk: [
       ["أفضل محامي في تبوك: معايير الاختيار", "lawyer-tabuk.html", "قارن التخصص والترخيص ونطاق العمل قبل اختيار المحامي المناسب لنوع القضية."],
+      ["محامي طلاق في تبوك", "divorce-lawyer-tabuk.html", "افصل الطلاق أو الفسخ عن الحضانة والنفقة والحقوق المالية وحدد المرحلة الحالية."],
       ["محامي قضايا مخدرات في تبوك", "drug-cases-lawyer-tabuk.html", "ابدأ من الصفة ومرحلة الضبط أو التحقيق أو المحاكمة وأقرب موعد."],
       ["محامي عقود في تبوك", "contracts-lawyer-tabuk.html", "لفحص الالتزامات والدفعات والإنهاء والضمانات قبل التوقيع أو عند النزاع."],
       ["محامي تنفيذ في تبوك", "execution-lawyer-tabuk.html", "لتحديد السند وصفة طالب التنفيذ أو المنفذ ضده والإجراء الأخير."],
       ["استشارة قانونية في تبوك", "legal-consultation-tabuk.html", "لفهم الصفة والمرحلة والخيارات قبل رفع الدعوى أو الرد عليها."],
       ["توكيل محامي ومتابعة القضية", "appoint-lawyer-tabuk.html", "لتحديد نطاق الوكالة والتمثيل والمتابعة والمواعيد المهمة."]
+    ],
+    "medina-region": [
+      ["دليل منطقة المدينة المنورة", "medina-region-legal-services.html", "اختر المدينة أو المحافظة ثم انتقل إلى المشكلة القانونية والمرحلة الأقرب إلى طلبك."],
+      ["إفراغ عقاري في ينبع", "real-estate-transfer-notary-yanbu.html", "رتّب بيانات الصك والأطراف والوكالة والقيود قبل بدء إجراء نقل الملكية."],
+      ["دليل خدمات الموثق", "notary-services-saudi.html", "تحقق من نوع التوثيق والمستندات وصفة الأطراف قبل حجز الموعد."],
+      ["المصادر الرسمية", "official-sources.html", "راجع القناة الرسمية والمتطلبات الحالية قبل اتخاذ الإجراء."]
     ],
     dammam: [
       ["استشارة قانونية قبل اتخاذ الإجراء", "legal-consultation-dammam.html", "لفهم الموقف والمستند والجهة والمدة قبل بدء الإجراء."],
@@ -1150,7 +1213,40 @@ function normalizeGeneratedOutput() {
   }
 }
 
+function focusedFilesFromArguments() {
+  const requested = process.argv
+    .slice(2)
+    .filter((value) => value.endsWith(".html"));
+  return [...new Set(requested)];
+}
+
+function generateFocused(requestedFiles) {
+  const availableFiles = new Set(readdirSync(root).filter((file) => file.endsWith(".html") && !file.startsWith("google")));
+  const missingFiles = requestedFiles.filter((file) => !availableFiles.has(file));
+  if (missingFiles.length) throw new Error(`Focused SEO files not found: ${missingFiles.join(", ")}`);
+
+  if (requestedFiles.includes("real-estate-transfer-notary-yanbu.html")) yanbuRealEstateTransferPage();
+
+  for (const file of requestedFiles) optimizeLocalServiceMetadata(file);
+  const catalog = [...availableFiles]
+    .map((file) => {
+      const html = readFileSync(resolve(root, file), "utf8");
+      return { file, html, title: pageTitle(html, file), cluster: clusterFor(file, html) };
+    })
+    .filter((page) => !isNoindex(page.html));
+  for (const file of requestedFiles) enhanceHtml(file, catalog);
+
+  updateSitemaps();
+  console.log(`Enhanced ${requestedFiles.length} focused SEO pages and refreshed sitemaps.`);
+}
+
 function generate() {
+  const focusedFiles = focusedFilesFromArguments();
+  if (focusedFiles.length) {
+    generateFocused(focusedFiles);
+    return;
+  }
+
   syncVersionedAssets();
   nationalGuide();
   yanbuRealEstateTransferPage();
