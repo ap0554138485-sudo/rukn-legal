@@ -5,6 +5,7 @@ import { locations } from "./generate-national-wave1.mjs";
 import { renderNationalPage } from "./generate-national-wave8.mjs";
 import { families, stages } from "./national-waves10-14-data.mjs";
 import { stageLexicon as wavesFifteenToSeventeenStageLexicon } from "./national-waves15-17-data.mjs";
+import { stageLexicon as wavesEighteenToTwentyTwoStageLexicon } from "./national-waves18-22-data.mjs";
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), "..");
 const contentDate = "2026-09-02";
@@ -73,6 +74,7 @@ const reviewModes = [
 
 const stageLexicon = {
   ...wavesFifteenToSeventeenStageLexicon,
+  ...wavesEighteenToTwentyTwoStageLexicon,
   standing: ["هوية صاحب الحق", "سند الوكالة", "حدود التمثيل", "تطابق الأسماء", "صفة الطرف الآخر", "تاريخ نشوء الصفة", "تعارض المصالح", "قرار قبول الصفة"],
   timeline: ["حدث البداية", "وقت الإنشاء", "وقت الإرسال", "إثبات الوصول", "الفجوة الزمنية", "تعارض التاريخ", "الحدث القاطع", "آخر موعد مثبت"],
   "claim-scope": ["الطلب الرئيسي", "الطلب الاحتياطي", "حدود المبلغ", "الفترة المطالب بها", "الواقعة المؤسسة", "الدفع المقابل", "المسألة المستبعدة", "منطوق النتيجة"],

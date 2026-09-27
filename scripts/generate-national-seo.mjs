@@ -19,6 +19,12 @@ const logoFile = "logo-128-20260824.png";
 const whatsappMessage = "السلام عليكم، أرغب في طلب خدمة قانونية. نوع المسألة، المدينة، والمرحلة الحالية: ";
 const whatsappUrl = `https://wa.me/966506142113?text=${encodeURIComponent(whatsappMessage)}`;
 const relatedLinkLimit = 10;
+const latestNationalRelease = {
+  pattern: /^saudi-guide-w(?:18|19|20|21|22)-/i,
+  date: "2026-09-27",
+  dateArabic: "27 سبتمبر 2026",
+  dateEnglish: "27 September 2026"
+};
 
 const searchAppearanceOverrides = new Map([
   ["lawyer-tabuk.html", {
@@ -147,10 +153,14 @@ function jsonLd(value) {
 }
 
 function modifiedDateFor(file) {
+  if (latestNationalRelease.pattern.test(file)) return latestNationalRelease.date;
   return searchAppearanceOverrides.get(file)?.dateModified || releaseDate;
 }
 
 function modifiedDateLabelFor(file, language) {
+  if (latestNationalRelease.pattern.test(file)) {
+    return language === "en" ? latestNationalRelease.dateEnglish : latestNationalRelease.dateArabic;
+  }
   const override = searchAppearanceOverrides.get(file);
   if (language === "en") return override?.dateModifiedEnglish || releaseDateEnglish;
   return override?.dateModifiedArabic || releaseDateArabic;
@@ -186,7 +196,7 @@ function normalizeStructuredData(html, canonical, file) {
         if (schemaTypeIncludes(node, "WebPage") && (!node.url || node.url === canonical)) {
           node.author = { "@id": `${baseUrl}/#organization` };
           node.publisher = { "@id": `${baseUrl}/#organization` };
-          node.dateModified = releaseDate;
+          node.dateModified = modifiedDateFor(file);
         }
         if (schemaTypeIncludes(node, "Article") && (!node.mainEntityOfPage?.["@id"] || node.mainEntityOfPage["@id"] === `${canonical}#webpage`)) {
           node.author = { "@id": `${baseUrl}/#organization` };

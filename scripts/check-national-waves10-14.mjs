@@ -9,13 +9,14 @@ import { pages as waveEightPages } from "./generate-national-wave8.mjs";
 import { pages as waveNinePages } from "./generate-national-wave9.mjs";
 import { pages as expansionPages } from "./generate-national-waves10-14.mjs";
 import { pages as advancedExpansionPages } from "./generate-national-waves15-17.mjs";
+import { pages as evidenceExpansionPages } from "./generate-national-waves18-22.mjs";
 
 const root = resolve(import.meta.dirname, "..");
 const baseUrl = "https://rukn-legal-vwptio.cranl.net";
 const batch = Number(process.argv[2]);
-if (!Number.isInteger(batch) || batch < 10 || batch > 17) throw new Error("Choose a batch from 10 through 17.");
+if (!Number.isInteger(batch) || batch < 10 || batch > 22) throw new Error("Choose a batch from 10 through 22.");
 
-const allExpansionPages = [...expansionPages, ...advancedExpansionPages];
+const allExpansionPages = [...expansionPages, ...advancedExpansionPages, ...evidenceExpansionPages];
 const pages = allExpansionPages.filter((page) => page.batch === batch);
 const originalPages = [...waveOnePages, ...waveTwoPages, ...waveThreePages, ...wavesFourToSevenPages, ...waveEightPages, ...waveNinePages];
 const earlierExpansion = allExpansionPages.filter((page) => page.batch < batch);
