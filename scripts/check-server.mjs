@@ -70,7 +70,7 @@ try {
   assert(post.status === 405, `POST returned ${post.status}`);
   assert(post.headers.get("allow") === "GET, HEAD", "405 response is missing the Allow header");
 
-  for (const publicPath of ["/sitemap.xml", "/sitemap-core.xml", "/sitemap-national-w9.xml", "/robots.txt", "/styles-20260821b.css", "/script-20260824b.js", "/logo-128-20260824.png"]) {
+  for (const publicPath of ["/sitemap.xml", "/sitemap-core.xml", "/robots.txt", "/styles-20260821b.css", "/script-20260824b.js", "/logo-128-20260824.png"]) {
     const response = await fetch(`${origin}${publicPath}`);
     assert(response.status === 200, `${publicPath} returned ${response.status}`);
   }
@@ -82,7 +82,11 @@ try {
   const sitemapIndex = await sitemap.text();
   assert(sitemapIndex.includes("<sitemapindex"), "sitemap.xml is not a sitemap index");
   assert(sitemapIndex.includes("/sitemap-core.xml"), "sitemap index is missing the core sitemap");
-  assert(sitemapIndex.includes("/sitemap-national-w9.xml"), "sitemap index is missing national batch 9");
+  assert(!sitemapIndex.includes("/sitemap-national-"), "sitemap index still lists the noindexed national guide waves");
+  const nationalGuide = await fetch(`${origin}/saudi-guide-w9-arbitration-additional-award-baqaa.html`);
+  assert(nationalGuide.status === 200, `national guide returned ${nationalGuide.status}`);
+  assert(nationalGuide.headers.get("x-robots-tag") === "noindex, follow", "national guide pages are missing X-Robots-Tag noindex");
+  assert(!home.headers.get("x-robots-tag"), "home page must stay indexable");
 
   for (const privatePath of ["/package.json", "/server.js", "/DEPLOYMENT.md", "/.git/config", "/scripts/generate-notary-pages.mjs"]) {
     const response = await fetch(`${origin}${privatePath}`);

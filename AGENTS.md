@@ -46,3 +46,8 @@ The second-wave Riyadh service pages are generated from `scripts/generate-riyadh
 - For batches ten through fourteen, generate each 100-page batch separately with `npm run generate:national-wave10` through `npm run generate:national-wave14`. After all requested batches are generated, run `npm run check:national-waves10-14`, `npm run audit:seo`, `npm run audit:keywords`, and `npm run check:server` before committing.
 - `national-seo-rollout.json` records completed and remaining batches. Future batches must use new legal topics, cover all 13 regions, preserve the no-local-branch disclaimer, and pass a maximum five-word-shingle similarity of 50%.
 - Do not create street or neighborhood pages whose only unique value is the place name. Every indexable page must address a distinct legal problem, document, decision, or stage.
+
+## Index focus (2026-09-28)
+
+- Search Console showed 2,403 of ~2,430 pages "discovered – not indexed", with the national guide waves diluting crawl priority. The generated `saudi-guide-w*` pages now stay online for visitors but are served with `X-Robots-Tag: noindex, follow` by `server.js`, and `scripts/generate-national-seo.mjs` leaves them out of the sitemaps (only `sitemap-core.xml` is listed; old `sitemap-national-w*.xml` files are deleted). The per-wave `check-national-*` scripts still expect the old per-wave sitemaps.
+- Tabuk is the primary market: the home page title/H1 target "محامي ... في تبوك", and the `tabuk-hub` block on `index.html` links each Tabuk service page with its target keyword as anchor text. Keep one page per keyword (e.g. `lawyer-tabuk.html` = محامي تبوك / محامين تبوك / أفضل محامي في تبوك; `tabuk-region-lawyers.html` = the region's governorates outside Tabuk city).

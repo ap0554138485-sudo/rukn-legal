@@ -1,4 +1,4 @@
-import { readFileSync, readdirSync, writeFileSync as nativeWriteFileSync } from "node:fs";
+import { readFileSync, readdirSync, unlinkSync, writeFileSync as nativeWriteFileSync } from "node:fs";
 import { resolve } from "node:path";
 import { locations as nationalLocations } from "./generate-national-wave1.mjs";
 
@@ -28,16 +28,16 @@ const latestNationalRelease = {
 
 const searchAppearanceOverrides = new Map([
   ["lawyer-tabuk.html", {
-    title: "محامي تبوك | رقم التواصل وكيف تختار أفضل محامي في تبوك",
-    description: "دليل محامي تبوك لمن يبحث عن رقم التواصل أو أفضل محامي في تبوك: قارن التخصص والترخيص والأتعاب قبل توكيل المحامي المناسب لمرحلة قضيتك.",
-    dateModified: "2026-09-19",
-    dateModifiedArabic: "19 سبتمبر 2026"
+    title: "محامي تبوك | أفضل محامين في تبوك ورقم التواصل",
+    description: "دليل محامين تبوك: رقم التواصل المباشر مع محامي في تبوك، وكيف تختار أفضل محامي في تبوك حسب التخصص والترخيص والأتعاب ومرحلة قضيتك قبل التوكيل.",
+    dateModified: "2026-09-28",
+    dateModifiedArabic: "28 سبتمبر 2026"
   }],
   ["tabuk-region-lawyers.html", {
-    title: "محامي في منطقة تبوك | دليل المدن والمحافظات",
-    description: "ابحث عن محامي في منطقة تبوك حسب المدينة: تبوك، ضباء، الوجه، أملج، تيماء، حقل والبدع. اختر موقعك ثم انتقل إلى التخصص القانوني المناسب.",
-    dateModified: "2026-09-19",
-    dateModifiedArabic: "19 سبتمبر 2026"
+    title: "محامي في محافظات منطقة تبوك | ضباء والوجه وأملج وتيماء وحقل والبدع",
+    description: "محامي في محافظات منطقة تبوك: ضباء، الوجه، أملج، تيماء، حقل والبدع. اختر محافظتك ثم انتقل إلى التخصص القانوني المناسب لطلبك، ولمدينة تبوك نفسها افتح دليل محامي تبوك.",
+    dateModified: "2026-09-28",
+    dateModifiedArabic: "28 سبتمبر 2026"
   }],
   ["family-lawyer-tabuk.html", {
     title: "محامي أحوال شخصية في تبوك | الطلاق والحضانة والنفقة",
@@ -1168,15 +1168,12 @@ function sitemapModifiedDate(pages) {
 
 function updateSitemaps() {
   const excluded = new Set(["googlebffd6cc2130f2272.html"]);
-  const pages = readdirSync(root).filter((file) => file.endsWith(".html") && !excluded.has(file)).map((file) => ({ file, html: readFileSync(resolve(root, file), "utf8") })).filter(({ html }) => !isNoindex(html));
+  // National guide waves (saudi-guide-w*) are served with X-Robots-Tag: noindex by server.js,
+  // so they are left out of the sitemaps and any old per-wave sitemap files are removed.
+  const pages = readdirSync(root).filter((file) => file.endsWith(".html") && !excluded.has(file) && !/^saudi-guide-w\d+-/i.test(file)).map((file) => ({ file, html: readFileSync(resolve(root, file), "utf8") })).filter(({ html }) => !isNoindex(html));
   pages.sort((a, b) => (a.file === "index.html" ? -1 : b.file === "index.html" ? 1 : a.file.localeCompare(b.file)));
-  const groups = new Map([["sitemap-core.xml", []]]);
-  for (const page of pages) {
-    const wave = page.file.match(/^saudi-guide-w(\d+)-/i)?.[1];
-    const sitemapFile = wave ? `sitemap-national-w${wave}.xml` : "sitemap-core.xml";
-    if (!groups.has(sitemapFile)) groups.set(sitemapFile, []);
-    groups.get(sitemapFile).push(page);
-  }
+  for (const staleSitemap of readdirSync(root).filter((file) => /^sitemap-national-w\d+\.xml$/i.test(file))) unlinkSync(resolve(root, staleSitemap));
+  const groups = new Map([["sitemap-core.xml", pages]]);
 
   const sitemapFiles = [...groups.keys()].sort((a, b) => {
     if (a === "sitemap-core.xml") return -1;

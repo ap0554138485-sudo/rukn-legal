@@ -51,6 +51,10 @@ function cacheControl(filePath, ext) {
     : 'public, max-age=300, must-revalidate';
 }
 
+function isNationalGuide(filePath) {
+  return /^saudi-guide-w\d+-[a-z0-9-]+\.html$/i.test(path.basename(filePath || ''));
+}
+
 function responseHeaders(ext, encoding, filePath, stat) {
   const headers = {
     'Content-Type': types[ext] || 'application/octet-stream',
@@ -68,6 +72,10 @@ function responseHeaders(ext, encoding, filePath, stat) {
     headers['Content-Encoding'] = encoding;
     headers.Vary = 'Accept-Encoding';
   }
+
+  // The generated national guide waves stay available to visitors but are kept out of the index,
+  // so Google concentrates on the core city and service pages (Tabuk first).
+  if (isNationalGuide(filePath)) headers['X-Robots-Tag'] = 'noindex, follow';
 
   if (stat) {
     headers.ETag = `W/"${stat.size.toString(16)}-${Math.trunc(stat.mtimeMs).toString(16)}"`;
