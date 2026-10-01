@@ -41,7 +41,7 @@
     "generate:national-waves4-7": "node scripts/generate-national-waves4-7.mjs 4 && node scripts/generate-national-waves4-7.mjs 5 && node scripts/generate-national-waves4-7.mjs 6 && node scripts/generate-national-waves4-7.mjs 7 && node scripts/generate-national-seo.mjs",
     "generate:answers": "node scripts/generate-search-answer-articles.mjs && node scripts/generate-national-seo.mjs",
     "generate:national": "node scripts/generate-national-seo.mjs",
-    "generate:all": "node scripts/generate-riyadh-wave2.js && node scripts/generate-jeddah-wave3.js && node scripts/generate-dammam-waves.mjs && node scripts/generate-tabuk-wave3.mjs && node scripts/generate-notary-pages.mjs && node scripts/generate-eastern-province-pages.mjs && node scripts/generate-saudi-region-pages.mjs && node scripts/generate-national-wave1.mjs && node scripts/generate-national-wave2.mjs && node scripts/generate-national-wave3.mjs && node scripts/generate-national-waves4-7.mjs 4 && node scripts/generate-national-waves4-7.mjs 5 && node scripts/generate-national-waves4-7.mjs 6 && node scripts/generate-national-waves4-7.mjs 7 && node scripts/generate-national-wave8.mjs && node scripts/generate-national-wave9.mjs && node scripts/generate-national-waves10-14.mjs 10 && node scripts/generate-national-waves10-14.mjs 11 && node scripts/generate-national-waves10-14.mjs 12 && node scripts/generate-national-waves10-14.mjs 13 && node scripts/generate-national-waves10-14.mjs 14 && node scripts/generate-national-waves15-17.mjs 15 && node scripts/generate-national-waves15-17.mjs 16 && node scripts/generate-national-waves15-17.mjs 17 && node scripts/generate-national-waves18-22.mjs 18 && node scripts/generate-national-waves18-22.mjs 19 && node scripts/generate-national-waves18-22.mjs 20 && node scripts/generate-national-waves18-22.mjs 21 && node scripts/generate-national-waves18-22.mjs 22 && node scripts/generate-search-answer-articles.mjs && node scripts/generate-national-seo.mjs",
+    "generate:all": "node scripts/generate-riyadh-wave2.js && node scripts/generate-jeddah-wave3.js && node scripts/generate-dammam-waves.mjs && node scripts/generate-tabuk-wave3.mjs && node scripts/generate-notary-pages.mjs && node scripts/generate-eastern-province-pages.mjs && node scripts/generate-saudi-region-pages.mjs && node scripts/generate-national-wave1.mjs && node scripts/generate-national-wave2.mjs && node scripts/generate-national-wave3.mjs && node scripts/generate-national-waves4-7.mjs 4 && node scripts/generate-national-waves4-7.mjs 5 && node scripts/generate-national-waves4-7.mjs 6 && node scripts/generate-national-waves4-7.mjs 7 && node scripts/generate-national-wave8.mjs && node scripts/generate-national-wave9.mjs && node scripts/generate-national-waves10-14.mjs 10 && node scripts/generate-national-waves10-14.mjs 11 && node scripts/generate-national-waves10-14.mjs 12 && node scripts/generate-national-waves10-14.mjs 13 && node scripts/generate-national-waves10-14.mjs 14 && node scripts/generate-national-waves15-17.mjs 15 && node scripts/generate-national-waves15-17.mjs 16 && node scripts/generate-national-waves15-17.mjs 17 && node scripts/generate-national-waves18-22.mjs 18 && node scripts/generate-national-waves18-22.mjs 19 && node scripts/generate-national-waves18-22.mjs 20 && node scripts/generate-national-waves18-22.mjs 21 && node scripts/generate-national-waves18-22.mjs 22 && node scripts/generate-search-answer-articles.mjs && node scripts/generate-legal-questions.mjs && node scripts/generate-national-seo.mjs",
     "check:dammam": "node scripts/check-dammam-waves.mjs",
     "check:eastern": "node scripts/check-eastern-province-pages.mjs",
     "check:regions": "node scripts/check-saudi-region-pages.mjs",
@@ -74,7 +74,11 @@
     "check:notary": "node scripts/check-notary-pages.mjs",
     "check:server": "node scripts/check-server.mjs",
     "audit:seo": "node scripts/audit-seo.mjs",
-    "audit:keywords": "node scripts/audit-keywords.mjs"
+    "audit:keywords": "node scripts/audit-keywords.mjs",
+    "generate:legal-questions": "node scripts/generate-legal-questions.mjs && node scripts/generate-national-seo.mjs",
+    "check:legal-questions": "node scripts/check-legal-questions.mjs"
   },
-  "engines": {"node": ">=18"}
+  "engines": {
+    "node": ">=18"
+  }
 }

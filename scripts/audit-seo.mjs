@@ -78,7 +78,8 @@ for (const file of files) {
   const appleTouchIcons = matches(html, /<link\s+rel="apple-touch-icon"\s+href="([^"]+)"\s*\/?\s*>/gi);
   const themeColors = matches(html, /<meta\s+name="theme-color"\s+content="([^"]+)"\s*\/?\s*>/gi);
   const expectedCanonical = file === "index.html" ? `${origin}/` : `${origin}/${file}`;
-  const isNoindex = robots.some((value) => /\bnoindex\b/i.test(value));
+  // server.js sends X-Robots-Tag: noindex for the national guide waves.
+  const isNoindex = robots.some((value) => /\bnoindex\b/i.test(value)) || /^saudi-guide-w\d+-/i.test(basename(file));
   const internalTargets = new Set();
 
   for (const [label, values] of [

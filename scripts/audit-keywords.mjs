@@ -22,7 +22,7 @@ function normalize(value) {
 
 function targetFor(file, title) {
   if (file === "en.html") return null;
-  if (file === "index.html") return "محامي وخدمات واستشارات قانونية في السعودية";
+  if (file === "index.html") return "محامي واستشارات قانونية في تبوك";
   if (file === "articles.html") return "مقالات وإرشادات قانونية";
   if (file === "legal-services-dammam.html") return "خدمات قانونية في الدمام";
   if (file === "legal-consultation-tabuk.html") return "استشارات قانونية في تبوك";
