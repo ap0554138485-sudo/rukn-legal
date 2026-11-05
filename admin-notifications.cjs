@@ -34,7 +34,7 @@ function eventLabel(action) {
   return group ? `نشاط في ${group}` : 'نشاط جديد في المنصة';
 }
 function formatEvent(platform, event) {
-  return `الإدارة | ${platform}\nالعميل: ${clean(event.customer) || 'زائر غير مسجل'}\nمعرف الحساب: ${clean(event.customerId, 80) || 'غير متاح'}\nالحركة: ${eventLabel(event.action)}\nالوقت: ${new Date(event.at).toLocaleString('ar-SA', { timeZone: 'Asia/Riyadh', hour12: false })}\nمرجع الحدث: ${event.id}`;
+  return `الإدارة | ${platform}\nالعميل: ${clean(event.customer) || 'زائر غير مسجل'}\nمعرف الحساب: ${clean(event.customerId, 80) || 'غير متاح'}\nالحركة: ${eventLabel(event.action)}\nالوقت: ${new Date(event.at).toLocaleString('ar-SA', { timeZone: 'Asia/Riyadh', calendar: 'gregory', hour12: false })}\nمرجع الحدث: ${event.id}`;
 }
 function requestAction(method, pathname) {
   if (!['POST', 'PUT', 'PATCH', 'DELETE'].includes(method) || !pathname.startsWith('/api/')) return null;
@@ -64,7 +64,7 @@ function createNotifications(platform, { env = process.env, transport = fetch, c
   if (configured) {try{fs.mkdirSync(dir, { recursive: true, mode: 0o700 });}catch{configured=false;console.error('Administration queue directory is unavailable.');}}
   if (enabled && !configured) console.error('Administration alerts need bot, chat and persistent queue settings.');
   function record(action, actor = {}) {
-    if (!configured) return false;
+    if (!configured || action === 'page.view') return false;
     try {
       // Only these fields are allowed; bodies, URLs, passwords and metadata are never serialized.
       const event = { id: randomUUID(), at: clock(), action: clean(action), customer: clean(actor.full_name || actor.name || actor.fullName), customerId: clean(actor.id, 80), attempts: 0, nextAttempt: 0 };
@@ -85,6 +85,7 @@ function createNotifications(platform, { env = process.env, transport = fetch, c
       for (const name of fs.readdirSync(dir).filter(f => /^\d+-[a-f0-9-]+\.json$/.test(f)).sort()) {
         const file = path.join(dir, name);
         const event = JSON.parse(fs.readFileSync(file, 'utf8'));
+        if(event.action==='page.view'){fs.unlinkSync(file);continue;}
         if (event.nextAttempt > clock()) continue;
         let ok = false, retryAfter = 0;
         try {
@@ -144,6 +145,7 @@ function createNotifications(platform, { env = process.env, transport = fetch, c
         body=JSON.parse(raw);
       }
       if(!['page.view','whatsapp.click','phone.click'].includes(body?.kind)){finish(400);return;}
+      if(body.kind==='page.view'){finish(204);return;}
       record(body.kind,actor);finish(204);
     }catch{if(!res.headersSent)finish(400);}
   }

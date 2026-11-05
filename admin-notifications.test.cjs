@@ -59,3 +59,16 @@ test('public collector rejects cross-origin and unsupported events',async()=>{
     const files=fs.readdirSync(dir);assert.equal(files.length,1);assert.doesNotMatch(fs.readFileSync(path.join(dir,files[0]),'utf8'),/SECRET/);
   }finally{fs.rmSync(dir,{recursive:true,force:true});}
 });
+test('page views are never queued and old queued visits are discarded without sending',async()=>{
+  const dir=fs.mkdtempSync(path.join(os.tmpdir(),'admin-important-test-'));let sends=0;
+  try{
+    const alerts=createNotifications('سند',{env:{ADMIN_EVENTS_DIR:dir,ADMIN_TELEGRAM_ENABLED:'true',ADMIN_TELEGRAM_BOT_TOKEN:'test',ADMIN_TELEGRAM_CHAT_ID:'123'},autoStart:false,transport:async()=>{sends++;return{ok:true,json:async()=>({ok:true})};}});
+    assert.equal(alerts.record('page.view',{id:'u1',name:'عميل'}),false);
+    fs.writeFileSync(path.join(dir,'1000-aaaa.json'),JSON.stringify({id:'aaaa',at:1000,action:'page.view',nextAttempt:0}));
+    assert.equal(alerts.record('auth.login',{id:'u1',name:'عميل'}),true);
+    await alerts.tick();assert.equal(sends,1);assert.equal(fs.readdirSync(dir).length,0);
+    const res={setHeader(){},writeHead(status){this.status=status;},end(){}};
+    await alerts.handlePublicEvent({headers:{host:'example.com',origin:'https://example.com'},body:{kind:'page.view'}},res);
+    assert.equal(res.status,204);assert.equal(fs.readdirSync(dir).length,0);
+  }finally{fs.rmSync(dir,{recursive:true,force:true});}
+});

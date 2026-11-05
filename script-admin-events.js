@@ -4,8 +4,6 @@
     const body=JSON.stringify({kind});
     fetch('/api/activity/admin-events',{method:'POST',headers:{'Content-Type':'application/json','X-Faaid':'1'},body,keepalive:true,credentials:'same-origin'}).catch(()=>{});
   };
-  send('page.view');
-  window.addEventListener('hashchange',()=>send('page.view'));
   document.addEventListener('click',event=>{
     const link=event.target.closest?.('a[href]');if(!link)return;
     try{
