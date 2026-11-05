@@ -2,6 +2,8 @@ const http = require('http');
 const fs = require('fs');
 const path = require('path');
 const zlib = require('zlib');
+const { Transform } = require('node:stream');
+const adminNotifications=require('./admin-notifications.cjs').createNotifications('ركن الأنظمة القانونية');
 
 const port = process.env.PORT || 3000;
 const root = __dirname;
@@ -23,7 +25,7 @@ const types = {
 
 const compressible = new Set(['.html', '.css', '.js', '.xml', '.txt', '.json', '.svg']);
 const longCache = new Set(['.css', '.js', '.png', '.jpg', '.jpeg', '.svg', '.ico']);
-const publicFiles = new Set(['favicon.ico', 'robots.txt', 'sitemap.xml']);
+const publicFiles = new Set(['favicon.ico', 'robots.txt', 'sitemap.xml', 'script-admin-events.js']);
 const contentSecurityPolicy = [
   "default-src 'self'",
   "base-uri 'self'",
@@ -97,6 +99,7 @@ function sendFile(req, res, filePath, statusCode = 200, stat) {
   }
 
   const headers = responseHeaders(ext, encoding, filePath, stat);
+  if(ext==='.html'&&headers.ETag)headers.ETag=headers.ETag.replace('W/"','W/"admin1-');
   if (statusCode === 200 && stat && req.headers['if-none-match'] === headers.ETag) {
     res.writeHead(304, headers);
     return res.end();
@@ -106,8 +109,15 @@ function sendFile(req, res, filePath, statusCode = 200, stat) {
 
   const stream = fs.createReadStream(filePath);
   let output = stream;
-  if (encoding === 'br') output = stream.pipe(zlib.createBrotliCompress());
-  if (encoding === 'gzip') output = stream.pipe(zlib.createGzip());
+  if(ext==='.html'){
+    let tail=Buffer.alloc(0);
+    output=stream.pipe(new Transform({
+      transform(chunk,_encoding,done){const data=Buffer.concat([tail,chunk]);const split=Math.max(0,data.length-256);tail=data.subarray(split);done(null,data.subarray(0,split));},
+      flush(done){const insertion=Buffer.from('<script src="/script-admin-events.js" defer></script>');const close=tail.lastIndexOf(Buffer.from('</body>'));this.push(close<0?Buffer.concat([tail,insertion]):Buffer.concat([tail.subarray(0,close),insertion,tail.subarray(close)]));done();}
+    }));
+  }
+  if (encoding === 'br') output = output.pipe(zlib.createBrotliCompress());
+  if (encoding === 'gzip') output = output.pipe(zlib.createGzip());
   output.pipe(res);
 }
 
@@ -131,6 +141,9 @@ function sendNotFound(req, res) {
 }
 
 http.createServer((req, res) => {
+  if(req.method==='POST'&&req.url==='/api/activity/admin-events'){
+    void adminNotifications.handlePublicEvent(req,res);return;
+  }
   if (!['GET', 'HEAD'].includes(req.method)) {
     res.writeHead(405, { ...responseHeaders('.txt'), Allow: 'GET, HEAD' });
     return res.end('Method Not Allowed');

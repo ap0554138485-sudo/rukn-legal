@@ -5,6 +5,7 @@
   "description": "Rukn Legal website",
   "scripts": {
     "start": "node server.js",
+    "test:admin": "node --test admin-notifications.test.cjs",
     "generate:riyadh": "node scripts/generate-riyadh-wave2.js && node scripts/generate-national-seo.mjs",
     "generate:jeddah": "node scripts/generate-jeddah-wave3.js && node scripts/generate-national-seo.mjs",
     "generate:wave3": "node scripts/generate-jeddah-wave3.js && node scripts/generate-national-seo.mjs",
