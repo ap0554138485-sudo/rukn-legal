@@ -3,8 +3,19 @@ const fs = require('node:fs');
 const path = require('node:path');
 const { randomUUID } = require('node:crypto');
 const { AsyncLocalStorage } = require('node:async_hooks');
+const allowedActions = new Set([
+  'auth.login', 'account.login', 'client_login', 'login',
+  'registration.submitted', 'registration.requester', 'account.registered',
+  'scanner.import', 'amlak.login', 'amlak.register', 'amlak.invite_registered',
+  'amlak.scanner_import'
+]);
+const isAllowedAction = action => allowedActions.has(action);
 
 const labels = {
+  'amlak.login': 'تسجيل دخول',
+  'amlak.register': 'تسجيل حساب جديد',
+  'amlak.invite_registered': 'تسجيل حساب جديد',
+  'amlak.scanner_import': 'إتمام مزامنة إيجار',
   'auth.login': 'تسجيل دخول', 'registration.submitted': 'تسجيل حساب جديد',
   'registration.requester': 'تسجيل حساب جديد', 'scanner.import': 'إتمام مزامنة ناجز',
   'password_reset.requested': 'طلب إعادة تعيين كلمة المرور',
@@ -34,26 +45,14 @@ function eventLabel(action) {
   return group ? `نشاط في ${group}` : 'نشاط جديد في المنصة';
 }
 function formatEvent(platform, event) {
+  if (event.action.startsWith('amlak.')) platform = 'سند لإدارة الأملاك';
   return `الإدارة | ${platform}\nالعميل: ${clean(event.customer) || 'زائر غير مسجل'}\nمعرف الحساب: ${clean(event.customerId, 80) || 'غير متاح'}\nالحركة: ${eventLabel(event.action)}\nالوقت: ${new Date(event.at).toLocaleString('ar-SA', { timeZone: 'Asia/Riyadh', calendar: 'gregory', hour12: false })}\nمرجع الحدث: ${event.id}`;
 }
 function requestAction(method, pathname) {
-  if (!['POST', 'PUT', 'PATCH', 'DELETE'].includes(method) || !pathname.startsWith('/api/')) return null;
-  if (/\/(ops|admin|activity|customer-events|events\/collect|uploads|img)(\/|$)/.test(pathname)) return null;
-  if (/recover/.test(pathname)) return 'account.recovery';
-  if (/password|reset/.test(pathname)) return 'account.password';
-  if (/logout/.test(pathname)) return 'account.logout';
-  if (/login/.test(pathname)) return 'account.login';
-  if (/register|signup/.test(pathname)) return 'account.registered';
-  if (/scanner|najiz|sync/.test(pathname)) return 'scanner.activity';
-  if (/support|ticket/.test(pathname)) return 'support.message';
-  if (/contact/.test(pathname)) return 'ad.contact';
-  if (/problems|errors/.test(pathname)) return 'client.problem';
-  if (/\/sites(?:\/|$)/.test(pathname)) return 'site.activity';
-  if (/\/google(?:\/|$)/.test(pathname)) return 'integration.activity';
-  if (/\/team(?:\/|$)/.test(pathname)) return 'team.activity';
-  if (/\/ads(?:\/|$)/.test(pathname)) return method === 'DELETE' ? 'ad.deleted' : method === 'POST' && pathname === '/api/ads' ? 'ad.created' : 'ad.updated';
-  if (/\/tasks(?:\/|$)/.test(pathname)) return 'task.activity';
-  return 'platform.activity';
+  if (method !== 'POST') return null;
+  if (pathname === '/api/login' || pathname === '/api/auth/login') return 'account.login';
+  if (pathname === '/api/register' || pathname === '/api/auth/register') return 'account.registered';
+  return null;
 }
 function createNotifications(platform, { env = process.env, transport = fetch, clock = Date.now, autoStart = true } = {}) {
   const context = new AsyncLocalStorage();
@@ -64,7 +63,7 @@ function createNotifications(platform, { env = process.env, transport = fetch, c
   if (configured) {try{fs.mkdirSync(dir, { recursive: true, mode: 0o700 });}catch{configured=false;console.error('Administration queue directory is unavailable.');}}
   if (enabled && !configured) console.error('Administration alerts need bot, chat and persistent queue settings.');
   function record(action, actor = {}) {
-    if (!configured || action === 'page.view') return false;
+    if (!configured || !isAllowedAction(action)) return false;
     try {
       // Only these fields are allowed; bodies, URLs, passwords and metadata are never serialized.
       const event = { id: randomUUID(), at: clock(), action: clean(action), customer: clean(actor.full_name || actor.name || actor.fullName), customerId: clean(actor.id, 80), attempts: 0, nextAttempt: 0 };
@@ -85,7 +84,10 @@ function createNotifications(platform, { env = process.env, transport = fetch, c
       for (const name of fs.readdirSync(dir).filter(f => /^\d+-[a-f0-9-]+\.json$/.test(f)).sort()) {
         const file = path.join(dir, name);
         const event = JSON.parse(fs.readFileSync(file, 'utf8'));
-        if(event.action==='page.view'){fs.unlinkSync(file);continue;}
+        if (!isAllowedAction(event.action)) {
+          fs.unlinkSync(file);
+          continue;
+        }
         if (event.nextAttempt > clock()) continue;
         let ok = false, retryAfter = 0;
         try {
@@ -116,7 +118,6 @@ function createNotifications(platform, { env = process.env, transport = fetch, c
     res.once('finish', () => {
       if (scope.recorded) return;
       let customer; try { customer=actor(); } catch { return; }
-      if(res.statusCode>=500){record('client.problem',customer||{});return;}
       if(res.statusCode < 200 || res.statusCode >= 300)return;
       let action;try{action=requestAction(req.method, new URL(req.originalUrl || req.url, 'http://localhost').pathname);}catch{return;}
       if (!action) return;
@@ -125,31 +126,12 @@ function createNotifications(platform, { env = process.env, transport = fetch, c
     });
     return context.run(scope, next);
   }
-  const publicLimits=new Map();
-  async function handlePublicEvent(req,res,actor={}) {
-    res.setHeader('Cache-Control','no-store');
-    const finish=(status)=>{res.writeHead(status);res.end();};
-    if (!configured) {finish(204);return;}
-    try {
-      const origin=new URL(req.headers.origin||'');
-      const expected=env.PUBLIC_ORIGIN?new URL(env.PUBLIC_ORIGIN).host:req.headers.host;
-      if (origin.host!==expected || !['http:','https:'].includes(origin.protocol)) {finish(403);return;}
-      const ip=(env.NODE_ENV==='production'&&req.headers['x-forwarded-for']?.split(',').at(-1)?.trim())||req.socket?.remoteAddress||'unknown';
-      for(const [key,value] of publicLimits)if(value.until<clock())publicLimits.delete(key);
-      const entry=publicLimits.get(ip)||{count:0,until:clock()+300000};
-      publicLimits.set(ip,entry);if(++entry.count>30){finish(429);return;}
-      let body=req.body;
-      if (!body) {
-        let raw='',size=0;
-        for await(const chunk of req){size+=chunk.length;if(size>256){finish(413);return;}raw+=chunk.toString('utf8');}
-        body=JSON.parse(raw);
-      }
-      if(!['page.view','whatsapp.click','phone.click'].includes(body?.kind)){finish(400);return;}
-      if(body.kind==='page.view'){finish(204);return;}
-      record(body.kind,actor);finish(204);
-    }catch{if(!res.headersSent)finish(400);}
+  function handlePublicEvent(_req, res) {
+    res.setHeader('Cache-Control', 'no-store');
+    res.writeHead(204);
+    res.end();
   }
   if (configured && autoStart) { timer = setInterval(tick, 1500); timer.unref(); }
   return { record, observe, tick, configured, handlePublicEvent, stop: () => clearInterval(timer) };
 }
-module.exports = { createNotifications, formatEvent, requestAction, eventLabel };
+module.exports = { createNotifications, formatEvent, requestAction, eventLabel, isAllowedAction };

@@ -28,47 +28,54 @@ test('disabled alerts do not create storage or send; request classifier never re
   assert.equal(alerts.record('auth.login', { id: '1' }), false);
   assert.equal(requestAction('GET', '/api/me'), null);
   assert.equal(requestAction('POST', '/api/ops/browser-result'), null);
-  assert.equal(requestAction('POST', '/api/ads'), 'ad.created');
-  assert.equal(requestAction('POST', '/api/password/reset/SECRET'), 'account.password');
+  assert.equal(requestAction('POST', '/api/ads'), null);
+  assert.equal(requestAction('POST', '/api/password/reset/SECRET'), null);
   assert.doesNotMatch(formatEvent('ركن', { id: '1', at: Date.now(), action: 'whatsapp.click' }), /أرسل رسالة/);
 });
-test('request observation reports only successful actions or server problems and avoids audit duplicates',async()=>{
+test('request observation reports only successful authentication and avoids audit duplicates',async()=>{
   const dir=fs.mkdtempSync(path.join(os.tmpdir(),'admin-observer-test-'));
   try{
     const env={ADMIN_EVENTS_DIR:dir,ADMIN_TELEGRAM_ENABLED:'true',ADMIN_TELEGRAM_BOT_TOKEN:'test',ADMIN_TELEGRAM_CHAT_ID:'123'};
     const alerts=createNotifications('فائض',{env,autoStart:false});
     for(const status of [200,401,500]){
       const res=new EventEmitter();res.statusCode=status;
-      await alerts.observe({method:'POST',url:'/api/ads'},res,()=>({id:'u1',name:'عميل'}),async()=>{});
+      await alerts.observe({method:'POST',url:'/api/login'},res,()=>({id:'u1',name:'عميل'}),async()=>{});
       res.emit('finish');
     }
-    assert.equal(fs.readdirSync(dir).length,2);
+    assert.equal(fs.readdirSync(dir).length,1);
     const res=new EventEmitter();res.statusCode=200;
     await alerts.observe({method:'POST',url:'/api/scanner/import'},res,()=>({id:'u1'}),async()=>{alerts.record('scanner.import',{id:'u1'});});
-    res.emit('finish');assert.equal(fs.readdirSync(dir).length,3);
+    res.emit('finish');assert.equal(fs.readdirSync(dir).length,2);
   }finally{fs.rmSync(dir,{recursive:true,force:true});}
 });
-test('public collector rejects cross-origin and unsupported events',async()=>{
+test('legacy browser events never generate notifications',async()=>{
   const dir=fs.mkdtempSync(path.join(os.tmpdir(),'admin-public-test-'));
   try{
     const alerts=createNotifications('ركن',{env:{ADMIN_EVENTS_DIR:dir,ADMIN_TELEGRAM_ENABLED:'true',ADMIN_TELEGRAM_BOT_TOKEN:'test',ADMIN_TELEGRAM_CHAT_ID:'123'},autoStart:false});
     const res=()=>({setHeader(){},writeHead(status){this.status=status;},end(){}});
-    let response=res();await alerts.handlePublicEvent({headers:{host:'example.com',origin:'https://evil.example'},body:{kind:'page.view'}},response);assert.equal(response.status,403);
-    response=res();await alerts.handlePublicEvent({headers:{host:'example.com',origin:'https://example.com'},body:{kind:'password',password:'SECRET'}},response);assert.equal(response.status,400);
+    let response=res();await alerts.handlePublicEvent({headers:{host:'example.com',origin:'https://evil.example'},body:{kind:'page.view'}},response);assert.equal(response.status,204);
+    response=res();await alerts.handlePublicEvent({headers:{host:'example.com',origin:'https://example.com'},body:{kind:'password',password:'SECRET'}},response);assert.equal(response.status,204);
     response=res();await alerts.handlePublicEvent({headers:{host:'example.com',origin:'https://example.com'},body:{kind:'whatsapp.click',password:'SECRET'}},response);assert.equal(response.status,204);
-    const files=fs.readdirSync(dir);assert.equal(files.length,1);assert.doesNotMatch(fs.readFileSync(path.join(dir,files[0]),'utf8'),/SECRET/);
+    const files=fs.readdirSync(dir);assert.equal(files.length,0);
   }finally{fs.rmSync(dir,{recursive:true,force:true});}
 });
-test('page views are never queued and old queued visits are discarded without sending',async()=>{
+test('private operations and old queued actions are discarded',async()=>{
   const dir=fs.mkdtempSync(path.join(os.tmpdir(),'admin-important-test-'));let sends=0;
   try{
     const alerts=createNotifications('سند',{env:{ADMIN_EVENTS_DIR:dir,ADMIN_TELEGRAM_ENABLED:'true',ADMIN_TELEGRAM_BOT_TOKEN:'test',ADMIN_TELEGRAM_CHAT_ID:'123'},autoStart:false,transport:async()=>{sends++;return{ok:true,json:async()=>({ok:true})};}});
     assert.equal(alerts.record('page.view',{id:'u1',name:'عميل'}),false);
-    fs.writeFileSync(path.join(dir,'1000-aaaa.json'),JSON.stringify({id:'aaaa',at:1000,action:'page.view',nextAttempt:0}));
+    fs.writeFileSync(path.join(dir,'1000-aaaa.json'),JSON.stringify({id:'aaaa',at:1000,action:'support.message',nextAttempt:0}));
+    assert.equal(alerts.record('ad.created',{id:'u1'}),false);
     assert.equal(alerts.record('auth.login',{id:'u1',name:'عميل'}),true);
     await alerts.tick();assert.equal(sends,1);assert.equal(fs.readdirSync(dir).length,0);
     const res={setHeader(){},writeHead(status){this.status=status;},end(){}};
     await alerts.handlePublicEvent({headers:{host:'example.com',origin:'https://example.com'},body:{kind:'page.view'}},res);
     assert.equal(res.status,204);assert.equal(fs.readdirSync(dir).length,0);
   }finally{fs.rmSync(dir,{recursive:true,force:true});}
+});
+
+test('Sanad events display the product used by the customer', () => {
+  for (const [action, product] of [['auth.login', 'سند لإدارة المحاماة'], ['amlak.login', 'سند لإدارة الأملاك'], ['amlak.scanner_import', 'سند لإدارة الأملاك']]) {
+    assert.ok(formatEvent('سند لإدارة المحاماة', { action, at: Date.now() }).includes(product));
+  }
 });

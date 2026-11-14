@@ -2,7 +2,6 @@ const http = require('http');
 const fs = require('fs');
 const path = require('path');
 const zlib = require('zlib');
-const { Transform } = require('node:stream');
 const adminNotifications=require('./admin-notifications.cjs').createNotifications('ركن الأنظمة القانونية');
 
 const port = process.env.PORT || 3000;
@@ -109,13 +108,6 @@ function sendFile(req, res, filePath, statusCode = 200, stat) {
 
   const stream = fs.createReadStream(filePath);
   let output = stream;
-  if(ext==='.html'){
-    let tail=Buffer.alloc(0);
-    output=stream.pipe(new Transform({
-      transform(chunk,_encoding,done){const data=Buffer.concat([tail,chunk]);const split=Math.max(0,data.length-256);tail=data.subarray(split);done(null,data.subarray(0,split));},
-      flush(done){const insertion=Buffer.from('<script src="/script-admin-events.js" defer></script>');const close=tail.lastIndexOf(Buffer.from('</body>'));this.push(close<0?Buffer.concat([tail,insertion]):Buffer.concat([tail.subarray(0,close),insertion,tail.subarray(close)]));done();}
-    }));
-  }
   if (encoding === 'br') output = output.pipe(zlib.createBrotliCompress());
   if (encoding === 'gzip') output = output.pipe(zlib.createGzip());
   output.pipe(res);
